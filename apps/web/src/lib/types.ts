@@ -1,18 +1,12 @@
 // Core domain types. Mirrors the PID data model (Section 9) so the sample data
 // can be swapped for the database without touching screens.
 
-export type ChannelMode = "standard" | "triple_lock" | "racing_only"
+/** standard: no age-restricted ads. age_verified: the triple lock is on, so age-restricted
+ * categories (alcohol, wagering…) can reach signed-in, 18+ verified viewers who haven't opted out. */
+export type ChannelMode = "standard" | "age_verified"
 export type Pairing = "grandstand" | "broadcast" | "minimal"
-export type Template = "editorial" | "broadcast" | "minimal"
-export type AccentName =
-  | "pitch"
-  | "turf"
-  | "harbour"
-  | "maroon"
-  | "navy"
-  | "gold"
-  | "violet"
-  | "mono"
+/** Two templates to start. Editorial: magazine, text-led. Broadcast: dark, video-led. */
+export type Template = "editorial" | "broadcast"
 
 export type Plan = "starter" | "pro" | "publisher" | "enterprise"
 
@@ -25,14 +19,17 @@ export interface Channel {
   customDomain?: string
   template: Template
   pairing: Pairing
-  accent: AccentName
+  /** The creator's own accent colour (hex). Text on it is picked automatically for contrast. */
+  accentHex: string
+  logoText?: string
   mode: ChannelMode
   plan: Plan
   nav: { label: string; href: string }[]
   /** Homepage modules in display order, with on/off. */
   modules: { id: HomeModule; enabled: boolean }[]
   adCategoryBlocks: string[]
-  adsenseEnabled: boolean
+  /** Age-restricted categories the creator has blocked (only meaningful in age_verified mode). */
+  blockedAgeCategories: AgeCategory[]
   followers: number
   youtube?: {
     handle: string
@@ -41,9 +38,20 @@ export interface Channel {
     autoImport: boolean
     lastSyncedAt: string
   }
-  voice: { tone: string; bannedWords: string[]; houseStyle: string }
+  voice: { tone: string; bannedWords: string[]; houseStyle: string; sources: VoiceSource[] }
   notablePersonFlag: boolean
   sections: { slug: string; label: string }[]
+  bio: string
+}
+
+export type AgeCategory = "alcohol" | "wagering"
+
+export interface VoiceSource {
+  id: string
+  kind: "upload" | "url" | "site"
+  label: string
+  words: number
+  status: "learned" | "processing"
 }
 
 export type HomeModule =
@@ -86,7 +94,7 @@ export type Block =
   | { type: "quote"; text: string; cite?: string }
   | { type: "list"; items: string[] }
   | { type: "video"; videoId: string }
-  | { type: "image"; caption: string }
+  | { type: "image"; caption: string; src?: string }
   | { type: "divider" }
 
 export interface ComplianceFlag {
@@ -118,6 +126,8 @@ export interface Video {
   views: number
   watchMinutes: number
   posterTone: string
+  /** Poster image under /media. */
+  poster?: string
   chapters: Chapter[]
   transcript: TranscriptLine[]
   article: Article
@@ -155,6 +165,7 @@ export interface Short {
   startSec?: number
   endSec?: number
   posterTone: string
+  poster?: string
   caption: string
 }
 
@@ -184,6 +195,8 @@ export interface Campaign {
   id: string
   advertiser: string
   isWagering: boolean
+  ageCategory?: AgeCategory
+  format: NativeFormat
   pricing: "cpm" | "flat" | "cpc"
   status: "live" | "scheduled" | "ended" | "in_review"
   budget: number
@@ -199,7 +212,7 @@ export interface Creative {
   campaignId: string
   advertiser: string
   name: string
-  size: "300x250" | "970x250" | "320x100"
+  format: NativeFormat
   isWagering: boolean
   status: "pending" | "approved" | "rejected"
   submittedAt: string
@@ -218,4 +231,47 @@ export interface AdDecision {
     age: { pass: boolean; ref?: string }
     optout: { pass: boolean; ref?: string }
   }
+}
+
+/** Homestand Native Formats: advertisers supply a brief; we render it in the channel's design. */
+export type NativeFormat = "chapter_sponsor" | "halftime" | "stat_card" | "sponsored_short" | "presented_by"
+
+export interface Sponsor {
+  id: string
+  name: string
+  /** Brand colour used in the format (contrast-checked like channel accents). */
+  colour: string
+  line: string
+  stat?: { value: string; label: string }
+  image?: string
+  cta: string
+  url: string
+  ageCategory?: AgeCategory
+}
+
+/** Standalone article written in the studio (not generated from a video). */
+export interface StandaloneArticle {
+  id: string
+  channelId: string
+  slug: string
+  status: ContentStatus
+  headline: string
+  standfirst: string
+  author: string
+  section: string
+  hero?: string
+  publishedAt?: string
+  readMinutes: number
+  blocks: Block[]
+}
+
+/** A custom page, e.g. About, Contact, Partners. */
+export interface CustomPage {
+  id: string
+  channelId: string
+  slug: string
+  title: string
+  status: "draft" | "published"
+  inNav: boolean
+  blocks: Block[]
 }

@@ -10,8 +10,8 @@ export default function AnalyticsPage() {
   // The last 30 days are the shared daily stats; studioDays() adds the 60 before for comparisons.
   const days = studioDays()
   const top: TopItem[] = [
-    ...listVideos(channel.id, "published").map<TopItem>((v) => ({ id: v.id, title: v.title, kind: "Video", views: v.views, watchMinutes: v.watchMinutes, tone: v.posterTone })),
-    ...listShorts(channel.id, "published").map<TopItem>((s) => ({ id: s.id, title: s.title, kind: "Short", views: s.views, watchMinutes: Math.round((s.views * s.durationSec * 0.7) / 60), tone: s.posterTone })),
+    ...listVideos(channel.id, "published").map<TopItem>((v) => ({ id: v.id, title: v.title, kind: "Video", views: v.views, watchMinutes: v.watchMinutes, tone: v.posterTone, src: v.poster })),
+    ...listShorts(channel.id, "published").map<TopItem>((s) => ({ id: s.id, title: s.title, kind: "Short", views: s.views, watchMinutes: Math.round((s.views * s.durationSec * 0.7) / 60), tone: s.posterTone, src: s.poster })),
   ]
     .sort((a, b) => b.views - a.views)
     .slice(0, 6)

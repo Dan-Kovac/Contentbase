@@ -1,4 +1,4 @@
-import type { AccentName, Pairing } from "@/lib/types"
+import type { Pairing } from "@/lib/types"
 
 /** 1086 -> "18:06", 3725 -> "1:02:05" */
 export function formatDuration(sec: number) {
@@ -30,16 +30,40 @@ export function aud(n: number, cents = true) {
   })
 }
 
-/** Channel accents: fill colour and the text colour that sits on it (pre-checked ≥6:1). */
-export const ACCENTS: Record<AccentName, { label: string; value: string; on: string }> = {
-  pitch: { label: "Pitch", value: "#2ef0a0", on: "#0a0a0a" },
-  turf: { label: "Turf", value: "#0e5a3a", on: "#ffffff" },
-  harbour: { label: "Harbour", value: "#1c4fb8", on: "#ffffff" },
-  maroon: { label: "Maroon", value: "#8a1c2c", on: "#ffffff" },
-  navy: { label: "Navy", value: "#1b2a4a", on: "#ffffff" },
-  gold: { label: "Gold", value: "#8a5300", on: "#ffffff" },
-  violet: { label: "Violet", value: "#5b2a86", on: "#ffffff" },
-  mono: { label: "Mono", value: "#0a0a0a", on: "#ffffff" },
+/** WCAG relative luminance of a #rrggbb colour. */
+function luminance(hex: string) {
+  const h = hex.replace("#", "")
+  const [r, g, b] = [0, 2, 4].map((i) => {
+    const c = parseInt(h.slice(i, i + 2), 16) / 255
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+  })
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+
+/** WCAG contrast ratio between two #rrggbb colours (1–21). */
+export function contrastRatio(a: string, b: string) {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
+  return (hi + 0.05) / (lo + 0.05)
+}
+
+export function isHex(v: string) {
+  return /^#[0-9a-f]{6}$/i.test(v)
+}
+
+/** Black or white, whichever reads better on the given fill. */
+export function readableOn(hex: string) {
+  return contrastRatio(hex, "#0a0a0a") >= contrastRatio(hex, "#ffffff") ? "#0a0a0a" : "#ffffff"
+}
+
+/**
+ * A creator's own accent passes when its best text colour reaches 4.5:1 on it
+ * and the accent itself reaches 3:1 against the white page (for marks and borders).
+ */
+export function checkAccent(hex: string) {
+  const on = readableOn(hex)
+  const text = contrastRatio(hex, on)
+  const page = contrastRatio(hex, "#ffffff")
+  return { on, text, page, ok: text >= 4.5 && page >= 3 }
 }
 
 /** Type pairings a channel can pick. CSS font-family values use the app's font variables. */
@@ -50,12 +74,11 @@ export const PAIRINGS: Record<Pairing, { label: string; description: string; dis
 }
 
 /** CSS variables to set on a channel's root element. */
-export function channelStyle(accent: AccentName, pairing: Pairing) {
-  const a = ACCENTS[accent]
+export function channelStyle(accentHex: string, pairing: Pairing) {
   const p = PAIRINGS[pairing]
   return {
-    "--chan": a.value,
-    "--chan-on": a.on,
+    "--chan": accentHex,
+    "--chan-on": readableOn(accentHex),
     "--chan-display": p.display,
     "--chan-body": p.body,
     "--chan-weight": String(p.weight),

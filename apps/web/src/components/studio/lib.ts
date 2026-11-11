@@ -218,6 +218,7 @@ export interface DraftPack {
   section: string
   durationSec: number
   posterTone: string
+  poster?: string
   sourcePublishedAt: string
   source: Video["source"]
   readMinutes: number
@@ -237,6 +238,7 @@ export function toPack(v: Video, channelName: string): DraftPack {
     section: sectionLabel(v.section),
     durationSec: v.durationSec,
     posterTone: v.posterTone,
+    poster: v.poster,
     sourcePublishedAt: v.sourcePublishedAt,
     source: v.source,
     readMinutes: v.article.readMinutes,

@@ -6,6 +6,9 @@ import {
   campaigns,
   channels,
   creatives,
+  customPages,
+  sponsors,
+  standaloneArticles,
   dailyStats,
   importJobs,
   shorts,
@@ -60,4 +63,34 @@ export function allVideos() {
 }
 export function allShorts() {
   return shorts
+}
+export function listSponsors() {
+  return sponsors
+}
+export function getSponsor(id: string) {
+  return sponsors.find((s) => s.id === id)
+}
+export function listArticles(channelId: string) {
+  return standaloneArticles.filter((a) => a.channelId === channelId)
+}
+export function getArticle(id: string) {
+  return standaloneArticles.find((a) => a.id === id)
+}
+export function getArticleBySlug(channelId: string, slug: string) {
+  return standaloneArticles.find((a) => a.channelId === channelId && a.slug === slug)
+}
+export function allArticles() {
+  return standaloneArticles
+}
+export function listPages(channelId: string) {
+  return customPages.filter((p) => p.channelId === channelId)
+}
+export function getPage(id: string) {
+  return customPages.find((p) => p.id === id)
+}
+export function getPageBySlug(channelId: string, slug: string) {
+  return customPages.find((p) => p.channelId === channelId && p.slug === slug)
+}
+export function allPages() {
+  return customPages
 }

@@ -187,7 +187,7 @@ export function AnalyticsDashboard({ days, top }: { days: StudioDay[]; top: TopI
                     <TableCell className="py-2.5">
                       <div className="flex items-center gap-3">
                         <div className={cn("shrink-0", t.kind === "Short" ? "w-[27px] mx-[19px]" : "w-[64px]")}>
-                          <VideoThumb tone={t.tone} ratio={t.kind === "Short" ? "9/16" : "16/9"} className="rounded-sm [&_span.rounded-full]:hidden" />
+                          <VideoThumb tone={t.tone} src={t.src} ratio={t.kind === "Short" ? "9/16" : "16/9"} className="rounded-sm [&_span.rounded-full]:hidden" />
                         </div>
                         <div className="min-w-0">
                           <p className="line-clamp-1 whitespace-normal font-semibold">{t.title}</p>

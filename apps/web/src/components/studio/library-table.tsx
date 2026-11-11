@@ -45,6 +45,7 @@ export interface LibraryRow {
   date: string
   views: number
   tone: string
+  src?: string
   durationSec?: number
   exclusive: boolean
   href?: string
@@ -228,7 +229,7 @@ export function LibraryTable({ initialRows }: { initialRows: LibraryRow[] }) {
                   <TableCell className="py-2.5">
                     <div className="flex min-w-0 items-center gap-3">
                       <div className={cn("shrink-0", r.kind === "short" ? "w-[34px]" : "w-[96px]")}>
-                        <VideoThumb tone={r.tone} ratio={r.kind === "short" ? "9/16" : "16/9"} className="rounded-md [&_span.rounded-full]:hidden" />
+                        <VideoThumb tone={r.tone} src={r.src} ratio={r.kind === "short" ? "9/16" : "16/9"} className="rounded-md [&_span.rounded-full]:hidden" />
                       </div>
                       <div className="min-w-0">
                         {r.href ? (

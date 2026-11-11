@@ -10,6 +10,7 @@ import { StatusBadge } from "./status-badge"
  */
 export function VideoThumb({
   tone,
+  src,
   durationSec,
   ratio = "16/9",
   exclusive,
@@ -18,6 +19,8 @@ export function VideoThumb({
   children,
 }: {
   tone?: string
+  /** Poster image. Without it, a tone fill with stepped tiers stands in. */
+  src?: string
   durationSec?: number
   ratio?: "16/9" | "9/16"
   exclusive?: boolean
@@ -30,11 +33,16 @@ export function VideoThumb({
       className={cn("relative w-full overflow-hidden rounded-lg", className)}
       style={{ aspectRatio: ratio, background: tone ?? "var(--chan, #1a1a1a)" }}
     >
-      <svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMax slice" className="absolute inset-0 size-full" aria-hidden>
-        <rect x="0" y="70" width="160" height="20" fill="#fff" opacity="0.08" />
-        <rect x="20" y="56" width="120" height="14" fill="#fff" opacity="0.08" />
-        <rect x="40" y="42" width="80" height="14" fill="#fff" opacity="0.06" />
-      </svg>
+      {src ? (
+        // eslint-disable-next-line @next/next/no-img-element -- prototype posters; next/image once media is on the CDN
+        <img src={src} alt="" className="absolute inset-0 size-full object-cover" loading="lazy" />
+      ) : (
+        <svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMax slice" className="absolute inset-0 size-full" aria-hidden>
+          <rect x="0" y="70" width="160" height="20" fill="#fff" opacity="0.08" />
+          <rect x="20" y="56" width="120" height="14" fill="#fff" opacity="0.08" />
+          <rect x="40" y="42" width="80" height="14" fill="#fff" opacity="0.06" />
+        </svg>
+      )}
       <div className="absolute inset-0 grid place-items-center">
         <span className="grid size-11 place-items-center rounded-full bg-black/35 text-white backdrop-blur-sm">
           <Play className="ml-0.5 size-5 fill-current" />
@@ -62,6 +70,7 @@ export function VideoCard({
   kicker,
   meta,
   tone,
+  src,
   durationSec,
   exclusive,
   live,
@@ -72,6 +81,7 @@ export function VideoCard({
   kicker?: string
   meta?: string
   tone?: string
+  src?: string
   durationSec?: number
   exclusive?: boolean
   live?: boolean
@@ -79,7 +89,7 @@ export function VideoCard({
 }) {
   return (
     <Link href={href} className="group flex min-w-0 flex-col gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-      <VideoThumb tone={tone} durationSec={durationSec} exclusive={exclusive} live={live} />
+      <VideoThumb tone={tone} src={src} durationSec={durationSec} exclusive={exclusive} live={live} />
       {kicker && <span className="kicker mt-1 text-foreground">{kicker}</span>}
       <h3
         className={cn(
@@ -100,6 +110,7 @@ export function ShortCard({
   href,
   title,
   tone,
+  src,
   durationSec,
   sponsored,
   className,
@@ -107,13 +118,14 @@ export function ShortCard({
   href: string
   title: string
   tone?: string
+  src?: string
   durationSec?: number
   sponsored?: boolean
   className?: string
 }) {
   return (
     <Link href={href} className={cn("group flex w-[168px] shrink-0 flex-col gap-2 outline-none focus-visible:ring-2 focus-visible:ring-ring", className)}>
-      <VideoThumb tone={tone} durationSec={durationSec} ratio="9/16" />
+      <VideoThumb tone={tone} src={src} durationSec={durationSec} ratio="9/16" />
       {sponsored && <span className="text-[11px] font-bold uppercase tracking-[1px] text-muted-foreground">Sponsored</span>}
       <p className="line-clamp-2 text-[15px] font-semibold leading-5 text-foreground group-hover:underline">{title}</p>
     </Link>

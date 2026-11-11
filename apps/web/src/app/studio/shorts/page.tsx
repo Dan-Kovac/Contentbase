@@ -16,7 +16,7 @@ function ShortTile({ s, needsSource, from }: { s: Short; needsSource?: boolean; 
         href={`/studio/shorts/${s.id}`}
         className="group flex flex-col gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
-        <VideoThumb tone={s.posterTone} ratio="9/16" durationSec={s.durationSec}>
+        <VideoThumb tone={s.posterTone} src={s.poster} ratio="9/16" durationSec={s.durationSec}>
           <div className="absolute left-2 top-2">
             <StatusBadge
               tone={s.status}

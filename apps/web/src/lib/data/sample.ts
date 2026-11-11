@@ -2,6 +2,9 @@
 // so pages prerender. Replace with the database behind src/lib/data/index.ts.
 import type {
   AdDecision,
+  CustomPage,
+  Sponsor,
+  StandaloneArticle,
   Article,
   Block,
   Campaign,
@@ -23,8 +26,8 @@ export const channels: Channel[] = [
     customDomain: "footyfix.com.au",
     template: "editorial",
     pairing: "minimal",
-    accent: "pitch",
-    mode: "triple_lock",
+    accentHex: "#1c4fb8",
+    mode: "age_verified",
     plan: "pro",
     nav: [
       { label: "Latest", href: "" },
@@ -40,8 +43,8 @@ export const channels: Channel[] = [
       { id: "grid", enabled: true },
       { id: "sections", enabled: true },
     ],
-    adCategoryBlocks: ["alcohol"],
-    adsenseEnabled: false,
+    adCategoryBlocks: [],
+    blockedAgeCategories: ["alcohol"],
     followers: 18420,
     youtube: {
       handle: "@footyfixau",
@@ -55,6 +58,11 @@ export const channels: Channel[] = [
       bannedWords: ["insane", "unreal", "lock", "smokey"],
       houseStyle:
         "Australian English. Club names in full on first mention (Carlton, not the Blues). Numbers under ten in words.",
+      sources: [
+        { id: "vs1", kind: "site", label: "footyfix.com.au · 64 articles", words: 61200, status: "learned" },
+        { id: "vs2", kind: "upload", label: "Season preview 2026.docx", words: 4800, status: "learned" },
+        { id: "vs3", kind: "url", label: "theage.com.au · Sam's column archive", words: 18900, status: "processing" },
+      ],
     },
     notablePersonFlag: false,
     sections: [
@@ -62,6 +70,7 @@ export const channels: Channel[] = [
       { slug: "aflw", label: "AFLW" },
       { slug: "draft", label: "Draft" },
     ],
+    bio: "Footy Fix is Sam Doherty and Jess Nguyen breaking down the AFL and AFLW every week: the numbers, the structures and the calls nobody else is making. No shouting, no hot takes for the sake of it.",
   },
   {
     id: "ch_trackside",
@@ -69,10 +78,10 @@ export const channels: Channel[] = [
     name: "Trackside",
     tagline: "Racing form, trainers and the stories behind the barrier.",
     owner: "Trackside Media Pty Ltd",
-    template: "editorial",
+    template: "broadcast",
     pairing: "grandstand",
-    accent: "navy",
-    mode: "racing_only",
+    accentHex: "#c9a227",
+    mode: "age_verified",
     plan: "publisher",
     nav: [
       { label: "Racing", href: "" },
@@ -89,7 +98,7 @@ export const channels: Channel[] = [
       { id: "sections", enabled: false },
     ],
     adCategoryBlocks: [],
-    adsenseEnabled: true,
+    blockedAgeCategories: [],
     followers: 9310,
     youtube: {
       handle: "@tracksideau",
@@ -102,12 +111,14 @@ export const channels: Channel[] = [
       tone: "Knowledgeable, measured, form-first.",
       bannedWords: ["certainty", "good thing"],
       houseStyle: "Horse names in capitals on first mention. Distances in metres.",
+      sources: [{ id: "vs4", kind: "site", label: "trackside.com.au · 1,840 posts", words: 702000, status: "learned" }],
     },
     notablePersonFlag: false,
     sections: [
       { slug: "form", label: "Form" },
       { slug: "trainers", label: "Trainers" },
     ],
+    bio: "Trackside covers Australian racing from the barrier draw to the last stride: form, trainers and the stories behind the horses.",
   },
 ]
 
@@ -178,6 +189,7 @@ export const videos: Video[] = [
     views: 0,
     watchMinutes: 0,
     posterTone: "#1c4fb8",
+    poster: "/media/afl-docklands.jpg",
     chapters: [
       { start: 0, title: "The numbers" },
       { start: 52, title: "Wingers leaving early" },
@@ -229,6 +241,7 @@ export const videos: Video[] = [
     views: 48210,
     watchMinutes: 162400,
     posterTone: "#0e5a3a",
+    poster: "/media/mcg-night.jpg",
     chapters: [{ start: 0, title: "Friday night" }, { start: 96, title: "Saturday" }, { start: 220, title: "Sunday" }],
     transcript: transcriptBlues.slice(0, 3),
     article: article({
@@ -259,6 +272,7 @@ export const videos: Video[] = [
     views: 12890,
     watchMinutes: 201300,
     posterTone: "#1b2a4a",
+    poster: "/media/stadium-day-pitch.jpg",
     chapters: [{ start: 0, title: "Arrival" }, { start: 640, title: "Training" }, { start: 1800, title: "Coaches' debrief" }],
     transcript: transcriptBlues.slice(2, 6),
     article: article({
@@ -289,6 +303,7 @@ export const videos: Video[] = [
     views: 0,
     watchMinutes: 0,
     posterTone: "#5b2a86",
+    poster: "/media/stadium-lights-blue.jpg",
     chapters: [{ start: 0, title: "The contenders" }, { start: 700, title: "The smokey" }],
     transcript: transcriptBlues.slice(0, 2),
     article: article({
@@ -317,6 +332,7 @@ export const videos: Video[] = [
     views: 0,
     watchMinutes: 0,
     posterTone: "#8a5300",
+    poster: "/media/stadium-night-stand.jpg",
     chapters: [],
     transcript: [],
     article: article({ headline: "Phantom draft, version three", standfirst: "Picks one to twenty after the trade period.", author: "Sam Doherty" }),
@@ -341,6 +357,7 @@ export const videos: Video[] = [
     views: 0,
     watchMinutes: 0,
     posterTone: "#334155",
+    poster: "/media/broadcast-control-room.jpg",
     chapters: [],
     transcript: [],
     article: article({ headline: "Mailbag #43", standfirst: "Your questions answered.", author: "Sam Doherty" }),
@@ -365,6 +382,7 @@ export const videos: Video[] = [
     views: 0,
     watchMinutes: 0,
     posterTone: "#1b2a4a",
+    poster: "/media/racing-motion.jpg",
     chapters: [{ start: 0, title: "The barrier stats" }, { start: 410, title: "The Valley's turns" }, { start: 900, title: "Saturday" }],
     transcript: transcriptBlues.slice(0, 2),
     article: {
@@ -380,7 +398,7 @@ export const videos: Video[] = [
       blocks: raceBlocks,
       keyPoints: ["Barrier one: 4 wins in 10 years", "Wide draws must burn or drop back", "Middle draws that settle handy win most"],
       complianceFlags: [
-        { id: "cf1", kind: "odds", blockIndex: 4, excerpt: "The favourite is at $2.10", message: "Mentions odds. Racing-only channels may discuss odds in editorial, but check it isn't promotional." },
+        { id: "cf1", kind: "odds", blockIndex: 4, excerpt: "The favourite is at $2.10", message: "Mentions odds. Editorial can report odds, but check it reads as reporting, not promotion." },
         { id: "cf2", kind: "bet_now", blockIndex: 4, excerpt: "punters should bet now", message: "Encourages betting. Remove calls to bet from editorial content." },
       ],
     },
@@ -406,6 +424,7 @@ export const videos: Video[] = [
     views: 9120,
     watchMinutes: 61300,
     posterTone: "#0e5a3a",
+    poster: "/media/racing-jockey-red.jpg",
     chapters: [{ start: 0, title: "The stable" }, { start: 420, title: "Derby Day" }],
     transcript: transcriptBlues.slice(0, 2),
     article: article({ headline: "Trainer of the week: a quiet Flemington double", standfirst: "A small stable, two winners and a plan that started in August.", author: "Trackside" }),
@@ -415,15 +434,15 @@ export const videos: Video[] = [
 ]
 
 export const shorts: Short[] = [
-  { id: "s_blues1", channelId: "ch_footyfix", videoId: "v_blues", title: "14 to 6 at the centre bounce", durationSec: 38, source: "clip", status: "ready", views: 0, startSec: 14, endSec: 52, posterTone: "#1c4fb8", caption: "Carlton lost the centre bounces 14 to 6. Here's why." },
-  { id: "s_blues2", channelId: "ch_footyfix", videoId: "v_blues", title: "The wingers are leaving early", durationSec: 44, source: "clip", status: "ready", views: 0, startSec: 52, endSec: 96, posterTone: "#0e5a3a", caption: "Watch where the wingers are when the ball spills." },
-  { id: "s_blues3", channelId: "ch_footyfix", videoId: "v_blues", title: "The fix is at Coburg", durationSec: 41, source: "clip", status: "ready", views: 0, startSec: 104, endSec: 145, posterTone: "#8a1c2c", caption: "Nine clearances a game in the VFL." },
-  { id: "s_round7a", channelId: "ch_footyfix", videoId: "v_round7", title: "Mark of the year so far", durationSec: 22, source: "clip", status: "published", views: 61200, posterTone: "#5b2a86", caption: "Off one step. Ridiculous." },
-  { id: "s_yt1", channelId: "ch_footyfix", title: "That snap from the boundary", durationSec: 31, source: "youtube_short", status: "published", views: 88400, posterTone: "#1b2a4a", caption: "Round 7, third quarter." },
-  { id: "s_yt2", channelId: "ch_footyfix", title: "Coach reacts to the umpiring", durationSec: 47, source: "youtube_short", status: "published", views: 34100, posterTone: "#334155", caption: "He wasn't happy." },
-  { id: "s_yt3", channelId: "ch_footyfix", title: "Sub rule in 30 seconds", durationSec: 30, source: "youtube_short", status: "published", views: 21900, posterTone: "#8a5300", caption: "Is it dead? Here's the case." },
-  { id: "s_cox1", channelId: "ch_trackside", videoId: "v_coxplate", title: "Barrier one, four from ten", durationSec: 36, source: "clip", status: "ready", views: 0, posterTone: "#1b2a4a", caption: "The Cox Plate draw in one number." },
-  { id: "s_tr2", channelId: "ch_trackside", title: "Ground level at Flemington", durationSec: 41, source: "youtube_short", status: "published", views: 15200, posterTone: "#0e5a3a", caption: "Derby Day from the rail." },
+  { id: "s_blues1", channelId: "ch_footyfix", videoId: "v_blues", title: "14 to 6 at the centre bounce", durationSec: 38, source: "clip", status: "ready", views: 0, startSec: 14, endSec: 52, posterTone: "#1c4fb8", poster: "/media/afl-docklands.jpg", caption: "Carlton lost the centre bounces 14 to 6. Here's why." },
+  { id: "s_blues2", channelId: "ch_footyfix", videoId: "v_blues", title: "The wingers are leaving early", durationSec: 44, source: "clip", status: "ready", views: 0, startSec: 52, endSec: 96, posterTone: "#0e5a3a", poster: "/media/stadium-night-wide.jpg", caption: "Watch where the wingers are when the ball spills." },
+  { id: "s_blues3", channelId: "ch_footyfix", videoId: "v_blues", title: "The fix is at Coburg", durationSec: 41, source: "clip", status: "ready", views: 0, startSec: 104, endSec: 145, posterTone: "#8a1c2c", poster: "/media/stadium-day-pitch.jpg", caption: "Nine clearances a game in the VFL." },
+  { id: "s_round7a", channelId: "ch_footyfix", videoId: "v_round7", title: "Mark of the year so far", durationSec: 22, source: "clip", status: "published", views: 61200, posterTone: "#5b2a86", poster: "/media/mcg-night.jpg", caption: "Off one step. Ridiculous." },
+  { id: "s_yt1", channelId: "ch_footyfix", title: "That snap from the boundary", durationSec: 31, source: "youtube_short", status: "published", views: 88400, posterTone: "#1b2a4a", poster: "/media/stadium-night-stand.jpg", caption: "Round 7, third quarter." },
+  { id: "s_yt2", channelId: "ch_footyfix", title: "Coach reacts to the umpiring", durationSec: 47, source: "youtube_short", status: "published", views: 34100, posterTone: "#334155", poster: "/media/broadcast-control-room.jpg", caption: "He wasn't happy." },
+  { id: "s_yt3", channelId: "ch_footyfix", title: "Sub rule in 30 seconds", durationSec: 30, source: "youtube_short", status: "published", views: 21900, posterTone: "#8a5300", poster: "/media/stadium-crowd-red.jpg", caption: "Is it dead? Here's the case." },
+  { id: "s_cox1", channelId: "ch_trackside", videoId: "v_coxplate", title: "Barrier one, four from ten", durationSec: 36, source: "clip", status: "ready", views: 0, posterTone: "#1b2a4a", poster: "/media/racing-close.jpg", caption: "The Cox Plate draw in one number." },
+  { id: "s_tr2", channelId: "ch_trackside", title: "Ground level at Flemington", durationSec: 41, source: "youtube_short", status: "published", views: 15200, posterTone: "#0e5a3a", poster: "/media/racing-hurdle.jpg", caption: "Derby Day from the rail." },
 ]
 
 export const importJobs: ImportJob[] = [
@@ -486,15 +505,15 @@ export const dailyStats: DailyStat[] = Array.from({ length: 30 }, (_, i) => {
 })
 
 export const campaigns: Campaign[] = [
-  { id: "cmp_ute", advertiser: "Southern Cross Utes", isWagering: false, pricing: "cpm", status: "live", budget: 18000, spent: 7420.5, impressions: 742050, clicks: 3120, flight: "1 November – 30 November 2026", channels: ["Footy Fix", "Trackside"] },
-  { id: "cmp_bookie", advertiser: "Harbour Bet (licensed)", isWagering: true, pricing: "cpm", status: "live", budget: 25000, spent: 11980, impressions: 599000, clicks: 2210, flight: "1 November – 31 December 2026", channels: ["Footy Fix", "Trackside"] },
-  { id: "cmp_boots", advertiser: "Kick Boots Co.", isWagering: false, pricing: "flat", status: "scheduled", budget: 6000, spent: 0, impressions: 0, clicks: 0, flight: "1 December – 14 December 2026", channels: ["Footy Fix"] },
-  { id: "cmp_tab", advertiser: "Riverbank Wagering", isWagering: true, pricing: "cpc", status: "in_review", budget: 12000, spent: 0, impressions: 0, clicks: 0, flight: "15 November – 15 December 2026", channels: ["Trackside"] },
+  { id: "cmp_ute", advertiser: "Southern Cross Utes", isWagering: false, format: "halftime", pricing: "cpm", status: "live", budget: 18000, spent: 7420.5, impressions: 742050, clicks: 3120, flight: "1 November – 30 November 2026", channels: ["Footy Fix", "Trackside"] },
+  { id: "cmp_bookie", advertiser: "Harbour Bet (licensed)", isWagering: true, ageCategory: "wagering", format: "chapter_sponsor", pricing: "cpm", status: "live", budget: 25000, spent: 11980, impressions: 599000, clicks: 2210, flight: "1 November – 31 December 2026", channels: ["Footy Fix", "Trackside"] },
+  { id: "cmp_boots", advertiser: "Kick Boots Co.", isWagering: false, format: "sponsored_short", pricing: "flat", status: "scheduled", budget: 6000, spent: 0, impressions: 0, clicks: 0, flight: "1 December – 14 December 2026", channels: ["Footy Fix"] },
+  { id: "cmp_tab", advertiser: "Riverbank Wagering", isWagering: true, ageCategory: "wagering", format: "stat_card", pricing: "cpc", status: "in_review", budget: 12000, spent: 0, impressions: 0, clicks: 0, flight: "15 November – 15 December 2026", channels: ["Trackside"] },
 ]
 
 export const creatives: Creative[] = [
   {
-    id: "cr_riv_1", campaignId: "cmp_tab", advertiser: "Riverbank Wagering", name: "Spring Carnival MREC", size: "300x250", isWagering: true, status: "pending", submittedAt: "11 November 2026, 8:15 am",
+    id: "cr_riv_1", campaignId: "cmp_tab", advertiser: "Riverbank Wagering", name: "Spring Carnival stat card", format: "stat_card", isWagering: true, status: "pending", submittedAt: "11 November 2026, 8:15 am",
     checks: [
       { label: "No odds promoted", result: "fail" },
       { label: "No notable person", result: "pass" },
@@ -504,7 +523,7 @@ export const creatives: Creative[] = [
     ],
   },
   {
-    id: "cr_hb_2", campaignId: "cmp_bookie", advertiser: "Harbour Bet (licensed)", name: "Racing band 970×250", size: "970x250", isWagering: true, status: "pending", submittedAt: "10 November 2026, 4:40 pm",
+    id: "cr_hb_2", campaignId: "cmp_bookie", advertiser: "Harbour Bet (licensed)", name: "Racing chapter sponsor", format: "chapter_sponsor", isWagering: true, status: "pending", submittedAt: "10 November 2026, 4:40 pm",
     checks: [
       { label: "No odds promoted", result: "pass" },
       { label: "No notable person", result: "check" },
@@ -514,7 +533,7 @@ export const creatives: Creative[] = [
     ],
   },
   {
-    id: "cr_boots_1", campaignId: "cmp_boots", advertiser: "Kick Boots Co.", name: "Summer boots MREC", size: "300x250", isWagering: false, status: "approved", submittedAt: "9 November 2026, 11:02 am",
+    id: "cr_boots_1", campaignId: "cmp_boots", advertiser: "Kick Boots Co.", name: "Summer boots sponsored short", format: "sponsored_short", isWagering: false, status: "approved", submittedAt: "9 November 2026, 11:02 am",
     checks: [{ label: "Brand-safe content", result: "pass" }],
   },
 ]
@@ -525,6 +544,74 @@ export const adDecisions: AdDecision[] = [
   { id: "dec_8f218", at: "11 Nov 2026 09:41:02", channel: "Footy Fix", slot: "in-article", outcome: "non_wagering_served", reason: "LOCK1_NO_SESSION", locks: { session: { pass: false, ref: "anonymous" }, age: { pass: false }, optout: { pass: true } } },
   { id: "dec_8f217", at: "11 Nov 2026 09:40:58", channel: "Footy Fix", slot: "sponsor-band", outcome: "non_wagering_served", reason: "LOCK3_OPTED_OUT", locks: { session: { pass: true, ref: "sess_2Lm8c44" }, age: { pass: true, ref: "aa_yoti_20261009" }, optout: { pass: false, ref: "opted out 2 Nov 2026" } } },
   { id: "dec_8f216", at: "11 Nov 2026 09:40:51", channel: "Footy Fix", slot: "in-article", outcome: "non_wagering_served", reason: "PAGE_IS_LIVE", locks: { session: { pass: true, ref: "sess_7Hq2f91" }, age: { pass: true, ref: "aa_connectid_20261104" }, optout: { pass: true } } },
-  { id: "dec_8f215", at: "11 Nov 2026 09:40:44", channel: "Trackside", slot: "in-article", outcome: "wagering_served", reason: "RACING_ONLY_EXEMPT", locks: { session: { pass: false, ref: "anonymous" }, age: { pass: false }, optout: { pass: true } } },
+  { id: "dec_8f215", at: "11 Nov 2026 09:40:44", channel: "Trackside", slot: "in-article", outcome: "non_wagering_served", reason: "LOCK1_NO_SESSION", locks: { session: { pass: false, ref: "anonymous" }, age: { pass: false }, optout: { pass: true } } },
   { id: "dec_8f214", at: "11 Nov 2026 09:40:39", channel: "Footy Fix", slot: "end-of-article", outcome: "house", reason: "NO_FILL", locks: { session: { pass: false }, age: { pass: false }, optout: { pass: true } } },
+]
+
+export const sponsors: Sponsor[] = [
+  { id: "sp_ute", name: "Southern Cross Utes", colour: "#0f3d2e", line: "Built for the drive to every away game.", stat: { value: "3.5t", label: "towing, every model" }, image: "/media/stadium-night-wide.jpg", cta: "Book a test drive", url: "https://example.com/utes" },
+  { id: "sp_boots", name: "Kick Boots Co.", colour: "#111111", line: "Grip for the wet ones.", stat: { value: "14", label: "studs, moulded for Australian grounds" }, image: "/media/stadium-day-pitch.jpg", cta: "Shop the range", url: "https://example.com/boots" },
+  { id: "sp_harbour", name: "Harbour Bet", colour: "#0b2545", line: "Racing coverage, every meeting.", image: "/media/racing-motion.jpg", cta: "Learn more", url: "https://example.com/harbour", ageCategory: "wagering" },
+  { id: "sp_brew", name: "Riverside Brewing", colour: "#7a3e00", line: "Brewed in Abbotsford since 1998.", stat: { value: "4.6%", label: "Pale ale, best enjoyed after the siren" }, image: "/media/festival-crowd.jpg", cta: "Find a stockist", url: "https://example.com/brew", ageCategory: "alcohol" },
+]
+
+export const standaloneArticles: StandaloneArticle[] = [
+  {
+    id: "a_ladder",
+    channelId: "ch_footyfix",
+    slug: "ladder-predictor-after-round-7",
+    status: "published",
+    headline: "Our ladder after Round 7, and why it will look different by Round 12",
+    standfirst: "Four teams are flattered by the draw. Two are better than their record. Here's how the run home changes things.",
+    author: "Jess Nguyen",
+    section: "afl",
+    hero: "/media/mcg-night.jpg",
+    publishedAt: "10 November 2026",
+    readMinutes: 7,
+    blocks: [
+      { type: "paragraph", text: "Seven rounds in, the ladder tells you who has won. It doesn't tell you who has played whom." },
+      { type: "heading", text: "Flattered by the draw" },
+      { type: "paragraph", text: "Four of the top six have played three or fewer games against last year's finalists. That changes from Round 8." },
+      { type: "quote", text: "The run home is where premierships are actually decided.", cite: "Sam Doherty" },
+      { type: "paragraph", text: "Brisbane and Collingwood look the real deal. Two others are about to find out." },
+    ],
+  },
+  {
+    id: "a_draft_notes",
+    channelId: "ch_footyfix",
+    slug: "draft-notes-november",
+    status: "draft",
+    headline: "Draft notes: the three mids everyone is underrating",
+    standfirst: "Clearance numbers, kicking efficiency and a VFL cameo worth watching again.",
+    author: "Sam Doherty",
+    section: "draft",
+    readMinutes: 5,
+    blocks: [{ type: "paragraph", text: "Start with the clearance numbers, because they don't lie for long." }],
+  },
+]
+
+export const customPages: CustomPage[] = [
+  {
+    id: "pg_about",
+    channelId: "ch_footyfix",
+    slug: "about",
+    title: "About Footy Fix",
+    status: "published",
+    inNav: true,
+    blocks: [
+      { type: "paragraph", text: "Footy Fix is Sam Doherty and Jess Nguyen breaking down the AFL and AFLW every week." },
+      { type: "heading", text: "What we do" },
+      { type: "list", items: ["A long-form analysis show every Tuesday", "Shorts from every round", "Draft coverage from August to November"] },
+      { type: "image", caption: "Recording at the MCG, Round 1", src: "/media/mcg-night.jpg" },
+    ],
+  },
+  {
+    id: "pg_partners",
+    channelId: "ch_footyfix",
+    slug: "partners",
+    title: "Work with us",
+    status: "draft",
+    inNav: false,
+    blocks: [{ type: "paragraph", text: "Sponsorship enquiries go through Homestand's partnerships team, so every partner buys on the same terms." }],
+  },
 ]

@@ -138,7 +138,7 @@ export default function StudioHome() {
               <li key={v.id} className="grid gap-4 p-4 md:grid-cols-[minmax(0,280px)_minmax(0,1fr)] md:items-center md:gap-8">
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="w-[96px] shrink-0">
-                    <VideoThumb tone={v.posterTone} />
+                    <VideoThumb tone={v.posterTone} src={v.poster} />
                   </div>
                   <div className="min-w-0">
                     <p className="line-clamp-2 text-sm font-semibold leading-5">{v.title}</p>
@@ -195,7 +195,7 @@ export default function StudioHome() {
             <li key={v.id}>
               <Link href={`/studio/review/${v.id}`} className="flex items-center gap-4 p-3 hover:bg-accent/60 focus-visible:bg-accent focus-visible:outline-none sm:px-4">
                 <div className="w-[88px] shrink-0">
-                  <VideoThumb tone={v.posterTone} />
+                  <VideoThumb tone={v.posterTone} src={v.poster} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold">{v.title}</p>
@@ -216,7 +216,7 @@ export default function StudioHome() {
               <Link href={`/studio/shorts/${s.id}`} className="flex items-center gap-4 p-3 hover:bg-accent/60 focus-visible:bg-accent focus-visible:outline-none sm:px-4">
                 <div className="flex w-[88px] shrink-0 justify-center">
                   <div className="w-[28px]">
-                    <VideoThumb tone={s.posterTone} ratio="9/16" className="[&_span]:hidden" />
+                    <VideoThumb tone={s.posterTone} src={s.poster} ratio="9/16" className="[&_span]:hidden" />
                   </div>
                 </div>
                 <div className="min-w-0 flex-1">

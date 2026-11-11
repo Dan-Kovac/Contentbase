@@ -102,7 +102,7 @@ export function ReviewQueue({ packs, compact = false }: { packs: DraftPack[]; co
                   aria-label={`Review ${p.headline}`}
                   tabIndex={-1}
                 >
-                  <VideoThumb tone={p.posterTone} durationSec={p.durationSec} />
+                  <VideoThumb tone={p.posterTone} src={p.poster} durationSec={p.durationSec} />
                 </Link>
                 <div className="flex min-w-0 flex-1 flex-col gap-2">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
