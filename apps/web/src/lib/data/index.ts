@@ -1,0 +1,63 @@
+// Data access for every screen. Today it reads the fixed sample data; in the
+// build plan these become database queries (Drizzle + Postgres) with the same
+// signatures, so screens don't change.
+import {
+  adDecisions,
+  campaigns,
+  channels,
+  creatives,
+  dailyStats,
+  importJobs,
+  shorts,
+  videos,
+} from "./sample"
+import type { ContentStatus } from "@/lib/types"
+
+export const DEMO_CHANNEL_SLUG = "footyfix"
+
+export function listChannels() {
+  return channels
+}
+export function getChannel(slug: string) {
+  return channels.find((c) => c.slug === slug)
+}
+export function getChannelById(id: string) {
+  return channels.find((c) => c.id === id)
+}
+export function listVideos(channelId: string, status?: ContentStatus | ContentStatus[]) {
+  const s = status ? (Array.isArray(status) ? status : [status]) : null
+  return videos.filter((v) => v.channelId === channelId && (!s || s.includes(v.status)))
+}
+export function getVideo(id: string) {
+  return videos.find((v) => v.id === id)
+}
+export function getVideoBySlug(channelId: string, slug: string) {
+  return videos.find((v) => v.channelId === channelId && v.slug === slug)
+}
+export function listShorts(channelId: string, status?: ContentStatus) {
+  return shorts.filter((s) => s.channelId === channelId && (!status || s.status === status))
+}
+export function getShort(id: string) {
+  return shorts.find((s) => s.id === id)
+}
+export function listImportJobs(channelId: string) {
+  return importJobs.filter((j) => j.channelId === channelId)
+}
+export function getDailyStats() {
+  return dailyStats
+}
+export function listCampaigns() {
+  return campaigns
+}
+export function listCreatives() {
+  return creatives
+}
+export function listAdDecisions() {
+  return adDecisions
+}
+export function allVideos() {
+  return videos
+}
+export function allShorts() {
+  return shorts
+}
