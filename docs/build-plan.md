@@ -4,7 +4,7 @@ A simple plan to take Homestand from brand to pilot. The detail lives in [pid.md
 
 ## Where we are (11 November 2026)
 
-- **Brand guidelines**: done, first version. Tokens, type, voice, ad standards and 10 components are in the [Homestand design system](https://claude.ai/artifact/CaZaHa7oNM8mt5GvUohXPV), with the same tokens as a shadcn theme in [`brand/globals.css`](brand/globals.css).
+- **Brand guidelines**: second version (homestand. wordmark, black, white and grey with the Pitch gradient, client customisation rules). Tokens, type, voice, ad standards and 11 components are in the [Homestand design system](https://claude.ai/artifact/CaZaHa7oNM8mt5GvUohXPV), with the same tokens as a shadcn theme in [`brand/globals.css`](brand/globals.css).
 - **Screens**: inventory written ([screens.md](screens.md)), designs not started.
 - **Code**: the repo was empty, so this is a fresh build. No earlier code to audit.
 
