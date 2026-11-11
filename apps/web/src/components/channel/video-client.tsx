@@ -100,6 +100,7 @@ export function Player({
   useEffect(() => {
     if (preroll === null) return
     if (preroll <= 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-roll countdown finished
       setPreroll(null)
       prerollDone.current = true
       seek(0)

@@ -24,6 +24,7 @@ export function NameForm() {
 
   useEffect(() => {
     if (!sub) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- derived check state for the simulated availability lookup
       setCheck("idle")
       return
     }

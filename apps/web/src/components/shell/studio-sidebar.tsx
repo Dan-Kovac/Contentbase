@@ -36,7 +36,7 @@ import { Monogram, Wordmark } from "@/components/brand/wordmark"
 
 export const STUDIO_NAV = [
   { href: "/studio", label: "Home", icon: LayoutDashboard },
-  { href: "/studio/review", label: "Ready to review", icon: Inbox, badge: "2" },
+  { href: "/studio/review", label: "Ready to review", icon: Inbox, badge: true },
   { href: "/studio/library", label: "Library", icon: Library },
   { href: "/studio/shorts", label: "Shorts", icon: Smartphone },
   { href: "/studio/upload", label: "Upload", icon: Upload },
@@ -59,7 +59,7 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(href + "/")
 }
 
-export function StudioSidebar() {
+export function StudioSidebar({ reviewCount = 0 }: { reviewCount?: number }) {
   const pathname = usePathname() ?? ""
   return (
     <Sidebar collapsible="icon">
@@ -85,7 +85,7 @@ export function StudioSidebar() {
                       <span>{item.label}</span>
                     </Link>
                   </SidebarMenuButton>
-                  {item.badge && <SidebarMenuBadge className="bg-pitch text-pop-foreground rounded-sm px-1.5 text-[11px] font-bold">{item.badge}</SidebarMenuBadge>}
+                  {item.badge && reviewCount > 0 && <SidebarMenuBadge className="bg-pitch text-pop-foreground rounded-sm px-1.5 text-[11px] font-bold">{reviewCount}</SidebarMenuBadge>}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

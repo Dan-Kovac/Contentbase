@@ -217,7 +217,7 @@ export function ShortsEditor({ short, parent }: { short: Short; parent?: ParentV
                 <TrimTimeline windowStart={windowStart} windowEnd={windowEnd} value={range} onChange={setRange} label="Trim the short" />
               </section>
 
-              <section className={cn("grid gap-3", !rendered && "opacity-60")} aria-labelledby="reframe-h" aria-disabled={!rendered}>
+              <section className={cn("grid gap-3", !rendered && "opacity-60")} aria-labelledby="reframe-h" data-disabled={!rendered || undefined}>
                 <div className="flex items-baseline justify-between gap-2">
                   <h2 id="reframe-h" className="kicker text-foreground">
                     Reframe

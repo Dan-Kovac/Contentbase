@@ -27,7 +27,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <TooltipProvider>{children}</TooltipProvider>
-          <Toaster position="bottom-right" />
+          <Toaster position="top-right" />
         </ThemeProvider>
       </body>
     </html>

@@ -8,7 +8,6 @@ import {
   Heading2,
   List,
   Minus,
-  MoreHorizontal,
   Pilcrow,
   Plus,
   Quote,
@@ -33,7 +32,6 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { VideoThumb } from "@/components/brand/media"
 import { cn } from "@/lib/utils"
 import type { Block } from "@/lib/types"
 import { ASSIST_LABELS, type AssistAction, fixText, headlineIdeas, suggestFor } from "./assist"

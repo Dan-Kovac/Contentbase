@@ -43,6 +43,7 @@ export function useSignupDraft() {
   const [draft, setDraft] = useState<SignupDraft>(DEFAULT_DRAFT)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sessionStorage is only readable after mount
     setDraft(read())
   }, [])
 

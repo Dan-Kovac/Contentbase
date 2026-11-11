@@ -29,6 +29,7 @@ export function VerifyAgeFlow() {
 
   useEffect(() => {
     if (step !== "handoff") return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- prototype simulation: reset before the timer starts
     setProgress(0)
     const t = setInterval(() => setProgress((p) => Math.min(100, p + 4)), 120)
     const done = setTimeout(() => setStep("success"), 3400)

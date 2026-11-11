@@ -4,15 +4,17 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { StudioSidebar } from "@/components/shell/studio-sidebar"
-import { getChannel, DEMO_CHANNEL_SLUG } from "@/lib/data"
+import { allVideos, getChannel, DEMO_CHANNEL_SLUG } from "@/lib/data"
 
 export const metadata = { title: { default: "Studio", template: "%s · Studio · Homestand" } }
 
 export default function StudioLayout({ children }: { children: React.ReactNode }) {
   const channel = getChannel(DEMO_CHANNEL_SLUG)!
+  // The demo studio shows both sample channels' draft packs in its queue.
+  const reviewCount = allVideos().filter((v) => v.status === "ready").length
   return (
     <SidebarProvider>
-      <StudioSidebar />
+      <StudioSidebar reviewCount={reviewCount} />
       <SidebarInset>
         <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur md:px-6">
           <SidebarTrigger className="-ml-1" />

@@ -74,7 +74,7 @@ export function AuditTable({ entries }: { entries: AuditEntry[] }) {
           </TableBody>
         </Table>
       </div>
-      <p className="mt-2 text-[12px] text-muted-foreground">Append-only. Entries can't be edited or deleted, including by admins.</p>
+      <p className="mt-2 text-[12px] text-muted-foreground">Append-only. Entries can&apos;t be edited or deleted, including by admins.</p>
     </div>
   )
 }

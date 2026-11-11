@@ -33,6 +33,7 @@ export function ImportLive() {
   const [done, setDone] = useState(0)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- prototype simulation: reset before the timer starts
     setDone(0)
     const step = Math.max(1, Math.round(total / 60))
     const t = setInterval(() => {

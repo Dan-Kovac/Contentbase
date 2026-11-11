@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useEffectEvent, useRef, useState } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { ChevronDown, ChevronUp, MonitorPlay, Pause, Play, SquarePlay } from "lucide-react"
@@ -58,30 +58,29 @@ export function ShortsFeed({
   const touchY = useRef<number | null>(null)
   const item = feed[index]
 
-  const go = useCallback(
-    (d: number) => {
-      setIndex((i) => Math.min(feed.length - 1, Math.max(0, i + d)))
-      setT(0)
-      setPlaying(false)
-    },
-    [feed.length],
-  )
+  const go = (d: number) => {
+    setIndex((i) => Math.min(feed.length - 1, Math.max(0, i + d)))
+    setT(0)
+    setPlaying(false)
+  }
+
+  const onKey = useEffectEvent((e: KeyboardEvent) => {
+    const tag = (e.target as HTMLElement)?.tagName
+    if (tag === "INPUT" || tag === "TEXTAREA") return
+    if (e.key === "ArrowDown" || e.key === "j") {
+      e.preventDefault()
+      go(1)
+    } else if (e.key === "ArrowUp" || e.key === "k") {
+      e.preventDefault()
+      go(-1)
+    }
+  })
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement)?.tagName
-      if (tag === "INPUT" || tag === "TEXTAREA") return
-      if (e.key === "ArrowDown" || e.key === "j") {
-        e.preventDefault()
-        go(1)
-      } else if (e.key === "ArrowUp" || e.key === "k") {
-        e.preventDefault()
-        go(-1)
-      }
-    }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [go])
+    const handler = (e: KeyboardEvent) => onKey(e)
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [])
 
   useEffect(() => {
     if (!playing || item.kind !== "short") return
