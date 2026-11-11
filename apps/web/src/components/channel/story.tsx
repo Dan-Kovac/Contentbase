@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ArrowRight, FileText } from "lucide-react"
 import { VideoThumb } from "@/components/brand/media"
+import { StatusBadge } from "@/components/brand/status-badge"
 import { formatDuration } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { BODY, DISPLAY, type Story } from "./lib"
@@ -184,3 +185,28 @@ export function RailHeading({
     </div>
   )
 }
+
+/** The grid's first story: picture beside the text from md, so the grid opens like a magazine spread. */
+export function FeatureStory({ story }: { story: Story }) {
+  return (
+    <article className="group relative grid gap-5 md:grid-cols-2 md:gap-8">
+      <StoryImage story={story} ratio={story.kind === "video" ? "16/9" : "3/2"} className="md:self-start" />
+      <div className="flex flex-col gap-3">
+        <span className="kicker text-foreground">
+          {story.sectionLabel}
+          {story.exclusive && <StatusBadge tone="exclusive" className="ml-1" />}
+        </span>
+        <h3 className={cn(DISPLAY, "text-[30px] leading-[33px] md:text-[36px] md:leading-[39px]")}>
+          <Link href={story.href} className="outline-none after:absolute after:inset-0 after:rounded-lg focus-visible:after:ring-2 focus-visible:after:ring-ring group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
+            {story.headline}
+          </Link>
+        </h3>
+        <p className={cn(BODY, "text-[17px] leading-[26px] text-foreground/75 md:text-[18px] md:leading-[28px]")}>{story.standfirst}</p>
+        <p className="text-[13px] text-muted-foreground">
+          {story.author} · {story.date} · {story.readMinutes} min read
+        </p>
+      </div>
+    </article>
+  )
+}
+

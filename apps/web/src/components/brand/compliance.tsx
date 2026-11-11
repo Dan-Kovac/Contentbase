@@ -40,7 +40,7 @@ export function LockStatus({
       })}
       {!compact && (
         <div className="col-span-full rounded-md bg-muted px-3 py-2 text-[13px] font-semibold">
-          {verdict ?? (allPass ? "Wagering creative eligible. Evidence written before serve." : "Fail closed: non-wagering ad served.")}
+          {verdict ?? (allPass ? "Age-restricted ad eligible. Evidence written before serve." : "Fail closed: an unrestricted ad was served.")}
         </div>
       )}
     </div>

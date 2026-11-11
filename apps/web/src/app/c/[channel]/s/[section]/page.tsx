@@ -5,7 +5,7 @@ import { notFound } from "next/navigation"
 import { ChevronLeft, ChevronRight, Film } from "lucide-react"
 import { ShortCard } from "@/components/brand/media"
 import { DISPLAY, SITE, channelStories, publicShorts, shortPath } from "@/components/channel/lib"
-import { ModuleHeading, StoryCard } from "@/components/channel/story"
+import { FeatureStory, ModuleHeading, StoryCard } from "@/components/channel/story"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { ChannelPageSkeleton } from "@/components/channel/skeleton"
 import { getChannel, listChannels } from "@/lib/data"
@@ -63,7 +63,7 @@ async function SectionPageContent({ params }: { params: Params }) {
       {first ? (
         <>
           <div className="mb-12 border-b pb-12">
-            <StoryCard story={first} size="lg" standfirst />
+            <FeatureStory story={first} />
           </div>
           {rest.length > 0 && (
             <ul className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
