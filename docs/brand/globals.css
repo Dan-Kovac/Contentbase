@@ -1,0 +1,200 @@
+/* Homestand theme for shadcn/ui (Tailwind v4). Generated from docs/brand/tokens.json.
+   Paste over the :root, .dark and @theme inline blocks that `shadcn init` writes into app/globals.css.
+   Fonts: load Barlow Condensed, Barlow, Source Serif 4 and IBM Plex Mono with next/font/google
+   and point the --font-* variables at them. */
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f1512;
+  --card: #ffffff;
+  --card-foreground: var(--foreground);
+  --popover: #ffffff;
+  --popover-foreground: var(--foreground);
+  --primary: #0e5a3a;
+  --primary-foreground: #ffffff;
+  --secondary: #e9eeea;
+  --secondary-foreground: var(--foreground);
+  --muted: #f1f4f1;
+  --muted-foreground: #545f58;
+  --accent: #eef2ef;
+  --accent-foreground: var(--foreground);
+  --destructive: #b42318;
+  --destructive-foreground: #ffffff;
+  --border: #dce2dd;
+  --input: #8a958e;
+  --ring: var(--primary);
+  --floodlight: #f2b51d;
+  --floodlight-foreground: #0f1512;
+  --live: #c8231b;
+  --live-foreground: #ffffff;
+  --scheduled: #1d55c4;
+  --scheduled-foreground: #ffffff;
+  --ad-frame: #f7f8f6;
+  --ad-label: var(--muted-foreground);
+  --sidebar: #f7f8f6;
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: #e9eeea;
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--primary);
+  --chart-1: #0e5a3a;
+  --chart-2: #1d55c4;
+  --chart-3: #b9870c;
+  --chart-4: #8a1c2c;
+  --chart-5: #545f58;
+  --channel-turf: #0e5a3a;
+  --channel-harbour: #1c4fb8;
+  --channel-maroon: #8a1c2c;
+  --channel-navy: #1b2a4a;
+  --channel-ochre: #8a5300;
+  --channel-violet: #5b2a86;
+  --channel-ember: #b03a0a;
+  --channel-slate: #334155;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+  --radius-sm: 2px;
+  --radius: 4px;
+  --radius-lg: 8px;
+  --radius-pill: 999px;
+  --container-max: 1280px;
+  --measure: 68ch;
+  --sidebar-width: 248px;
+  --header-height: 64px;
+  --ad-mrec-width: 300px;
+  --ad-mrec-height: 250px;
+  --ad-billboard-width: 970px;
+  --ad-billboard-height: 250px;
+  --ad-band-mobile-height: 100px;
+  --ad-short-width: 1080px;
+  --ad-short-height: 1920px;
+  --font-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-sans: Barlow, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+
+.dark {
+  --background: #0b0f0d;
+  --foreground: #edf2ee;
+  --card: #121815;
+  --card-foreground: var(--foreground);
+  --popover: #121815;
+  --popover-foreground: var(--foreground);
+  --primary: #41c084;
+  --primary-foreground: #05140c;
+  --secondary: #1c2420;
+  --secondary-foreground: var(--foreground);
+  --muted: #1a221e;
+  --muted-foreground: #9aa69e;
+  --accent: #1c2420;
+  --accent-foreground: var(--foreground);
+  --destructive: #f26b5e;
+  --destructive-foreground: #1a0605;
+  --border: #27312b;
+  --input: #66736b;
+  --ring: var(--primary);
+  --floodlight: #f5c84a;
+  --floodlight-foreground: #0f1512;
+  --live: #ff6b5e;
+  --live-foreground: #1a0605;
+  --scheduled: #7aa7ff;
+  --scheduled-foreground: #06122b;
+  --ad-frame: #101512;
+  --ad-label: var(--muted-foreground);
+  --sidebar: #0e1310;
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: #1a221e;
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--primary);
+  --chart-1: #41c084;
+  --chart-2: #7aa7ff;
+  --chart-3: #f5c84a;
+  --chart-4: #ff8a96;
+  --chart-5: #9aa69e;
+  --channel-turf: #41c084;
+  --channel-harbour: #7aa2ff;
+  --channel-maroon: #ff8a96;
+  --channel-navy: #93a8d6;
+  --channel-ochre: #f0b44c;
+  --channel-violet: #c49bf0;
+  --channel-ember: #ff9a62;
+  --channel-slate: #a5b4c8;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-floodlight: var(--floodlight);
+  --color-floodlight-foreground: var(--floodlight-foreground);
+  --color-live: var(--live);
+  --color-live-foreground: var(--live-foreground);
+  --color-scheduled: var(--scheduled);
+  --color-scheduled-foreground: var(--scheduled-foreground);
+  --color-ad-frame: var(--ad-frame);
+  --color-ad-label: var(--ad-label);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-channel-turf: var(--channel-turf);
+  --color-channel-harbour: var(--channel-harbour);
+  --color-channel-maroon: var(--channel-maroon);
+  --color-channel-navy: var(--channel-navy);
+  --color-channel-ochre: var(--channel-ochre);
+  --color-channel-violet: var(--channel-violet);
+  --color-channel-ember: var(--channel-ember);
+  --color-channel-slate: var(--channel-slate);
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius-lg);
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground font-sans; }
+}
