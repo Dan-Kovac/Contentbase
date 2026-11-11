@@ -10,13 +10,14 @@ The brand works at two levels, and every rule below says which one it governs:
 | Area | The client chooses | Fixed by the platform |
 | --- | --- | --- |
 | Logo | Upload a logo (SVG or PNG) and a square icon. With no logo, the channel name is set in the pairing's display face. | Logo height in the header (28px desktop, 24px mobile) and clear space |
-| Accent colour | One of `channel-pitch`, `channel-turf`, `channel-harbour`, `channel-maroon`, `channel-navy`, `channel-gold`, `channel-violet` or `channel-mono`. A custom hex is allowed only if it passes the automatic contrast check before saving. | Where the accent appears: logo tile, active nav underline, Follow button, kicker squares, video placeholder, links. Grounds, text and greys never change. |
+| Accent colour | Their own hex. It must pass the automatic check (4.5:1 for the text on it, 3:1 against the page) before saving; text on it is black or white automatically. | Where the accent appears: logo tile, active nav underline, Follow button, kicker squares, video placeholder, links. Grounds, text and greys never change. |
 | Type pairing | Grandstand, Broadcast or Minimal (see Typography) | The type scale, line lengths and weights inside each pairing |
-| Template | Editorial, Broadcast or Minimal | Page anatomy and every ad position |
-| Homepage | Reorder and toggle the modules: lead story, shorts row, article grid, section rows, sponsor band | No free-form blocks and no new ad slots |
+| Template | Editorial (white magazine) or Broadcast (dark, video-led), each previewed before choosing | Page anatomy and every ad position |
+| Homepage | Reorder and toggle the modules: lead story, shorts row, article grid, section rows | No new ad positions |
+| Pages | Build their own pages (About, Work with us, anything) from blocks, and choose which appear in the navigation | Page layout, type and spacing |
 | Navigation | Up to 8 items, named by the client | Header layout and mobile menu |
 | Article formatting | Headings, paragraphs, lists, pull quotes, images, video, shorts embeds, dividers and embeds in the block editor; mark any item Exclusive | Fonts, sizes and spacing come from the pairing; no colour or font controls inside articles |
-| Ads | Block categories (e.g. wagering, alcohol) and turn AdSense on or off | Slot sizes, ad frames, labels, density caps and the betting opt-out link |
+| Ads | Standard or Age-verified mode; block age-restricted categories (alcohol, wagering) | The five native formats, where they sit, labels, density caps and opt-outs |
 
 The `ChannelPreview` component shows three channels built from these choices.
 
@@ -99,15 +100,19 @@ Homestand is black, white and grey with one radiant pop. The neutrals do the wor
 - Short page: full-height vertical player, caption below, swipe for the next. Ads allowed: a sponsored card every 8 shorts at most.
 - Exclusive, logged out: the `ExclusiveGate` only, with no ads.
 
-## Advertising standards
+## Advertising: Homestand Native Formats
 
-Ads are designed into the page and are never added on top of it.
+Ads are designed into the page, never added on top of it, and never look like a standard banner. Advertisers supply a brief; we render it in the channel's design (`components/brand/native-ads.tsx`).
 
-- Every unit is an `AdSlot`: an `ad-frame` ground, a `border` hairline, `radius-sm` corners and a visible `ad-label` ("Advertisement", "Sponsored" or "Presented by").
-- Slots reserve their size from the `ad-size` tokens before anything loads: `ad-mrec-width` × `ad-mrec-height`, `ad-billboard-width` × `ad-billboard-height`, and `ad-band-mobile-height`. An unfilled slot shows a house promo at the same size.
-- Wagering units always show "Don't show me betting ads" inside the frame.
-- These are banned everywhere: pop-ups, interstitials, sticky overlays, autoplay with sound, AdSense Auto ads, and any ad between a headline and its first paragraph.
-- Density is capped at 1 ad per 600 words and 3 per page (ADS-02).
+- **Chapter sponsor**: a brand owns a chapter. Its colour marks that segment of the player timeline; the chapter list reads "The fix on the list · presented by Kick Boots Co."
+- **Half-time break**: an editorial pause between article sections, styled like a broadcast break: the sponsor's photo or muted loop, its colour washed across, one line, one button. Fixed 340px tall, full container width, never between a headline and its first paragraph.
+- **Stat card**: a scoreboard tile with one big number or claim, a 4px top rule in the sponsor colour, sitting beside the key points.
+- **Sponsored short**: exactly the size of every other short (168px wide in rows, full size in the feed), with a "Sponsored" tag top left.
+- **Presented by**: a 2px rule in the sponsor colour across the top of a module header, with "Presented by" and the brand name.
+- Every format carries a visible "Sponsored" label. Age-restricted sponsors add an `18+` tag and a one-tap opt-out ("Don't show me betting ads", "Don't show me alcohol ads").
+- Sponsor colours get the same automatic contrast check as channel accents; text on them is black or white, whichever reads better.
+- Banned everywhere: banners in standard sizes, pop-ups, interstitials, sticky overlays, autoplay with sound, third-party ad scripts.
+- Density: 1 format per 600 words and 3 per page.
 
 ## Imagery and video
 

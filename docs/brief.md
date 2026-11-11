@@ -38,9 +38,25 @@ Confident and punchy, like a good software startup. Short sentences. Plain Austr
 | Don't show me betting ads | Gambling preferences |
 | $99 a month inc. GST | $99/mo |
 
-## Wagering and the triple lock
+## Age-verified advertising (the triple lock)
 
-Feature-level. The landing page has a clear "Earn" section explaining the triple lock in one line ("Wagering ads only reach signed-in, age-verified adults who haven't opted out, so you can earn from them legally from 1 January 2027") with a link to the For advertisers page. It is a reason to join for publishers, not the headline. Copy never encourages betting.
+The triple lock is **age-verified advertising**, not a gambling feature. A channel in Age-verified mode only shows age-restricted ads (alcohol, wagering, and other categories later) to viewers who are signed in, confirmed 18+ and haven't opted out. Lead with age-appropriate advertising; name the industries second. The 1 January 2027 wagering rules are one reason it matters, not the pitch. Feature-level on the landing page, in full on the For advertisers page. Copy never encourages betting or drinking.
+
+Channel modes: **Standard** (no age-restricted ads) and **Age-verified** (triple lock on; the creator can still block categories). There is no racing-only mode.
+
+## Ads: Homestand Native Formats
+
+No banner placements, no standard IAB sizes, no AdSense. Advertisers fill a brief (name, one line, an image or muted loop, a link) and Homestand renders it in the channel's own design:
+
+| Format | Where it appears |
+| --- | --- |
+| Chapter sponsor | A brand owns a chapter of the video: a marker on the player timeline and a credit in the chapter list |
+| Half-time break | An editorial pause between article sections, styled like a broadcast break, full width of the container |
+| Stat card | A sponsor message set as a scoreboard tile beside the key points |
+| Sponsored short | A 9:16 short exactly the size of every other short, in rows and the feed |
+| Presented by | A sponsor credit on the lead story or a section header |
+
+Every format is labelled, fixed in size, fast (no third-party code) and checked in creative review. Age-restricted formats carry an 18+ mark and a one-tap opt-out.
 
 ## Product decisions
 
@@ -50,3 +66,7 @@ Feature-level. The landing page has a clear "Earn" section explaining the triple
 | New videos | Automatic. Each new YouTube upload becomes a draft pack (video page, article, shorts, SEO) in a "Ready to review" queue. One click publishes. Nothing goes live without that click. | MIG-01, MIG-08, ING-04–11 |
 | Shorts in the MVP | YouTube Shorts only (imported, plus shorts we cut from long videos). TikTok and Instagram come later (MIG-10, EDT-08). | ING-07 |
 | Pricing | Shown on the site with a 14-day trial: Starter $29, Pro $99, Publisher $299, Enterprise on request, AUD inc. GST | BIL-01, BIL-02 |
+| Channel look | The creator's own accent hex (contrast-checked) and logo; 3 preset type pairings (custom fonts later); 2 templates, Editorial and Broadcast, each previewed visually | CHN-02, CHN-03 |
+| Custom pages | Creators build their own pages (About, Work with us, anything) and write standalone articles, not only video-generated ones | CHN-04, EDT-01 |
+| Brand voice | Learned from the creator's own writing: upload articles, paste links or import a whole site; editable by hand | ING-09 |
+| Stack | Vercel + Supabase (database, auth, storage); Mux for video | — |
