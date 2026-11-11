@@ -28,7 +28,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
             Privacy
           </Link>
           <Link href="/advertisers#triple-lock" className="hover:text-foreground">
-            Responsible gambling
+            How age-restricted ads work
           </Link>
           <a href="https://www.gamblinghelponline.org.au" className="hover:text-foreground">
             Gambling Help Online: 1800 858 858

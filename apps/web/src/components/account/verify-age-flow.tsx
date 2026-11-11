@@ -98,7 +98,7 @@ export function VerifyAgeFlow() {
           <dd>11 November 2026, 9:41 am</dd>
         </dl>
         <p className="text-[14px] leading-[22px] text-muted-foreground">
-          That&apos;s all we store. You can still choose &ldquo;Don&apos;t show me betting ads&rdquo; at any time in your account.
+          That&apos;s all we store. You can still turn off betting ads or alcohol ads at any time in your account.
         </p>
         <div className="flex flex-col gap-2.5">
           <Button asChild size="lg" className="h-11">
@@ -128,7 +128,7 @@ export function VerifyAgeFlow() {
           </ul>
         </div>
         <p className="text-[14px] leading-[22px] text-muted-foreground">
-          You can keep watching everything. Until you&apos;re confirmed, you won&apos;t see betting ads.
+          You can keep watching everything. Until you&apos;re confirmed, you won&apos;t see age-restricted ads, such as alcohol or betting.
         </p>
         <div className="flex flex-col gap-2.5">
           <Button size="lg" className="h-11" onClick={() => setStep("choose")}>
@@ -152,8 +152,8 @@ export function VerifyAgeFlow() {
       <div className="flex flex-col gap-2 rounded-lg bg-muted p-4">
         <p className="text-[14px] font-semibold">Why we ask</p>
         <p className="text-[14px] leading-[22px] text-muted-foreground">
-          Australian law only allows betting ads online for signed-in adults who haven&apos;t opted out. We only use this check for betting ads. You
-          don&apos;t need it to watch anything on Homestand.
+          Some advertisers, such as alcohol and betting brands, may only reach adults. We use this check only to decide whether those ads can show to
+          you. You don&apos;t need it to watch anything on Homestand.
         </p>
       </div>
       <form

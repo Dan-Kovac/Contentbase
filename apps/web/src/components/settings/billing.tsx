@@ -30,10 +30,10 @@ const PLANS: Record<Plan, { name: string; price: number | null; for: string; fea
     name: "Starter",
     price: 29,
     for: "Solo creators getting started",
-    features: ["1 channel on a Homestand subdomain", "10 video hours a month", "Draft articles and shorts", "All three templates"],
+    features: ["1 channel on a Homestand subdomain", "10 video hours a month", "Draft articles and shorts", "Both templates"],
     loses: [
       "footyfix.com.au stops serving your channel. Old links redirect to footyfix.homestand.com.au.",
-      "Triple lock mode switches off, so your channel moves to Standard mode and wagering ads stop.",
+      "Age-verified mode switches off, so your channel moves to Standard mode and age-restricted ads, including alcohol and wagering, stop.",
       "Video hours drop to 10 a month. You've used 18.5 this month, so new imports pause until 1 December.",
     ],
   },
@@ -41,13 +41,13 @@ const PLANS: Record<Plan, { name: string; price: number | null; for: string; fea
     name: "Pro",
     price: 99,
     for: "Established creators",
-    features: ["Custom domain", "40 video hours a month", "Triple lock mode", "Ad revenue share (next phase)", "Priority processing"],
+    features: ["Custom domain", "40 video hours a month", "Age-verified advertising", "Ad revenue share (next phase)", "Priority processing"],
   },
   publisher: {
     name: "Publisher",
     price: 299,
     for: "Small media brands and clubs",
-    features: ["Everything in Pro", "3 channels and team roles", "150 video hours a month", "Migration help from our team", "Google AdSense in unsold slots"],
+    features: ["Everything in Pro", "3 channels and team roles", "150 video hours a month", "Migration help from our team", "Priority support"],
   },
   enterprise: {
     name: "Enterprise",

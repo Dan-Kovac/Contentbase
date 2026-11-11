@@ -31,7 +31,14 @@ import type { Channel, ChannelMode } from "@/lib/types"
 import { ADMIN_USER } from "./data"
 import { nowStamp } from "./clock"
 
-const MODE: Record<ChannelMode, string> = { standard: "Standard", triple_lock: "Triple lock", racing_only: "Racing-only" }
+const MODE: Record<ChannelMode, string> = { standard: "Standard", age_verified: "Age-verified" }
+const AGE_CATEGORIES = ["alcohol", "wagering"] as const
+
+function allowed(c: Channel) {
+  if (c.mode !== "age_verified") return "No age-restricted ads"
+  const on = AGE_CATEGORIES.filter((a) => !c.blockedAgeCategories.includes(a))
+  return on.length ? `Allows ${on.join(" and ")}` : "All age-restricted categories blocked"
+}
 const PLAN = { starter: "Starter", pro: "Pro", publisher: "Publisher", enterprise: "Enterprise" } as const
 
 type Row = Channel & { suspended?: boolean }
@@ -60,7 +67,7 @@ export function ChannelsTable({ channels }: { channels: Channel[] }) {
     const c = action.channel
     if (!reason.trim()) return setError("Add a reason. Every admin action is logged with one.")
     if (action.kind === "mode" && mode === c.mode) return setError("Choose a different mode.")
-    if (action.kind === "mode" && mode === "racing_only" && !declared) return setError("Racing-only needs the owner's racing content declaration.")
+    if (action.kind === "mode" && mode === "age_verified" && !declared) return setError("Confirm the owner has accepted the age-verified advertising terms.")
     const at = nowStamp()
     let text = ""
     if (action.kind === "suspend") {
@@ -105,7 +112,10 @@ export function ChannelsTable({ channels }: { channels: Channel[] }) {
                   <div className="font-mono text-[12px] text-muted-foreground">{r.customDomain ?? `${r.slug}.homestand.com.au`}</div>
                 </TableCell>
                 <TableCell>{r.owner}</TableCell>
-                <TableCell>{MODE[r.mode]}</TableCell>
+                <TableCell>
+                  {MODE[r.mode]}
+                  <div className="text-[12px] text-muted-foreground">{allowed(r)}</div>
+                </TableCell>
                 <TableCell>{PLAN[r.plan]}</TableCell>
                 <TableCell>
                   {r.notablePersonFlag ? <StatusBadge tone="failed">Flagged</StatusBadge> : <span className="text-muted-foreground">Not flagged</span>}
@@ -171,7 +181,7 @@ export function ChannelsTable({ channels }: { channels: Channel[] }) {
                   ? "The channel goes back online and the owner is notified."
                   : "The channel shows a suspended page to viewers, and the owner is notified by email. Content is kept."
                 : action?.kind === "mode"
-                  ? "Mode decides whether wagering ads can serve. The change takes effect on the next ad request."
+                  ? "Mode decides whether age-restricted ads (alcohol, wagering) can serve. The change takes effect on the next ad request."
                   : `You'll see ${c?.name}'s studio as ${c?.owner} sees it. Publishing is disabled while impersonating.`}
             </DialogDescription>
           </DialogHeader>
@@ -182,17 +192,16 @@ export function ChannelsTable({ channels }: { channels: Channel[] }) {
                 <Select value={mode} onValueChange={(v) => setMode(v as ChannelMode)}>
                   <SelectTrigger id="new-mode" className="w-full"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="standard">Standard: no wagering ads</SelectItem>
-                    <SelectItem value="triple_lock">Triple lock: wagering only when all three locks pass</SelectItem>
-                    <SelectItem value="racing_only">Racing-only: declared racing service</SelectItem>
+                    <SelectItem value="standard">Standard: no age-restricted ads</SelectItem>
+                    <SelectItem value="age_verified">Age-verified: age-restricted ads only when all three locks pass</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              {mode === "racing_only" && (
+              {mode === "age_verified" && c?.mode !== "age_verified" && (
                 <div className="flex items-start gap-2">
                   <Checkbox id="declared" checked={declared} onCheckedChange={(v) => setDeclared(v === true)} />
                   <Label htmlFor="declared" className="font-normal leading-5">
-                    The owner has signed the racing content declaration. A quarterly review is scheduled.
+                    The owner has accepted the age-verified advertising terms, and the channel is not on the notable-person register.
                   </Label>
                 </div>
               )}

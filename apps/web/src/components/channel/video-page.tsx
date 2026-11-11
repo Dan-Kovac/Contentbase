@@ -17,19 +17,20 @@ import {
   sectionPath,
   shortPath,
   videoPath,
-  type RelatedItem,
+  type Related,
 } from "./lib"
+import { StoryCard } from "./story"
 
 /**
  * Where the one in-article unit goes: before the first subheading that follows at least two
  * paragraphs (a natural break). Never between the headline and the first paragraph.
  * Returns -1 when the article is too short to carry an in-article unit.
  */
-export function inArticleAdIndex(blocks: Block[]) {
+export function inArticleAdIndex(blocks: Block[], minParagraphs = 2) {
   let paragraphs = 0
   for (let i = 0; i < blocks.length; i++) {
     const b = blocks[i]
-    if (b.type === "heading" && paragraphs >= 2) return i
+    if (b.type === "heading" && paragraphs >= minParagraphs) return i
     if (b.type === "paragraph") paragraphs++
   }
   // No subheadings: after the third paragraph, if there is more to read after it.
@@ -41,27 +42,72 @@ export function inArticleAdIndex(blocks: Block[]) {
   return -1
 }
 
-export function ArticleHeader({ channel, video }: { channel: Channel; video: Video }) {
+export interface HeaderData {
+  kicker: string
+  kickerHref: string
+  headline: string
+  standfirst: string
+  author: string
+  date: string
+  readMinutes: number
+  /** Extra byline item, e.g. "Video 18:06". */
+  extra?: string
+}
+
+export function ArticleHeaderView({ h, size = "md" }: { h: HeaderData; size?: "md" | "lg" }) {
   return (
-    <header className="flex flex-col gap-4">
-      <Link href={sectionPath(channel, video.section)} className="kicker w-fit text-foreground hover:underline">
-        {sectionLabel(channel, video.section)}
+    <header className="flex flex-col gap-4 font-sans">
+      <Link href={h.kickerHref} className="kicker w-fit text-foreground hover:underline">
+        {h.kicker}
       </Link>
-      <h1 className={cn(DISPLAY, "text-[36px] leading-[1.04] sm:text-[44px] md:text-[52px]")}>{video.article.headline}</h1>
-      <p className={cn(BODY, "text-[20px] leading-[30px] text-foreground/80 md:text-[22px] md:leading-[33px]")}>
-        {video.article.standfirst}
-      </p>
+      <h1 className={cn(DISPLAY, size === "lg" ? "text-[40px] leading-[1.02] sm:text-[52px] md:text-[64px]" : "text-[36px] leading-[1.04] sm:text-[44px] md:text-[52px]")}>
+        {h.headline}
+      </h1>
+      <p className={cn(BODY, "text-[20px] leading-[30px] text-foreground/80 md:text-[22px] md:leading-[33px]")}>{h.standfirst}</p>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-y py-3 text-[14px]">
-        <span className="font-semibold">By {video.article.author}</span>
+        <span className="font-semibold">By {h.author}</span>
+        {h.date && (
+          <>
+            <span className="text-muted-foreground" aria-hidden>·</span>
+            <time dateTime={isoDate(h.date)} className="text-muted-foreground">
+              {h.date}
+            </time>
+          </>
+        )}
         <span className="text-muted-foreground" aria-hidden>·</span>
-        <time dateTime={isoDate(displayDate(video))} className="text-muted-foreground">
-          {displayDate(video)}
-        </time>
-        <span className="text-muted-foreground" aria-hidden>·</span>
-        <span className="text-muted-foreground">{video.article.readMinutes} min read</span>
+        <span className="text-muted-foreground">{h.readMinutes} min read</span>
+        {h.extra && (
+          <>
+            <span className="text-muted-foreground" aria-hidden>·</span>
+            <span className="font-mono text-[13px] text-muted-foreground tabular">{h.extra}</span>
+          </>
+        )}
       </div>
     </header>
   )
+}
+
+export function ArticleHeader({ channel, video }: { channel: Channel; video: Video }) {
+  return (
+    <ArticleHeaderView
+      h={{
+        kicker: sectionLabel(channel, video.section),
+        kickerHref: sectionPath(channel, video.section),
+        headline: video.article.headline,
+        standfirst: video.article.standfirst,
+        author: video.article.author,
+        date: displayDate(video),
+        readMinutes: video.article.readMinutes,
+        extra: `Video ${formatDuration(video.durationSec)}`,
+      }}
+    />
+  )
+}
+
+/** Split blocks around the Half-time break so the break can leave the reading column. */
+export function splitAtBreak(blocks: Block[], minParagraphs = 2) {
+  const at = inArticleAdIndex(blocks, minParagraphs)
+  return at > 0 ? { before: blocks.slice(0, at), after: blocks.slice(at) } : { before: blocks, after: [] as Block[] }
 }
 
 export function BlockView({ block, channel }: { block: Block; channel: Channel }) {
@@ -99,7 +145,12 @@ export function BlockView({ block, channel }: { block: Block; channel: Channel }
     case "image":
       return (
         <figure className="my-8">
-          <div className="aspect-[3/2] w-full rounded-lg bg-muted" role="img" aria-label={block.caption} />
+          {block.src ? (
+            // eslint-disable-next-line @next/next/no-img-element -- prototype media; next/image once media is on the CDN
+            <img src={block.src} alt={block.caption} className="aspect-[3/2] w-full rounded-lg object-cover" loading="lazy" />
+          ) : (
+            <div className="aspect-[3/2] w-full rounded-lg bg-muted" role="img" aria-label={block.caption} />
+          )}
           <figcaption className="mt-2 font-sans text-[13px] text-muted-foreground">{block.caption}</figcaption>
         </figure>
       )
@@ -109,7 +160,7 @@ export function BlockView({ block, channel }: { block: Block; channel: Channel }
       return (
         <figure className="my-8">
           <Link href={videoPath(channel, v)}>
-            <VideoThumb tone={v.posterTone} durationSec={v.durationSec} />
+            <VideoThumb tone={v.posterTone} src={v.poster} durationSec={v.durationSec} />
           </Link>
           <figcaption className="mt-2 font-sans text-[13px] text-muted-foreground">{v.title}</figcaption>
         </figure>
@@ -123,7 +174,7 @@ export function BlockView({ block, channel }: { block: Block; channel: Channel }
 export function KeyPoints({ points }: { points: string[] }) {
   if (!points.length) return null
   return (
-    <aside aria-labelledby="key-points" className="my-10 rounded-lg border bg-card p-5 md:p-6">
+    <aside aria-labelledby="key-points" className="h-full rounded-lg border bg-card p-5 md:p-6">
       <h2 id="key-points" className="kicker mb-4 text-foreground">Key points</h2>
       <ol className="flex flex-col gap-3 font-sans text-[16px] leading-[23px]">
         {points.map((p, i) => (
@@ -142,7 +193,7 @@ export function ExclusiveGate({ channel, video }: { channel: Channel; video: Vid
   return (
     <section aria-labelledby="gate-title" className="relative overflow-hidden rounded-lg bg-brand-black text-brand-white">
       <div className="absolute inset-0 scale-105 blur-md" aria-hidden>
-        <VideoThumb tone={video.posterTone} className="h-full rounded-none" />
+        <VideoThumb tone={video.posterTone} src={video.poster} className="h-full rounded-none" />
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-brand-black/95 via-brand-black/60 to-brand-black/10" aria-hidden />
       <div className="relative flex aspect-auto min-h-[360px] flex-col items-center justify-center gap-4 px-6 py-12 text-center md:aspect-video md:min-h-0">
@@ -166,10 +217,9 @@ export function ExclusiveGate({ channel, video }: { channel: Channel; video: Vid
   )
 }
 
-export function RelatedItems({ channel, items }: { channel: Channel; items: RelatedItem[] }) {
-  if (!items.length) return null
-  const videos = items.filter((i) => i.kind === "video")
-  const shorts = items.filter((i) => i.kind === "short")
+export function RelatedItems({ channel, related }: { channel: Channel; related: Related }) {
+  const { stories, shorts } = related
+  if (!stories.length && !shorts.length) return null
   return (
     <section aria-labelledby="related-title">
       <div className="mb-6 border-t-2 border-foreground pt-3">
@@ -178,34 +228,26 @@ export function RelatedItems({ channel, items }: { channel: Channel; items: Rela
         </h2>
       </div>
       <div className="grid gap-8 lg:grid-cols-12">
-        <ul className="grid gap-6 sm:grid-cols-2 lg:col-span-8">
-          {videos.map((i) =>
-            i.kind === "video" ? (
-              <li key={i.video.id}>
-                <Link href={videoPath(channel, i.video)} className="group flex flex-col gap-2 outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <VideoThumb tone={i.video.posterTone} durationSec={i.video.durationSec} exclusive={i.video.exclusive} />
-                  <span className="kicker mt-1 text-foreground">{sectionLabel(channel, i.video.section)}</span>
-                  <span className={cn(DISPLAY, "text-[20px] leading-[25px] group-hover:underline group-hover:underline-offset-4")}>
-                    {i.video.article.headline}
-                  </span>
-                  <span className="text-[13px] text-muted-foreground">
-                    {displayDate(i.video)} · {i.video.article.readMinutes} min read
-                  </span>
-                </Link>
+        {stories.length > 0 && (
+          <ul className={cn("grid gap-x-6 gap-y-10 sm:grid-cols-2", shorts.length ? "lg:col-span-8" : "lg:col-span-12 lg:grid-cols-4")}>
+            {stories.map((s) => (
+              <li key={s.id}>
+                <StoryCard story={s} size="sm" ratio={s.kind === "video" ? "16/9" : "3/2"} />
               </li>
-            ) : null,
-          )}
-        </ul>
-        {shorts.length > 0 && (
-          <ul className="flex gap-4 overflow-x-auto pb-2 lg:col-span-4 lg:justify-end">
-            {shorts.map((i) =>
-              i.kind === "short" ? (
-                <li key={i.short.id}>
-                  <ShortCard href={shortPath(channel, i.short)} title={i.short.title} tone={i.short.posterTone} durationSec={i.short.durationSec} />
-                </li>
-              ) : null,
-            )}
+            ))}
           </ul>
+        )}
+        {shorts.length > 0 && (
+          <div className="lg:col-span-4">
+            <h3 className="kicker mb-4 text-foreground">Shorts</h3>
+            <ul className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 lg:mx-0 lg:px-0">
+              {shorts.map((x) => (
+                <li key={x.id}>
+                  <ShortCard href={shortPath(channel, x)} title={x.title} tone={x.posterTone} src={x.poster} durationSec={x.durationSec} className="w-[150px]" />
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </section>
@@ -216,9 +258,7 @@ export function videoJsonLd(channel: Channel, video: Video) {
   const origin = `${SITE}/c/${channel.slug}`
   const url = `${origin}/v/${video.slug}`
   const published = isoDate(displayDate(video))
-  const thumbnail = video.youtubeId
-    ? `https://i.ytimg.com/vi/${video.youtubeId}/maxresdefault.jpg`
-    : `${url}/poster.jpg`
+  const thumbnail = video.poster ? `${SITE}${video.poster}` : video.youtubeId ? `https://i.ytimg.com/vi/${video.youtubeId}/maxresdefault.jpg` : `${url}/poster.jpg`
   const publisher = { "@type": "Organization", name: channel.name, url: origin }
   const videoObject = {
     "@type": "VideoObject",

@@ -6,11 +6,14 @@ import { toast } from "sonner"
 import { CheckCircle2, FileVideo, Pause, Play, RefreshCw, UploadCloud, WifiOff, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
+import { VideoThumb } from "@/components/brand/media"
 import { cn } from "@/lib/utils"
 import { PipelineSteps } from "./pipeline"
 import { UPLOAD_STEPS } from "./lib"
 
 const MAX_BYTES = 4 * 1024 ** 3
+/** The poster we pull from the upload once transcoding finishes (a sample frame in the prototype). */
+const SAMPLE_POSTER = "/media/broadcast-control-room.jpg"
 const GB = 1024 ** 3
 
 type Phase =
@@ -188,15 +191,16 @@ export function UploadFlow() {
   if (phase.kind === "processing") {
     return (
       <div className="rounded-lg border bg-card p-5">
-        <div className="flex items-center gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-md bg-muted">
-            <FileVideo className="size-5" aria-hidden />
-          </span>
+        <div className="flex items-center gap-4">
+          <div className="w-[120px] shrink-0 sm:w-[160px]">
+            <VideoThumb tone="#262626" src={phase.step >= 2 ? SAMPLE_POSTER : undefined} className="rounded-md [&_span.rounded-full]:hidden" />
+          </div>
           <div className="min-w-0">
             <p className="truncate font-mono text-[13px] font-medium">{phase.name}</p>
             <p className="mt-0.5 text-[13px] text-muted-foreground">
               Uploaded {bytes(phase.size)} · about {Math.max(1, (UPLOAD_STEPS.length - 1 - phase.step) * 2)} min left
             </p>
+            <p className="mt-1 text-xs text-muted-foreground">{phase.step >= 2 ? "Poster picked from the video" : "Picking a poster frame"}</p>
           </div>
         </div>
         <div className="mt-6" aria-live="polite">
@@ -210,7 +214,10 @@ export function UploadFlow() {
   return (
     <div className="rounded-lg border bg-card p-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <CheckCircle2 className="size-6 shrink-0 text-pop-ink" aria-hidden />
+        <div className="relative w-[160px] shrink-0">
+          <VideoThumb tone="#262626" src={SAMPLE_POSTER} className="rounded-md" />
+          <CheckCircle2 className="absolute -right-2 -top-2 size-6 rounded-full bg-card text-pop-ink" aria-hidden />
+        </div>
         <div className="min-w-0 flex-1">
           <p className="font-semibold">Your draft pack is ready to review</p>
           <p className="mt-0.5 text-sm text-muted-foreground">

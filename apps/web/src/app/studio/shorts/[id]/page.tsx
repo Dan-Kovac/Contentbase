@@ -48,6 +48,7 @@ async function Editor({ params }: { params: Promise<{ id: string }> }) {
           source: v.source,
           durationSec: v.durationSec,
           posterTone: v.posterTone,
+          poster: v.poster,
           transcript: v.transcript,
         }
       }

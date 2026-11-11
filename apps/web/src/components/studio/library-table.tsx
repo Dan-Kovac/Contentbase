@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
-import { CalendarClock, Lock, MoreHorizontal, Search, Trash2, X } from "lucide-react"
+import { CalendarClock, Lock, MoreHorizontal, PenLine, Search, Trash2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -55,6 +55,7 @@ export interface LibraryRow {
 const STATUS_OPTIONS: { value: "all" | ContentStatus; label: string }[] = [
   { value: "all", label: "All statuses" },
   { value: "ready", label: "Ready to review" },
+  { value: "draft", label: "Draft" },
   { value: "scheduled", label: "Scheduled" },
   { value: "published", label: "Published" },
   { value: "processing", label: "Processing" },
@@ -154,6 +155,13 @@ export function LibraryTable({ initialRows }: { initialRows: LibraryRow[] }) {
             ))}
           </SelectContent>
         </Select>
+        {kind === "article" && (
+          <Button variant="outline" asChild className="sm:order-last sm:ml-auto">
+            <Link href="/studio/articles/new">
+              <PenLine /> Write an article
+            </Link>
+          </Button>
+        )}
         {(q || status !== "all") && (
           <Button
             variant="ghost"

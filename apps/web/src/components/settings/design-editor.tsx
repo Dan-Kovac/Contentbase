@@ -1,66 +1,36 @@
 "use client"
 
 import { useMemo, useRef, useState } from "react"
-import { AlertCircle, ArrowDown, ArrowUp, Check, GripVertical, ImageUp, Plus, Trash2, X } from "lucide-react"
+import { AlertCircle, ArrowDown, ArrowUp, Check, GripVertical, ImageUp, Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ACCENTS, PAIRINGS, channelStyle } from "@/lib/format"
+import { PAIRINGS, channelStyle } from "@/lib/format"
 import { cn } from "@/lib/utils"
-import type { AccentName, Channel, HomeModule, Pairing, Template } from "@/lib/types"
+import type { Channel, HomeModule, Pairing, Template } from "@/lib/types"
 import { FixedNote, Panel, Section, Tag } from "./section"
-import { ChannelPreview } from "./channel-preview"
-import { checkAccent, normaliseHex, ratio } from "./contrast"
+import { AccentField, accentState } from "./accent-field"
+import { TemplatePreview } from "./template-preview"
 
 const MODULE_INFO: Record<HomeModule, { label: string; description: string; ad?: boolean }> = {
   lead: { label: "Lead story", description: "Your latest or pinned video, full width, with its headline." },
-  shorts: { label: "Shorts row", description: "Your YouTube Shorts and clips. Carries one sponsored card.", ad: true },
+  shorts: { label: "Shorts row", description: "Your YouTube Shorts and clips. Carries one sponsored short.", ad: true },
   grid: { label: "Article grid", description: "Your newest videos and articles, newest first." },
   sections: { label: "Section rows", description: "One row for each section, with a link to its page." },
-  sponsor: { label: "Sponsor band", description: "One “Presented by” band, 970 × 250 on desktop.", ad: true },
+  sponsor: { label: "Sponsor band", description: "One “Presented by” credit across the module, never a box.", ad: true },
 }
 
 const TEMPLATES: { id: Template; label: string; description: string }[] = [
-  { id: "editorial", label: "Editorial", description: "Headline under a big video. Reads like a magazine." },
-  { id: "broadcast", label: "Broadcast", description: "Dark masthead, headline over the video. TV energy." },
-  { id: "minimal", label: "Minimal", description: "Centred and quiet. The words lead." },
+  { id: "editorial", label: "Editorial", description: "A white magazine. A photo lead with its headline beside it, then a grid of stories." },
+  { id: "broadcast", label: "Broadcast", description: "Dark and video-led. A full-bleed hero, then rails of videos like a streaming app." },
 ]
 
 const MAX_NAV = 8
 
 type NavItem = { key: string; label: string; href: string }
-
-function TemplateGlyph({ id }: { id: Template }) {
-  return (
-    <div className="grid h-[72px] gap-1 rounded-[4px] border bg-background p-2" aria-hidden>
-      {id === "editorial" && (
-        <>
-          <div className="h-1.5 w-1/2 rounded-sm bg-foreground/70" />
-          <div className="rounded-sm bg-muted-foreground/30" />
-          <div className="h-1.5 w-4/5 rounded-sm bg-foreground/70" />
-        </>
-      )}
-      {id === "broadcast" && (
-        <>
-          <div className="h-2.5 rounded-sm bg-foreground" />
-          <div className="relative rounded-sm bg-muted-foreground/30">
-            <div className="absolute bottom-1 left-1 h-1.5 w-3/5 rounded-sm bg-foreground/80" />
-          </div>
-        </>
-      )}
-      {id === "minimal" && (
-        <>
-          <div className="mx-auto h-1.5 w-1/3 rounded-sm bg-foreground/70" />
-          <div className="mx-auto h-1.5 w-3/4 rounded-sm bg-foreground/70" />
-          <div className="rounded-sm bg-muted-foreground/30" />
-        </>
-      )}
-    </div>
-  )
-}
 
 function FileButton({
   id,
@@ -116,8 +86,7 @@ export function DesignEditor({ channel }: { channel: Channel }) {
   const [iconUrl, setIconUrl] = useState<string | null>(null)
   const [uploadError, setUploadError] = useState<string | null>(null)
 
-  const [accent, setAccent] = useState<AccentName | "custom">(channel.accent)
-  const [customHex, setCustomHex] = useState("#e4572e")
+  const [accent, setAccent] = useState(channel.accentHex.toUpperCase())
   const [pairing, setPairing] = useState<Pairing>(channel.pairing)
   const [template, setTemplate] = useState<Template>(channel.template)
 
@@ -140,19 +109,17 @@ export function DesignEditor({ channel }: { channel: Channel }) {
     [channel.sections],
   )
 
-  // Contrast check for a custom accent
-  const hex = normaliseHex(customHex)
-  const check = hex ? checkAccent(hex) : null
-  const customBlocked = accent === "custom" && (!hex || !check?.pass)
+  // Contrast check: the preview keeps the last colour that passed, so it never shows an unreadable channel.
+  const accentCheck = accentState(accent)
+  const [lastGood, setLastGood] = useState(channel.accentHex)
+  if (accentCheck.ok && accentCheck.hex && accentCheck.hex !== lastGood) setLastGood(accentCheck.hex)
+  const previewAccent = accentCheck.hex ?? lastGood
+  const accentBlocked = !accentCheck.ok
 
-  const style = useMemo(() => {
-    const base = channelStyle(accent === "custom" ? "mono" : accent, pairing) as Record<string, string>
-    if (accent === "custom" && hex && check) return { ...base, "--chan": hex, "--chan-on": check.textOn } as React.CSSProperties
-    return base as React.CSSProperties
-  }, [accent, pairing, hex, check])
+  const style = useMemo(() => channelStyle(previewAccent, pairing), [previewAccent, pairing])
 
-  const current = { logoUrl, logoName, iconUrl, accent, customHex, pairing, template, modules, nav }
-  const snapshot = JSON.stringify({ ...current, logoName: null, customHex: accent === "custom" ? customHex : null, nav: nav.map(({ label, href }) => ({ label, href })) })
+  const current = { logoUrl, logoName, iconUrl, accent, pairing, template, modules, nav }
+  const snapshot = JSON.stringify({ ...current, logoName: null, accent: accentCheck.hex ?? accent, nav: nav.map(({ label, href }) => ({ label, href })) })
   const [saved, setSaved] = useState({ snapshot, state: current })
   const dirty = saved.snapshot !== snapshot
 
@@ -162,7 +129,6 @@ export function DesignEditor({ channel }: { channel: Channel }) {
     setLogoName(s.logoName)
     setIconUrl(s.iconUrl)
     setAccent(s.accent)
-    setCustomHex(s.customHex)
     setPairing(s.pairing)
     setTemplate(s.template)
     setModules(s.modules)
@@ -170,7 +136,7 @@ export function DesignEditor({ channel }: { channel: Channel }) {
     setUploadError(null)
   }
   const navError = nav.some((n) => !n.label.trim()) ? "Every navigation item needs a name." : null
-  const blocked = customBlocked || !!navError
+  const blocked = accentBlocked || !!navError
 
   function moveModule(from: number, to: number) {
     setModules((list) => {
@@ -274,117 +240,17 @@ export function DesignEditor({ channel }: { channel: Channel }) {
         </Section>
 
         {/* Accent */}
-        <Section stacked id="accent" title="Accent colour" description="One colour for your logo tile, the active nav underline, the Follow button, kicker squares and links. Backgrounds, text and greys stay the same.">
-          <div role="radiogroup" aria-label="Accent colour" className="grid grid-cols-3 gap-2 sm:grid-cols-5">
-            {(Object.keys(ACCENTS) as AccentName[]).map((k) => {
-              const a = ACCENTS[k]
-              const selected = accent === k
-              return (
-                <button
-                  key={k}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  onClick={() => setAccent(k)}
-                  className={cn(
-                    "flex items-center gap-2 rounded-md border bg-card p-2 text-left text-[13px] font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                    selected && "border-foreground ring-1 ring-foreground",
-                  )}
-                >
-                  <span className="grid size-6 shrink-0 place-items-center rounded-[4px] border border-black/10" style={{ background: a.value, color: a.on }}>
-                    {selected && <Check className="size-3.5" aria-hidden />}
-                  </span>
-                  {a.label}
-                </button>
-              )
-            })}
-            <button
-              type="button"
-              role="radio"
-              aria-checked={accent === "custom"}
-              onClick={() => setAccent("custom")}
-              className={cn(
-                "flex items-center gap-2 rounded-md border bg-card p-2 text-left text-[13px] font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                accent === "custom" && "border-foreground ring-1 ring-foreground",
-              )}
-            >
-              <span
-                className="size-6 shrink-0 rounded-[4px] border border-black/10"
-                style={{ background: hex ?? "conic-gradient(#e4572e, #1c4fb8, #0e5a3a, #e4572e)" }}
-                aria-hidden
-              />
-              Custom
-            </button>
-          </div>
-
-          {accent === "custom" && (
-            <Panel className="mt-3">
-              <div className="grid gap-4 p-4 sm:grid-cols-[auto_1fr] sm:items-start sm:p-5">
-                <div className="grid gap-2">
-                  <Label htmlFor="custom-hex">Hex colour</Label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      aria-label="Pick a colour"
-                      value={hex ?? "#000000"}
-                      onChange={(e) => setCustomHex(e.target.value)}
-                      className="size-9 shrink-0 cursor-pointer rounded-md border bg-transparent p-1"
-                    />
-                    <Input
-                      id="custom-hex"
-                      value={customHex}
-                      onChange={(e) => setCustomHex(e.target.value)}
-                      className="w-32 font-mono uppercase"
-                      spellCheck={false}
-                      aria-invalid={customBlocked}
-                      aria-describedby="contrast-result"
-                    />
-                  </div>
-                </div>
-                <div id="contrast-result" aria-live="polite" className="grid gap-2">
-                  {!hex ? (
-                    <p className="flex items-start gap-2 text-[13px] text-destructive">
-                      <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
-                      That isn&apos;t a hex colour. Use six digits after a #, e.g. #1C4FB8.
-                    </p>
-                  ) : (
-                    check && (
-                      <>
-                        <ul className="grid gap-1.5 text-[13px]">
-                          <li className="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
-                            <span>
-                              On the white page <span className="text-muted-foreground">(needs 3:1)</span>
-                            </span>
-                            <span className={cn("flex items-center gap-1.5 font-mono font-medium tabular", !check.onPagePass && "text-destructive")}>
-                              {ratio(check.onPage)} {check.onPagePass ? <Check className="size-4" aria-label="Pass" /> : <X className="size-4" aria-label="Fail" />}
-                            </span>
-                          </li>
-                          <li className="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
-                            <span>
-                              {check.textOn === "#ffffff" ? "White" : "Black"} text on it <span className="text-muted-foreground">(needs 4.5:1)</span>
-                            </span>
-                            <span className={cn("flex items-center gap-1.5 font-mono font-medium tabular", !check.textPass && "text-destructive")}>
-                              {ratio(check.textRatio)} {check.textPass ? <Check className="size-4" aria-label="Pass" /> : <X className="size-4" aria-label="Fail" />}
-                            </span>
-                          </li>
-                        </ul>
-                        {check.pass ? (
-                          <p className="text-[13px] text-muted-foreground">Passes WCAG AA. You can save this colour.</p>
-                        ) : (
-                          <p className="flex items-start gap-2 text-[13px] text-destructive">
-                            <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
-                            {!check.onPagePass
-                              ? `${hex.toUpperCase()} is too pale on white (${ratio(check.onPage)}). Links and the nav underline need 3:1. Try a darker shade.`
-                              : `Text on ${hex.toUpperCase()} is hard to read (${ratio(check.textRatio)}). Try a darker or lighter shade.`}
-                          </p>
-                        )}
-                      </>
-                    )
-                  )}
-                </div>
-              </div>
-            </Panel>
-          )}
+        <Section
+          stacked
+          id="accent"
+          title="Accent colour"
+          description="Your own colour, as a hex. It appears on your logo tile, the active nav underline, the Follow button, kicker squares and links. We check its contrast as you type and pick black or white text for it."
+        >
+          <Panel>
+            <div className="p-4 sm:p-5">
+              <AccentField id="accent-hex" value={accent} onChange={setAccent} />
+            </div>
+          </Panel>
         </Section>
 
         {/* Type pairing */}
@@ -419,11 +285,17 @@ export function DesignEditor({ channel }: { channel: Channel }) {
               )
             })}
           </div>
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-dashed px-4 py-3">
+            <p className="text-[13px] text-muted-foreground">
+              <span className="font-medium text-foreground">Custom fonts.</span> Upload your own headline and reading faces.
+            </p>
+            <Tag>Coming soon</Tag>
+          </div>
         </Section>
 
         {/* Template */}
-        <Section stacked id="template" title="Template" description="The shape of your pages. Every template has the same fixed ad positions.">
-          <div role="radiogroup" aria-label="Template" className="grid gap-2 sm:grid-cols-3">
+        <Section stacked id="template" title="Template" description="The shape of your homepage and pages. Each preview uses your colour, logo and type. Both templates have the same fixed ad positions.">
+          <div role="radiogroup" aria-label="Template" className="grid gap-3 sm:grid-cols-2">
             {TEMPLATES.map((t) => {
               const selected = template === t.id
               return (
@@ -434,15 +306,31 @@ export function DesignEditor({ channel }: { channel: Channel }) {
                   aria-checked={selected}
                   onClick={() => setTemplate(t.id)}
                   className={cn(
-                    "flex flex-col gap-3 rounded-lg border bg-card p-3 text-left outline-none transition-colors hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                    "flex flex-col gap-3 rounded-lg border bg-card p-2 pb-3 text-left outline-none transition-colors hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                     selected && "border-foreground ring-1 ring-foreground",
                   )}
                 >
-                  <TemplateGlyph id={t.id} />
-                  <span>
-                    <span className="flex items-center justify-between text-[13px] font-semibold">
+                  <div aria-hidden className="pointer-events-none">
+                    <TemplatePreview
+                      template={t.id}
+                      accentHex={previewAccent}
+                      pairing={pairing}
+                      name={channel.name}
+                      logoUrl={logoUrl}
+                      nav={nav.map((n) => n.label)}
+                      sectionLabels={channel.sections.map((s) => s.label)}
+                      maxHeight={520}
+                      className="rounded-md"
+                    />
+                  </div>
+                  <span className="px-1">
+                    <span className="flex items-center justify-between text-sm font-semibold">
                       {t.label}
-                      {selected && <Check className="size-4" aria-hidden />}
+                      {selected ? (
+                        <span className="flex items-center gap-1 text-[12px] font-medium">
+                          <Check className="size-4" aria-hidden /> Selected
+                        </span>
+                      ) : null}
                     </span>
                     <span className="mt-0.5 block text-[13px] leading-5 text-muted-foreground">{t.description}</span>
                   </span>
@@ -480,7 +368,7 @@ export function DesignEditor({ channel }: { channel: Channel }) {
                     <div className={cn("min-w-0 flex-1", !m.enabled && "opacity-60")}>
                       <p className="flex flex-wrap items-center gap-2 text-sm font-medium">
                         {info.label}
-                        {info.ad && <Tag className="h-[18px] px-1.5 text-[10px]">Includes ad slot</Tag>}
+                        {info.ad && <Tag className="h-[18px] px-1.5 text-[10px]">Can carry a sponsor</Tag>}
                       </p>
                       <p className="text-[13px] leading-5 text-muted-foreground">{info.description}</p>
                     </div>
@@ -503,7 +391,7 @@ export function DesignEditor({ channel }: { channel: Channel }) {
               })}
             </ol>
             <p className="border-t bg-muted/40 px-4 py-3 text-[13px] text-muted-foreground sm:px-5">
-              You can&apos;t add ad slots or free-form blocks. Homestand places every ad so your homepage never gets crowded.
+              You can&apos;t add ads or free-form blocks. Homestand places every sponsor so your homepage never gets crowded.
             </p>
           </Panel>
         </Section>
@@ -578,8 +466,8 @@ export function DesignEditor({ channel }: { channel: Channel }) {
               "Backgrounds, text colours and greys. Your accent only appears in set places.",
               "Type sizes, weights and line lengths inside each pairing",
               "Page layouts, header and mobile menu",
-              "Ad slot positions and sizes, ad frames and labels, and the density cap of 1 ad per 600 words and 3 per page",
-              "The “Don't show me betting ads” link and the Powered by Homestand footer",
+              "Where ads appear, how they look and how they are labelled, and the density cap of 1 ad per 600 words and 3 per page",
+              "The 18+ opt-out links on age-restricted ads and the Powered by Homestand footer",
             ]}
           />
         </Section>
@@ -587,9 +475,9 @@ export function DesignEditor({ channel }: { channel: Channel }) {
         {/* Save bar */}
         <div className="sticky bottom-4 z-10 mt-2">
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-background/95 px-4 py-3 shadow-popover backdrop-blur">
-            <p className={cn("min-w-0 text-[13px]", customBlocked ? "text-destructive" : "text-muted-foreground")} aria-live="polite">
-              {customBlocked
-                ? "Fix the accent colour to save. It needs 3:1 on white and 4.5:1 with text."
+            <p className={cn("min-w-0 text-[13px]", accentBlocked ? "text-destructive" : "text-muted-foreground")} aria-live="polite">
+              {accentBlocked
+                ? "Fix the accent colour to save. It needs 3:1 on white and 4.5:1 with text on it."
                 : navError
                   ? navError
                   : dirty
@@ -615,15 +503,17 @@ export function DesignEditor({ channel }: { channel: Channel }) {
             <p className="text-[13px] font-semibold">Live preview</p>
             <p className="text-xs text-muted-foreground">Homepage · {TEMPLATES.find((t) => t.id === template)?.label}</p>
           </div>
-          <div className="mx-auto max-h-[380px] max-w-[400px] overflow-y-auto rounded-lg xl:max-h-[calc(100vh-8rem)]">
-            <ChannelPreview
+          <div className="mx-auto max-h-[420px] max-w-[440px] overflow-y-auto rounded-lg xl:max-h-[calc(100vh-8rem)] xl:max-w-none">
+            <TemplatePreview
+              template={template}
+              accentHex={previewAccent}
+              pairing={pairing}
               name={channel.name}
               logoUrl={logoUrl}
-              template={template}
+              iconUrl={iconUrl}
               modules={modules}
-              nav={nav}
+              nav={nav.map((n) => n.label)}
               sectionLabels={channel.sections.map((s) => s.label)}
-              style={style}
               domain={channel.customDomain ?? `${channel.slug}.homestand.com.au`}
             />
           </div>

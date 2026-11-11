@@ -35,13 +35,9 @@ export interface Kpi {
 
 export function pilotKpis(): Kpi[] {
   const decisions = listAdDecisions()
-  const outside = decisions.filter(
-    (d) =>
-      d.outcome === "wagering_served" &&
-      d.reason !== "RACING_ONLY_EXEMPT" &&
-      !(d.locks.session.pass && d.locks.age.pass && d.locks.optout.pass),
-  ).length
-  const exempt = decisions.filter((d) => d.reason === "RACING_ONLY_EXEMPT").length
+  // Age-restricted (alcohol, wagering) impressions served without all three locks passing.
+  const restricted = decisions.filter((d) => d.outcome === "wagering_served")
+  const outside = restricted.filter((d) => !(d.locks.session.pass && d.locks.age.pass && d.locks.optout.pass)).length
   const jobs = ["ch_footyfix", "ch_trackside"].flatMap((id) => listImportJobs(id)).filter((j) => j.status === "done")
   const imported = jobs.reduce((n, j) => n + j.imported, 0)
   const failed = jobs.reduce((n, j) => n + j.failed, 0)
@@ -51,16 +47,16 @@ export function pilotKpis(): Kpi[] {
     { id: "ttp", label: "Time to publish", value: "7 min 40 s", target: "Under 10 min, median", status: "on_track", detail: "Upload finished to draft pack ready. p90 is 14 min 05 s." },
     { id: "volume", label: "Publishing volume", value: "2.3×", target: "2× vs before", status: "on_track", detail: "Published items per channel per week, against each channel's pre-pilot baseline." },
     { id: "search", label: "Organic search sessions", value: "2,670 a day", target: "Growing month on month", status: "on_track", detail: "Up 31% on October. Google 88%, Bing 12%." },
-    { id: "signup", label: "Verified sign-up rate", value: "2.7%", target: "3% or more", status: "watch", detail: "Triple-lock accounts ÷ unique visitors. Trackside is at 1.9%." },
+    { id: "signup", label: "Verified sign-up rate", value: "2.7%", target: "3% or more", status: "watch", detail: "Signed-in, age-verified accounts ÷ unique visitors. Trackside is at 1.9%." },
     { id: "migration", label: "Migration success", value: `${migration}%`, target: "99% of items", status: "on_track", detail: `${imported.toLocaleString("en-AU")} imported items live with redirects, ${failed} failed.` },
     { id: "cwv", label: "Core Web Vitals pass rate", value: "93%", target: "90% with ads on", status: "on_track", detail: "Pages with good LCP, INP and CLS at the 75th percentile." },
     {
       id: "compliance",
-      label: "Wagering impressions outside a valid session",
+      label: "Age-restricted impressions outside a valid triple-lock session",
       value: String(outside),
       target: "0",
       status: outside === 0 ? "on_track" : "off_track",
-      detail: `Racing-only exempt impressions are counted separately: ${exempt}.`,
+      detail: `Alcohol and wagering impressions served without all three locks passing. ${restricted.length} age-restricted ${restricted.length === 1 ? "impression" : "impressions"} in the sample, each with evidence written before serve.`,
     },
   ]
 }
@@ -191,10 +187,10 @@ export interface AuditEntry {
 export const auditLog: AuditEntry[] = [
   { id: "aud_5521", at: "11 November 2026, 9:30 am", actor: "System", action: "evidence.export", target: "Harbour Bet (licensed) · 1–10 November 2026", after: "csv · 41,209 rows · ready" },
   { id: "aud_5520", at: "11 November 2026, 9:02 am", actor: "System", action: "import.run", target: "Footy Fix · YouTube new uploads", after: "1 imported · 0 failed" },
-  { id: "aud_5519", at: "11 November 2026, 8:15 am", actor: "System", action: "creative.submit", target: "Riverbank Wagering · Spring Carnival MREC", after: "status: pending · automated checks: 1 fail, 1 to check" },
-  { id: "aud_5518", at: "10 November 2026, 5:18 pm", actor: "Tom Ellis", action: "channel.mode_change", target: "Trackside", before: "mode: triple_lock", after: "mode: racing_only", reason: "Racing declaration signed by Trackside Media Pty Ltd." },
+  { id: "aud_5519", at: "11 November 2026, 8:15 am", actor: "System", action: "creative.submit", target: "Riverbank Wagering · Spring Carnival stat card", after: "status: pending · automated checks: 1 fail, 1 to check" },
+  { id: "aud_5518", at: "10 November 2026, 5:18 pm", actor: "Tom Ellis", action: "channel.mode_change", target: "Trackside", before: "mode: standard", after: "mode: age_verified", reason: "Owner asked to switch on age-verified advertising. Notable-person check done; alcohol and wagering both allowed." },
   { id: "aud_5517", at: "10 November 2026, 4:55 pm", actor: "Tom Ellis", action: "channel.impersonate", target: "Footy Fix (studio)", reason: "Support ticket 2231: custom domain stuck on SSL." },
-  { id: "aud_5516", at: "10 November 2026, 2:10 pm", actor: "Priya Raman", action: "creative.approve", target: "Kick Boots Co. · Summer boots MREC", before: "status: pending", after: "status: approved", reason: "Brand-safe. No restricted categories." },
+  { id: "aud_5516", at: "10 November 2026, 2:10 pm", actor: "Priya Raman", action: "creative.approve", target: "Kick Boots Co. · Summer boots sponsored short", before: "status: pending", after: "status: approved", reason: "Brand-safe. Not an age-restricted category." },
   { id: "aud_5515", at: "10 November 2026, 11:47 am", actor: "Priya Raman", action: "moderation.dismiss", target: "Report rep_0188 · Round 7 in five minutes", before: "status: open", after: "status: dismissed", reason: "Footage licensed via the club media pool. Licence on file." },
   { id: "aud_5514", at: "9 November 2026, 3:22 pm", actor: "Tom Ellis", action: "campaign.create", target: "Riverbank Wagering · cmp_tab", after: "pricing: cpc · status: in_review" },
   { id: "aud_5513", at: "9 November 2026, 10:05 am", actor: "Priya Raman", action: "channel.flag", target: "Footy Fix", before: "notable_person: unset", after: "notable_person: false", reason: "Owner checked against the notable-person register. Not listed." },

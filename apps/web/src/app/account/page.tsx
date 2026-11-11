@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { AccountCentre, type FollowedChannel } from "@/components/account/account-centre"
 import { listChannels } from "@/lib/data"
-import { ACCENTS, compact } from "@/lib/format"
+import { compact, readableOn } from "@/lib/format"
 
 export const metadata: Metadata = { title: "Your account" }
 
@@ -10,8 +10,8 @@ export default function AccountPage() {
     slug: c.slug,
     name: c.name,
     tagline: c.tagline,
-    accent: ACCENTS[c.accent].value,
-    accentOn: ACCENTS[c.accent].on,
+    accent: c.accentHex,
+    accentOn: readableOn(c.accentHex),
     initials: c.name
       .split(/\s+/)
       .map((w) => w[0])

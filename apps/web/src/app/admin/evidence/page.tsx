@@ -10,7 +10,7 @@ export default function EvidencePage() {
     <div>
       <PageHeader
         title="Ad decisions and evidence"
-        description="Every ad request, the result of each lock and the reason code. Wagering impressions carry a separate evidence record per lock, written before the creative is returned."
+        description="Every ad request, the result of each lock and the reason code. Age-restricted impressions (alcohol, wagering) carry an evidence record per lock, written before the creative is returned. Target: zero age-restricted impressions outside a valid triple-lock session."
       />
       <EvidenceViewer decisions={listAdDecisions()} campaigns={listCampaigns()} />
     </div>

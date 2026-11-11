@@ -60,7 +60,7 @@ export function ImportLive() {
       aside={
         <div className="flex flex-col gap-5">
           <p className="text-[13px] font-semibold uppercase tracking-[1px] text-brand-muted">{url}</p>
-          <ChannelPreview name={draft.name} subdomain={draft.subdomain} template={draft.template} accent={draft.accent} pairing={draft.pairing} />
+          <ChannelPreview name={draft.name} subdomain={draft.subdomain} template={draft.template} accentHex={draft.accentHex} pairing={draft.pairing} logoUrl={draft.logoUrl} iconUrl={draft.iconUrl} />
         </div>
       }
     >

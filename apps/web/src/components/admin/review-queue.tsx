@@ -16,7 +16,16 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
-import type { Creative } from "@/lib/types"
+import type { AgeCategory, Campaign, Creative, NativeFormat, Sponsor } from "@/lib/types"
+import { VideoThumb } from "@/components/brand/media"
+import {
+  ChapterSponsorCredit,
+  ChapterSponsorSegment,
+  HalftimeBreak,
+  PresentedBy,
+  SponsoredShortCard,
+  StatCard,
+} from "@/components/brand/native-ads"
 import { ADMIN_USER } from "./data"
 import { nowStamp } from "./clock"
 
@@ -29,48 +38,114 @@ interface Item extends Creative {
 }
 
 const REJECT_PRESETS = [
-  "Promotes odds. Resubmit without prices.",
+  "Promotes odds or prices. Resubmit without them.",
   "Features a notable person.",
-  "Responsible gambling message missing or too small.",
-  "Includes an inducement (bonus bets or deposit match).",
+  "Required responsible-use message missing or too small.",
+  "Includes an inducement, such as bonus bets or free drinks.",
+  "Could appeal to people under 18.",
 ]
 
-const CREATIVE_COPY: Record<string, { headline: string; body: string; small?: string }> = {
-  cr_riv_1: { headline: "Spring Carnival", body: "Every race, every track. Feature race from $3.50.", small: "Gamble responsibly. For free and confidential support call 1800 858 858 or visit gamblinghelponline.org.au. 18+ only." },
-  cr_hb_2: { headline: "Racing, covered", body: "Form, fields and results for every Australian meeting.", small: "Chances are you're about to lose. For free and confidential support call 1800 858 858. 18+ only." },
-  cr_boots_1: { headline: "Built for the last quarter", body: "New season boots. Free returns Australia-wide." },
+const FORMAT: Record<NativeFormat, string> = {
+  chapter_sponsor: "Chapter sponsor",
+  halftime: "Half-time break",
+  stat_card: "Stat card",
+  sponsored_short: "Sponsored short",
+  presented_by: "Presented by",
+}
+const AGE: Record<AgeCategory, string> = { alcohol: "Alcohol", wagering: "Wagering" }
+
+/** What each advertiser put in the brief. Moves to the creative record with the database. */
+const BRIEFS: Record<string, Partial<Sponsor> & { required?: string }> = {
+  cr_riv_1: {
+    colour: "#14532d",
+    line: "Every race, every track this Spring Carnival.",
+    stat: { value: "$3.50", label: "Feature race, Saturday" },
+    image: "/media/racing-jockey-red.jpg",
+    cta: "Learn more",
+    url: "https://example.com/riverbank",
+    required: "Gamble responsibly. For free and confidential support call 1800 858 858 or visit gamblinghelponline.org.au. 18+ only.",
+  },
+  cr_hb_2: {
+    required: "Chances are you're about to lose. For free and confidential support call 1800 858 858. 18+ only.",
+  },
 }
 
-function CreativePreview({ c }: { c: Creative }) {
-  const copy = CREATIVE_COPY[c.id] ?? { headline: c.name, body: c.advertiser }
-  const wide = c.size === "970x250"
-  const banner = c.size === "320x100"
+/** Build the sponsor the format renders from: the advertiser's sponsor record plus the creative's brief. */
+function sponsorFor(c: Creative, campaign: Campaign | undefined, sponsors: Sponsor[]): Sponsor & { required?: string } {
+  const base = c.advertiser.replace(/\s*\(.*\)$/, "")
+  const known = sponsors.find((s) => s.name === base)
+  const brief = BRIEFS[c.id] ?? {}
+  return {
+    id: known?.id ?? c.id,
+    name: base,
+    colour: brief.colour ?? known?.colour ?? "#1f2937",
+    line: brief.line ?? known?.line ?? c.name,
+    stat: brief.stat ?? known?.stat,
+    image: brief.image ?? known?.image,
+    cta: brief.cta ?? known?.cta ?? "Learn more",
+    url: brief.url ?? known?.url ?? "#",
+    ageCategory: campaign?.ageCategory ?? known?.ageCategory,
+    required: brief.required,
+  }
+}
+
+function CreativePreview({ c, sponsor }: { c: Creative; sponsor: Sponsor & { required?: string } }) {
   return (
-    <div className="rounded-lg border bg-ad-frame p-4 md:p-6">
-      <div className="mb-3 flex items-center justify-between text-[12px] text-muted-foreground">
-        <span className="font-mono">{c.size.replace("x", " × ")}</span>
-        <span>Shown at actual size where it fits</span>
+    <div className="flex flex-col gap-4 rounded-lg border bg-muted/40 p-4 md:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-[12px] text-muted-foreground">
+        <span className="font-semibold text-foreground">{FORMAT[c.format]}</span>
+        <span>Rendered as it will appear on a channel, at actual size</span>
       </div>
-      <div className="flex justify-center">
-        <div
-          className={cn(
-            "relative flex max-w-full flex-col justify-between overflow-hidden rounded-[2px] p-4 text-white",
-            wide ? "aspect-[970/250] w-[970px] md:p-8" : banner ? "aspect-[320/100] w-[320px]" : "aspect-[300/250] w-[300px]",
-          )}
-          style={{ background: c.isWagering ? "linear-gradient(135deg,#0b2545,#13315c 60%,#1f6f8b)" : "linear-gradient(135deg,#1f2a1d,#3f5233)" }}
-          role="img"
-          aria-label={`${c.advertiser} creative: ${copy.headline}. ${copy.body}`}
-        >
-          <span className="text-[11px] font-bold uppercase tracking-[1px] opacity-80">{c.advertiser}</span>
-          <div>
-            <p className={cn("font-extrabold leading-tight tracking-[-0.02em]", wide ? "text-[20px] sm:text-[34px] md:text-[44px]" : "text-[26px]")}>{copy.headline}</p>
-            <p className={cn("mt-1 opacity-90", wide ? "text-[12px] sm:text-[16px] md:text-[20px]" : "text-[14px]")}>{copy.body}</p>
-          </div>
-          {copy.small && <p className={cn("leading-snug opacity-80", wide ? "text-[8px] sm:text-[11px]" : "text-[9px]")}>{copy.small}</p>}
-        </div>
+      <div className="rounded-md border bg-background p-4 text-foreground md:p-6">
+        <FormatRender format={c.format} sponsor={sponsor} />
       </div>
+      <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-[13px] sm:grid-cols-[auto_1fr]">
+        <dt className="text-muted-foreground">Line</dt>
+        <dd>{sponsor.line}</dd>
+        {sponsor.stat && (
+          <>
+            <dt className="text-muted-foreground">Stat</dt>
+            <dd>
+              {sponsor.stat.value} · {sponsor.stat.label}
+            </dd>
+          </>
+        )}
+        <dt className="text-muted-foreground">Button and link</dt>
+        <dd className="break-all">
+          {sponsor.cta} · <span className="font-mono">{sponsor.url}</span>
+        </dd>
+        {sponsor.required && (
+          <>
+            <dt className="text-muted-foreground">Required message</dt>
+            <dd>{sponsor.required}</dd>
+          </>
+        )}
+      </dl>
     </div>
   )
+}
+
+function FormatRender({ format, sponsor }: { format: NativeFormat; sponsor: Sponsor }) {
+  switch (format) {
+    case "chapter_sponsor":
+      return (
+        <div className="flex max-w-[560px] flex-col gap-3">
+          <VideoThumb src={sponsor.image} tone="#1b2a4a" durationSec={1471} />
+          <div className="relative h-1.5 rounded-full bg-muted" aria-hidden>
+            <ChapterSponsorSegment sponsor={sponsor} from={0.28} to={0.61} />
+          </div>
+          <ChapterSponsorCredit sponsor={sponsor} chapter="The Valley's turns" />
+        </div>
+      )
+    case "halftime":
+      return <HalftimeBreak sponsor={sponsor} />
+    case "stat_card":
+      return <StatCard sponsor={sponsor} className="max-w-[340px]" />
+    case "sponsored_short":
+      return <SponsoredShortCard sponsor={sponsor} />
+    case "presented_by":
+      return <PresentedBy sponsor={sponsor} />
+  }
 }
 
 const RESULT: Record<CheckResult, { label: string; Icon: typeof Check; cls: string }> = {
@@ -79,7 +154,8 @@ const RESULT: Record<CheckResult, { label: string; Icon: typeof Check; cls: stri
   check: { label: "Check", Icon: CircleHelp, cls: "text-foreground" },
 }
 
-export function ReviewQueue({ creatives }: { creatives: Creative[] }) {
+export function ReviewQueue({ creatives, campaigns, sponsors }: { creatives: Creative[]; campaigns: Campaign[]; sponsors: Sponsor[] }) {
+  const campaignOf = (c: Creative) => campaigns.find((k) => k.id === c.campaignId)
   const [items, setItems] = useState<Item[]>(creatives)
   const [filter, setFilter] = useState<"pending" | "all">("pending")
   const [selectedId, setSelectedId] = useState(creatives.find((c) => c.status === "pending")?.id ?? creatives[0]?.id)
@@ -121,6 +197,8 @@ export function ReviewQueue({ creatives }: { creatives: Creative[] }) {
     toast(status === "approved" ? "Approved" : "Rejected", { description: `${selected.advertiser}: ${selected.name}` })
   }
 
+  const selectedCampaign = selected ? campaignOf(selected) : undefined
+  const ageCategory = selectedCampaign?.ageCategory
   const hasFail = selected?.checks.some((k) => k.result === "fail")
   const hasOpen = selected?.checks.some((k) => k.result === "check")
   const canApprove = selected?.status === "pending" && !hasFail && !hasOpen
@@ -170,8 +248,8 @@ export function ReviewQueue({ creatives }: { creatives: Creative[] }) {
                   </span>
                   <span className="text-[13px] text-muted-foreground">{c.advertiser}</span>
                   <span className="flex items-center gap-2 text-[12px] text-muted-foreground">
-                    {c.isWagering && <StatusBadge tone="wagering" />}
-                    <span className="font-mono">{c.size}</span>
+                    {campaignOf(c)?.ageCategory && <StatusBadge tone="wagering">18+ · {AGE[campaignOf(c)!.ageCategory!]}</StatusBadge>}
+                    <span>{FORMAT[c.format]}</span>
                   </span>
                   <span className="text-[12px] text-muted-foreground">Submitted {c.submittedAt}</span>
                 </button>
@@ -206,14 +284,21 @@ export function ReviewQueue({ creatives }: { creatives: Creative[] }) {
             )}
           </div>
 
-          <CreativePreview c={selected} />
+          <CreativePreview c={selected} sponsor={sponsorFor(selected, selectedCampaign, sponsors)} />
 
           <div className="grid gap-6 xl:grid-cols-2">
             <div>
               <h3 className="mb-2 text-[15px] font-semibold">
-                {selected.isWagering ? "Wagering checklist (ADS-06)" : "Brand-safety checklist"}
+                {ageCategory ? `Age-restricted checklist · ${AGE[ageCategory]} (ADS-06)` : "Brand-safety checklist"}
               </h3>
               <ul className="divide-y rounded-lg border">
+                {ageCategory && (
+                  <>
+                    <AutoCheck label="18+ mark and category opt-out shown in the format" />
+                    <AutoCheck label={`Booked only on age-verified channels (${selectedCampaign?.channels.join(", ")})`} />
+                    <AutoCheck label="Serves only when all three locks pass" />
+                  </>
+                )}
                 {selected.checks.map((k, i) => {
                   const r = RESULT[k.result]
                   return (
@@ -255,7 +340,7 @@ export function ReviewQueue({ creatives }: { creatives: Creative[] }) {
                   <span>
                     {selected.audit ??
                       (selected.status === "pending"
-                        ? "Your decision and reason are written to the audit log with your name and the time. Wagering creatives serve only after approval."
+                        ? "Your decision and reason are written to the audit log with your name and the time. Creatives serve only after approval."
                         : `Decision recorded. ${selected.status === "approved" ? "Approved" : "Rejected"} before this session.`)}
                   </span>
                 </p>
@@ -306,7 +391,7 @@ export function ReviewQueue({ creatives }: { creatives: Creative[] }) {
                 setReason(e.target.value)
                 if (e.target.value.trim()) setError(false)
               }}
-              placeholder={dialog === "approve" ? "e.g. All checks pass. RG message legible at actual size." : "Say what to fix so the advertiser can resubmit."}
+              placeholder={dialog === "approve" ? "e.g. All checks pass. Required message legible at actual size." : "Say what to fix so the advertiser can resubmit."}
               aria-invalid={error || undefined}
               aria-describedby={error ? "reason-error" : undefined}
               rows={3}
@@ -328,5 +413,19 @@ export function ReviewQueue({ creatives }: { creatives: Creative[] }) {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+function AutoCheck({ label }: { label: string }) {
+  return (
+    <li className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+      <span className="text-[14px]">{label}</span>
+      <span className="flex items-center gap-2">
+        <span className="text-[12px] text-muted-foreground">Automatic</span>
+        <span className="inline-flex items-center gap-1 text-[12px] font-bold uppercase tracking-[0.8px]">
+          <Check className="size-3.5" aria-hidden /> Pass
+        </span>
+      </span>
+    </li>
   )
 }

@@ -34,6 +34,7 @@ export interface TopItem {
   views: number
   watchMinutes: number
   tone: string
+  src?: string
 }
 
 function valueOf(rows: StudioDay[], m: (typeof METRICS)[number]) {

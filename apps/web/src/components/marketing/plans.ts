@@ -37,7 +37,7 @@ export const PLANS: PlanInfo[] = [
       "Everything in Starter",
       "Your own domain, e.g. footyfix.com.au",
       "40 video hours processed a month",
-      "Triple lock mode for wagering ads",
+      "Age-verified advertising",
       "Ad revenue share",
       "Priority processing",
     ],
@@ -56,7 +56,6 @@ export const PLANS: PlanInfo[] = [
       "Team roles for editors and producers",
       "150 video hours processed a month",
       "Migration assistance",
-      "Google AdSense in the same designed slots",
     ],
     cta: "Start free trial",
     href: "/signup",
@@ -105,10 +104,9 @@ export const COMPARISON: { group: string; rows: { label: string; values: [string
   {
     group: "Earn",
     rows: [
-      { label: "Premium ad slots", values: [true, true, true, true] },
-      { label: "Triple lock mode", values: [false, true, true, true] },
+      { label: "Homestand Native Formats", values: [true, true, true, true] },
+      { label: "Age-verified advertising", values: [false, true, true, true] },
       { label: "Ad revenue share", values: [false, true, true, true] },
-      { label: "Google AdSense in designed slots", values: [false, false, true, true] },
     ],
   },
   {

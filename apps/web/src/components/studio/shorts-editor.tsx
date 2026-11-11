@@ -26,6 +26,7 @@ export interface ParentVideo {
   source: "youtube" | "upload"
   durationSec: number
   posterTone: string
+  poster?: string
   transcript: TranscriptLine[]
 }
 
@@ -116,10 +117,10 @@ export function ShortsEditor({ short, parent }: { short: Short; parent?: ParentV
         <div className="md:sticky md:top-20 md:self-start">
           <div className="mx-auto w-[220px] md:w-full">
             {rendered || isImported ? (
-              <VerticalPreview tone={tone} caption={previewCaption} durationSec={isImported ? short.durationSec : range[1] - range[0]} reframe={reframe} offset={offset} />
+              <VerticalPreview tone={tone} src={short.poster ?? parent?.poster} caption={previewCaption} durationSec={isImported ? short.durationSec : range[1] - range[0]} reframe={reframe} offset={offset} />
             ) : (
               <div className="grid gap-2">
-                <SegmentPreview tone={parent?.posterTone ?? tone} start={range[0]} end={range[1]} />
+                <SegmentPreview tone={parent?.posterTone ?? tone} src={parent?.poster ?? short.poster} start={range[0]} end={range[1]} />
                 <div className="grid aspect-[9/16] w-full place-items-center rounded-lg border border-dashed p-6 text-center">
                   <div>
                     <FileVideo className="mx-auto size-6 text-muted-foreground" aria-hidden />
@@ -240,7 +241,7 @@ export function ShortsEditor({ short, parent }: { short: Short; parent?: ParentV
                 </ToggleGroup>
                 <div className="grid gap-3 sm:grid-cols-[minmax(0,260px)_1fr] sm:items-center">
                   <div className="relative overflow-hidden rounded-md" aria-hidden>
-                    <VideoThumb tone={parent?.posterTone ?? tone} className="rounded-md [&_span.rounded-full]:hidden" />
+                    <VideoThumb tone={parent?.posterTone ?? tone} src={parent?.poster ?? short.poster} className="rounded-md [&_span.rounded-full]:hidden" />
                     <div className="absolute inset-0 bg-black/45" />
                     <div
                       className="absolute inset-y-0 border-2 border-white bg-white/10 transition-[left] duration-200"

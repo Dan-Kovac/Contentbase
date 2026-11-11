@@ -10,7 +10,7 @@ export default function ChannelsPage() {
     <div>
       <PageHeader
         title="Channels"
-        description="Mode, plan and the notable-person flag for every channel. Flagged channels are kept out of wagering-linked revenue. Every action here is logged."
+        description="Mode, plan and the notable-person flag for every channel. Age-verified channels can carry alcohol and wagering ads behind the triple lock; flagged channels are kept out of wagering-linked revenue. Every action here is logged."
       />
       <ChannelsTable channels={listChannels()} />
     </div>

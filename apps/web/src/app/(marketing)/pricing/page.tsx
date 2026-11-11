@@ -35,11 +35,11 @@ const FAQ = [
   },
   {
     q: "Do you take a cut of my ad revenue?",
-    a: "Ads run in designed slots across the network. On Pro and above you receive a share of net ad revenue, split by your channel's verified viewing. On Publisher you can also run Google AdSense in the same slots and keep that income.",
+    a: "Ads run in Homestand Native Formats across the network. On Pro and above you receive a share of net ad revenue, split by your channel's verified viewing.",
   },
   {
-    q: "Do I need the triple lock?",
-    a: "Only if you want wagering ads. With triple lock mode off, no wagering ad reaches your channel from any source. Racing-only channels can declare racing-only mode instead.",
+    q: "What is age-verified advertising?",
+    a: "A switch on Pro and above. Turn it on and advertisers in age-restricted categories, such as alcohol and wagering, can reach your viewers who are signed in, confirmed 18 or over and haven't opted out. Leave it off and no age-restricted ad reaches your channel. You can allow one category and block the other.",
   },
   {
     q: "Can I leave and take my content with me?",

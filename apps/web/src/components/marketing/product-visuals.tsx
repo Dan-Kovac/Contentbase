@@ -2,10 +2,11 @@ import { ArrowRight, FileText, Film, Globe, Search } from "lucide-react"
 import { YouTubeIcon } from "@/components/auth/provider-icons"
 import { StatusBadge } from "@/components/brand/status-badge"
 import { VideoThumb } from "@/components/brand/media"
+import { PresentedBy } from "@/components/brand/native-ads"
 import { LockStatus } from "@/components/brand/compliance"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { getVideo, listShorts } from "@/lib/data"
+import { getChannel, getSponsor, getVideo, listShorts } from "@/lib/data"
 import { channelStyle, formatDuration } from "@/lib/format"
 import { cn } from "@/lib/utils"
 
@@ -31,11 +32,13 @@ export function BrowserFrame({ url, children, className }: { url: string; childr
 
 /** Footy Fix's channel home, built from the real channel tokens. Used in the landing hero. */
 export function ChannelHomeMock() {
+  const channel = getChannel("footyfix")!
   const lead = getVideo("v_blues")!
-  const shorts = listShorts("ch_footyfix").slice(0, 4)
+  const shorts = listShorts("ch_footyfix").slice(0, 6)
+  const sponsor = getSponsor("sp_ute")!
   return (
     <BrowserFrame url="footyfix.com.au">
-      <div className="bg-background text-foreground" style={channelStyle("pitch", "minimal")}>
+      <div className="bg-background text-foreground" style={channelStyle(channel.accentHex, channel.pairing)}>
         <div className="flex items-center gap-3 border-b px-4 py-3 sm:px-6">
           <span className="grid size-7 place-items-center rounded-[4px] bg-[var(--chan)] text-[13px] font-extrabold text-[var(--chan-on)]" aria-hidden>
             FF
@@ -50,12 +53,15 @@ export function ChannelHomeMock() {
           <span className="ml-auto rounded-full bg-[var(--chan)] px-3 py-1 text-[12px] font-semibold text-[var(--chan-on)]">Follow</span>
         </div>
         <div className="grid gap-4 p-4 sm:grid-cols-[1.4fr_1fr] sm:gap-6 sm:p-6">
-          <VideoThumb tone={lead.posterTone} durationSec={lead.durationSec} />
+          <VideoThumb tone={lead.posterTone} src={lead.poster} durationSec={lead.durationSec} />
           <div className="flex flex-col justify-center gap-2">
             <span className="kicker">AFL</span>
             <p className="text-[20px] font-extrabold leading-[24px] tracking-[-0.025em] sm:text-[24px] sm:leading-[28px]">{lead.article.headline}</p>
             <p className="line-clamp-3 font-serif text-[14px] leading-[21px] text-muted-foreground">{lead.article.standfirst}</p>
-            <p className="text-[12px] text-muted-foreground">Sam Doherty · 6 min read</p>
+            <p className="text-[12px] text-muted-foreground">{lead.article.author} · {lead.article.readMinutes} min read</p>
+            <div className="mt-2 hidden sm:block" inert>
+              <PresentedBy sponsor={sponsor} />
+            </div>
           </div>
         </div>
         <div className="hidden gap-3 px-6 pb-6 md:flex" aria-hidden>
@@ -65,7 +71,7 @@ export function ChannelHomeMock() {
           </div>
           {shorts.map((s) => (
             <div key={s.id} className="flex w-[104px] shrink-0 flex-col gap-1.5">
-              <VideoThumb tone={s.posterTone} ratio="9/16" />
+              <VideoThumb tone={s.posterTone} src={s.poster} ratio="9/16" />
               <span className="line-clamp-2 text-[12px] font-semibold leading-4">{s.title}</span>
             </div>
           ))}
@@ -90,11 +96,11 @@ export function ReviewCardMock({ className }: { className?: string }) {
       </div>
       <div className="grid gap-5 p-4 sm:grid-cols-[1fr_1.1fr] sm:p-5">
         <div className="flex flex-col gap-3">
-          <VideoThumb tone={v.posterTone} durationSec={v.durationSec} />
+          <VideoThumb tone={v.posterTone} src={v.poster} durationSec={v.durationSec} />
           <div className="grid grid-cols-3 gap-2" aria-label="Shorts drafts">
             {shorts.map((s) => (
               <div key={s.id} className="flex flex-col gap-1">
-                <VideoThumb tone={s.posterTone} ratio="9/16" durationSec={s.durationSec} />
+                <VideoThumb tone={s.posterTone} src={s.poster} ratio="9/16" durationSec={s.durationSec} />
               </div>
             ))}
           </div>
@@ -196,25 +202,22 @@ export function RedirectMock({ className }: { className?: string }) {
   )
 }
 
-/** The triple-lock switch as a creator sees it, with a passing ad decision underneath. */
-export function TripleLockPanel({ className }: { className?: string }) {
+/** The age-verified advertising switch as a creator sees it, with a passing decision underneath. */
+export function AgeVerifiedPanel({ className }: { className?: string }) {
   return (
     <div className={cn("flex flex-col gap-4 rounded-lg border bg-card p-4 sm:p-5", className)}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <label htmlFor="tl-demo" className="text-[15px] font-semibold">
-            Triple lock mode
+          <label htmlFor="av-demo" className="text-[15px] font-semibold">
+            Age-verified advertising
           </label>
-          <p className="text-[13px] leading-5 text-muted-foreground">Footy Fix · on from 1 January 2027</p>
+          <p className="text-[13px] leading-5 text-muted-foreground">Footy Fix · alcohol and wagering allowed</p>
         </div>
-        <Switch id="tl-demo" defaultChecked aria-describedby="tl-demo-note" />
+        <Switch id="av-demo" defaultChecked aria-describedby="av-demo-note" />
       </div>
-      <LockStatus
-        compact
-        locks={{ session: { pass: true }, age: { pass: true }, optout: { pass: true } }}
-      />
-      <p id="tl-demo-note" className="text-[13px] leading-5 text-muted-foreground">
-        All three pass, so a wagering ad can show. If any check fails or times out, a non-wagering ad fills the slot.
+      <LockStatus compact locks={{ session: { pass: true }, age: { pass: true }, optout: { pass: true } }} />
+      <p id="av-demo-note" className="text-[13px] leading-5 text-muted-foreground">
+        All three checks pass, so an age-restricted ad can show to this viewer. If any check fails or times out, an everyday ad fills the same space.
       </p>
     </div>
   )

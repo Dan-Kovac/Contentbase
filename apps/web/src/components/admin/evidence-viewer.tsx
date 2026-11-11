@@ -19,19 +19,18 @@ import { longStamp, shortTime } from "./data"
 import { nowStamp } from "./clock"
 
 const OUTCOME: Record<AdDecision["outcome"], string> = {
-  wagering_served: "Wagering served",
-  non_wagering_served: "Non-wagering served",
+  wagering_served: "Age-restricted served",
+  non_wagering_served: "Everyday ad served",
   house: "House promo",
 }
 
 const REASONS: Record<string, string> = {
   ALL_LOCKS_PASS: "Signed in, current 18+ assurance and not opted out (account and AdStop). Evidence written before the creative was returned.",
-  LOCK1_NO_SESSION: "No signed-in session. Wagering excluded; a non-wagering ad filled the slot.",
-  LOCK2_NO_ASSURANCE: "Signed in but no current 18+ assurance on file. Failed closed to non-wagering.",
-  LOCK3_OPTED_OUT: "The viewer has opted out of betting ads. Non-wagering ad served.",
+  LOCK1_NO_SESSION: "No signed-in session. Age-restricted categories excluded; an everyday ad filled the space.",
+  LOCK2_NO_ASSURANCE: "Signed in but no current 18+ assurance on file. Failed closed to an everyday ad.",
+  LOCK3_OPTED_OUT: "The viewer has turned off ads in this category. Everyday ad served.",
   PAGE_IS_LIVE: "The page is flagged as live coverage (TLK-08), so wagering is excluded for every viewer.",
-  RACING_ONLY_EXEMPT: "Declared racing-only channel (TLK-10): the triple lock is optional here. Declaration on file; reviewed quarterly.",
-  NO_FILL: "No eligible creative. The slot showed a house promo at the same size.",
+  NO_FILL: "No eligible creative. The space showed a house promo at the same size.",
 }
 
 type Job = {
@@ -135,7 +134,7 @@ export function EvidenceViewer({ decisions, campaigns }: { decisions: AdDecision
               `Scope: ${label}`,
               `Generated: ${nowStamp()}`,
               "Locks: 1 signed-in session, 2 current 18+ assurance, 3 not opted out (account and AdStop).",
-              "Fail closed: any failed or errored check serves a non-wagering ad.",
+              "Fail closed: any failed or errored check serves an everyday ad.",
               "",
               ...decisions.map((d) => `${d.id}  ${d.at}  ${d.channel}  ${d.slot}  ${d.outcome}  ${d.reason}`),
             ])
@@ -219,7 +218,7 @@ export function EvidenceViewer({ decisions, campaigns }: { decisions: AdDecision
                     <TableCell className="text-muted-foreground">{d.slot}</TableCell>
                     <TableCell>
                       {d.outcome === "wagering_served" ? (
-                        <StatusBadge tone="wagering">Wagering</StatusBadge>
+                        <StatusBadge tone="wagering">18+ served</StatusBadge>
                       ) : (
                         <span className="text-[13px]">{OUTCOME[d.outcome]}</span>
                       )}
@@ -250,14 +249,21 @@ export function EvidenceViewer({ decisions, campaigns }: { decisions: AdDecision
                 {longStamp(selected.at)} · {selected.channel} · {selected.slot}
               </p>
             </div>
-            {(selected.reason === "PAGE_IS_LIVE" || selected.reason === "RACING_ONLY_EXEMPT") && (
+            {selected.reason === "PAGE_IS_LIVE" && (
               <p className="rounded-md border border-foreground px-3 py-2 text-[13px] font-semibold">
-                {selected.reason === "PAGE_IS_LIVE"
-                  ? "Locks passed, but the page is live coverage, so wagering was excluded before the lock check counted."
-                  : "Lock results are recorded, but this declared racing-only channel is exempt from the triple lock."}
+                Locks passed, but the page is live coverage, so wagering was excluded before the lock check counted.
               </p>
             )}
-            <LockStatus locks={selected.locks} />
+            <LockStatus
+              locks={selected.locks}
+              verdict={
+                selected.outcome === "wagering_served"
+                  ? "Age-restricted ad eligible. Evidence written before serve."
+                  : selected.locks.session.pass && selected.locks.age.pass && selected.locks.optout.pass
+                    ? "Locks pass. An everyday ad was served for another reason (see the reason code)."
+                    : "Fail closed: an everyday ad was served."
+              }
+            />
             <div className="rounded-md border p-3">
               <p className="text-[12px] font-semibold uppercase tracking-[0.8px] text-muted-foreground">Reason code</p>
               <p className="mt-1 font-mono text-[13px] font-semibold">{selected.reason}</p>
@@ -267,7 +273,7 @@ export function EvidenceViewer({ decisions, campaigns }: { decisions: AdDecision
               <dt className="text-muted-foreground">Outcome</dt>
               <dd>{OUTCOME[selected.outcome]}</dd>
               <dt className="text-muted-foreground">Evidence</dt>
-              <dd>{selected.outcome === "wagering_served" ? <span className="font-mono">ev_{selected.id.slice(4)} · written before serve</span> : "Not required (non-wagering)"}</dd>
+              <dd>{selected.outcome === "wagering_served" ? <span className="font-mono">ev_{selected.id.slice(4)} · written before serve</span> : "Not required (everyday ad)"}</dd>
             </dl>
           </aside>
         )}

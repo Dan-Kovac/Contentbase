@@ -1,220 +1,139 @@
 "use client"
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react"
-import { MonitorPlay, Pause, Play, Search, SkipForward, SquarePlay } from "lucide-react"
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
+import { Search, ShieldCheck, ShieldOff } from "lucide-react"
 import { toast } from "sonner"
-import { AdSlot } from "@/components/brand/ad-slot"
-import { VideoThumb } from "@/components/brand/media"
+import { ChapterSponsorCredit, HalftimeBreak, StatCard } from "@/components/brand/native-ads"
 import { Input } from "@/components/ui/input"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { formatDuration } from "@/lib/format"
 import { cn } from "@/lib/utils"
-import type { Chapter, ChannelMode, TranscriptLine } from "@/lib/types"
-
-export type PreviewState = "logged_out" | "verified" | "opted_out"
+import type { Chapter, TranscriptLine } from "@/lib/types"
+import type { SlotPlan, Viewer } from "./lib"
 
 interface Ctx {
   time: number
   playing: boolean
   started: boolean
+  speed: number
+  setSpeed: (s: number) => void
   seek: (t: number) => void
   toggle: () => void
-  preview: PreviewState
-  setPreview: (p: PreviewState) => void
+  viewer: Viewer
+  setViewer: (v: Viewer) => void
+  plan: SlotPlan
+  /** Index of the sponsored chapter, or -1. */
+  sponsoredChapter: number
 }
 
 const VideoCtx = createContext<Ctx | null>(null)
 
-function useVideo() {
+export function useVideo() {
   const ctx = useContext(VideoCtx)
   if (!ctx) throw new Error("useVideo must sit inside VideoPageProvider")
   return ctx
 }
 
-export function VideoPageProvider({ duration, children }: { duration: number; children: React.ReactNode }) {
+export function VideoPageProvider({
+  duration,
+  plans,
+  sponsoredChapter,
+  children,
+}: {
+  duration: number
+  plans: Record<Viewer, SlotPlan>
+  sponsoredChapter: number
+  children: React.ReactNode
+}) {
   const [time, setTime] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [started, setStarted] = useState(false)
-  const [preview, setPreview] = useState<PreviewState>("logged_out")
+  const [speed, setSpeed] = useState(1)
+  const [viewer, setViewer] = useState<Viewer>("logged_out")
 
   useEffect(() => {
     if (!playing) return
     const id = window.setInterval(() => {
       setTime((t) => {
-        if (t + 1 >= duration) {
+        const next = t + speed
+        if (next >= duration) {
           setPlaying(false)
           return duration
         }
-        return t + 1
+        return next
       })
     }, 1000)
     return () => window.clearInterval(id)
-  }, [playing, duration])
+  }, [playing, duration, speed])
+
+  const seek = useCallback(
+    (t: number) => {
+      setTime(Math.max(0, Math.min(duration, Math.round(t))))
+      setStarted(true)
+      setPlaying(true)
+    },
+    [duration],
+  )
+  const toggle = useCallback(() => {
+    setStarted(true)
+    setPlaying((p) => !p)
+  }, [])
 
   const value = useMemo<Ctx>(
-    () => ({
-      time,
-      playing,
-      started,
-      seek: (t) => {
-        setTime(t)
-        setStarted(true)
-        setPlaying(true)
-      },
-      toggle: () => {
-        setStarted(true)
-        setPlaying((p) => !p)
-      },
-      preview,
-      setPreview,
-    }),
-    [time, playing, started, preview],
+    () => ({ time: Math.floor(time), playing, started, speed, setSpeed, seek, toggle, viewer, setViewer, plan: plans[viewer], sponsoredChapter }),
+    [time, playing, started, speed, seek, toggle, viewer, plans, sponsoredChapter],
   )
   return <VideoCtx.Provider value={value}>{children}</VideoCtx.Provider>
 }
 
-/**
- * Player area. YouTube-sourced videos play in the YouTube embedded player: we may not re-host
- * them, and our own pre-roll cannot run inside a YouTube embed (YouTube's ads apply there).
- * Uploaded videos play in the Homestand player (Mux), which may show one non-wagering
- * pre-roll (ADS-01; wagering pre-roll is not offered in the MVP).
- * Sample YouTube IDs are placeholders, so the prototype simulates playback on the poster.
- */
-export function Player({
-  title,
-  tone,
-  duration,
-  chapters,
-  source,
-}: {
-  title: string
-  tone: string
-  duration: number
-  chapters: Chapter[]
-  source: "youtube" | "upload"
-}) {
-  const { time, playing, started, toggle, seek } = useVideo()
-  const [preroll, setPreroll] = useState<number | null>(null)
-  const prerollDone = useRef(false)
-
-  useEffect(() => {
-    if (preroll === null) return
-    if (preroll <= 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-roll countdown finished
-      setPreroll(null)
-      prerollDone.current = true
-      seek(0)
-      return
-    }
-    const id = window.setTimeout(() => setPreroll((p) => (p === null ? null : p - 1)), 1000)
-    return () => window.clearTimeout(id)
-  }, [preroll, seek])
-
-  const onPlay = () => {
-    if (source === "upload" && !prerollDone.current && !started) {
-      setPreroll(5)
-      return
-    }
-    toggle()
-  }
-  const current = [...chapters].reverse().find((c) => c.start <= time)
-
+/** The chapter sponsor credit under the player. */
+export function ChapterSponsorUnderPlayer({ chapters }: { chapters: Chapter[] }) {
+  const { plan, sponsoredChapter, seek } = useVideo()
+  const chapter = chapters[sponsoredChapter]
+  if (!chapter) return null
   return (
-    <div className="flex flex-col gap-2">
-      <div className="relative">
-        <VideoThumb tone={tone} className="rounded-lg">
-          {preroll !== null ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/85 p-4 text-white">
-              <span className="text-[11px] font-bold uppercase tracking-[1px] text-white/70">Advertisement · Pre-roll</span>
-              <span className="text-center text-[15px] font-semibold">Southern Cross Utes</span>
-              <span className="text-[13px] text-white/70 tabular" aria-live="polite">Your video starts in {preroll}</span>
-              <button
-                type="button"
-                onClick={() => setPreroll(0)}
-                className="mt-1 inline-flex h-8 items-center gap-1.5 rounded-md border border-white/40 px-3 text-[13px] font-semibold hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
-              >
-                <SkipForward className="size-4" aria-hidden /> Skip ad
-              </button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={onPlay}
-              aria-label={playing ? `Pause ${title}` : `Play ${title}`}
-              className="absolute inset-0 z-10 grid place-items-center outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-white"
-            >
-              <span
-                className={cn(
-                  "grid size-16 place-items-center rounded-full text-white backdrop-blur-sm transition-opacity md:size-20",
-                  source === "youtube" ? "bg-[#c4302b]/90" : "bg-black/50",
-                  playing && "opacity-0 hover:opacity-100",
-                )}
-              >
-                {playing ? <Pause className="size-7 fill-current" /> : <Play className="ml-1 size-7 fill-current md:size-8" />}
-              </span>
-            </button>
-          )}
-          {started && preroll === null && (
-            <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/80 to-transparent px-3 pb-2 pt-8 text-white">
-              <div className="mb-1.5 flex items-center justify-between text-[12px] font-medium">
-                <span className="truncate">{current?.title}</span>
-                <span className="font-mono tabular">
-                  {formatDuration(time)} / {formatDuration(duration)}
-                </span>
-              </div>
-              <div className="relative h-1 rounded-full bg-white/30">
-                <div className="absolute inset-y-0 left-0 rounded-full bg-[var(--chan)]" style={{ width: `${(time / duration) * 100}%` }} />
-                {chapters.slice(1).map((c) => (
-                  <span key={c.start} className="absolute top-0 h-1 w-0.5 bg-black/70" style={{ left: `${(c.start / duration) * 100}%` }} aria-hidden />
-                ))}
-              </div>
-            </div>
-          )}
-          {!started && preroll === null && (
-            <span className="absolute bottom-2 right-2 z-20 rounded-[2px] bg-black/80 px-1.5 py-0.5 font-mono text-xs font-medium text-white tabular">
-              {formatDuration(duration)}
-            </span>
-          )}
-        </VideoThumb>
-      </div>
-      <p className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
-        {source === "youtube" ? (
-          <>
-            <SquarePlay className="size-4" aria-hidden /> Plays in the YouTube player. Captions available.
-          </>
-        ) : (
-          <><MonitorPlay className="size-4" aria-hidden /> Plays in the Homestand player. Captions available.</>
-        )}
-      </p>
+    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-md border bg-card px-3 py-2.5">
+      <ChapterSponsorCredit key={plan.chapter.id} sponsor={plan.chapter} chapter={`Chapter ${sponsoredChapter + 1}: ${chapter.title}`} />
+      <button
+        type="button"
+        onClick={() => seek(chapter.start)}
+        className="rounded-sm font-mono text-[12px] font-medium text-muted-foreground underline-offset-2 outline-none hover:text-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ring tabular"
+      >
+        Jump to {formatDuration(chapter.start)}
+      </button>
     </div>
   )
 }
 
 export function ChapterList({ chapters, duration }: { chapters: Chapter[]; duration: number }) {
-  const { time, seek, started } = useVideo()
+  const { time, seek, started, plan, sponsoredChapter } = useVideo()
   if (!chapters.length) return null
   return (
     <nav aria-label="Chapters" className="flex flex-col">
-      <h2 className="kicker mb-3 text-foreground">Chapters</h2>
+      <h2 className="kicker mb-3 text-foreground">
+        Chapters <span className="font-medium normal-case tracking-normal text-muted-foreground">· {chapters.length}</span>
+      </h2>
       <ol className="flex flex-col border-t">
         {chapters.map((c, i) => {
           const end = chapters[i + 1]?.start ?? duration
           const active = started && time >= c.start && time < end
+          const progress = active ? ((time - c.start) / (end - c.start)) * 100 : started && time >= end ? 100 : 0
           return (
-            <li key={c.start} className="border-b">
+            <li key={c.start} className={cn("relative border-b", active && "bg-accent")}>
               <button
                 type="button"
                 onClick={() => seek(c.start)}
                 aria-current={active ? "true" : undefined}
-                className={cn(
-                  "flex w-full items-baseline gap-3 px-2 py-3 text-left text-[15px] font-medium outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring",
-                  active && "bg-accent",
-                )}
+                className="flex w-full items-baseline gap-3 px-2 py-3 text-left text-[15px] font-medium outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
               >
                 <span className="w-14 shrink-0 font-mono text-[13px] text-muted-foreground tabular">{formatDuration(c.start)}</span>
                 <span className="min-w-0 flex-1">{c.title}</span>
-                {active && <span className="size-2 shrink-0 self-center rounded-full bg-[var(--chan)] ring-1 ring-foreground/20" aria-hidden />}
+                <span className="shrink-0 font-mono text-[12px] text-muted-foreground tabular">{formatDuration(end - c.start)}</span>
               </button>
+              {i === sponsoredChapter && (
+                <ChapterSponsorCredit key={plan.chapter.id} sponsor={plan.chapter} chapter="This chapter" className="px-2 pb-3 pl-[76px] text-[12px]" />
+              )}
+              <span className="absolute bottom-0 left-0 h-[2px] bg-[var(--chan)]" style={{ width: `${progress}%` }} aria-hidden />
             </li>
           )
         })}
@@ -223,68 +142,66 @@ export function ChapterList({ chapters, duration }: { chapters: Chapter[]; durat
   )
 }
 
-const PREVIEW_LABELS: Record<PreviewState, string> = {
+const PREVIEW_LABELS: Record<Viewer, string> = {
   logged_out: "Logged out",
+  signed_in: "Signed in",
   verified: "Signed in, 18+ verified",
-  opted_out: "Opted out of betting ads",
+  opted_out: "Verified, opted out of betting ads",
 }
 
-/** Prototype-only control so the ad states (screens B10) can be shown on one page. */
-export function PreviewAs({ mode, isLive }: { mode: ChannelMode; isLive: boolean }) {
-  const { preview, setPreview } = useVideo()
-  const eligible = wageringEligible(preview, mode, isLive)
+/** Prototype-only control so every ad state can be seen on one page. */
+export function PreviewAs() {
+  const { viewer, setViewer, plan } = useVideo()
   return (
-    <div className="rounded-md border border-dashed border-input bg-muted/50 px-3 py-2.5">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <span id="preview-as" className="text-[11px] font-bold uppercase tracking-[1px] text-muted-foreground">
-          Preview as
-        </span>
-        <ToggleGroup
-          type="single"
-          variant="outline"
-          size="sm"
-          value={preview}
-          aria-labelledby="preview-as"
-          className="flex-wrap bg-background"
-          onValueChange={(v) => {
-            if (!v) return
-            setPreview(v as PreviewState)
-            if (v === "opted_out") toast("You won't see betting ads on Homestand")
-          }}
-        >
-          {(Object.keys(PREVIEW_LABELS) as PreviewState[]).map((k) => (
-            <ToggleGroupItem key={k} value={k} className="text-[12px]">
-              {PREVIEW_LABELS[k]}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-        <span className="text-[12px] text-muted-foreground" aria-live="polite">
-          In-article slot: {eligible ? "wagering eligible (all three locks pass)" : "non-wagering"}
-          {!eligible && mode === "standard" ? " · channel mode is Standard" : ""}
-        </span>
+    <div className="rounded-md border border-dashed border-input bg-muted/50 px-3 py-3 font-sans">
+      <div className="flex flex-col gap-2.5">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <span id="preview-as" className="text-[11px] font-bold uppercase tracking-[1px] text-muted-foreground">
+            Preview as
+          </span>
+          <ToggleGroup
+            type="single"
+            variant="outline"
+            size="sm"
+            value={viewer}
+            aria-labelledby="preview-as"
+            className="flex-wrap bg-background"
+            onValueChange={(v) => {
+              if (!v) return
+              setViewer(v as Viewer)
+              if (v === "opted_out") toast("You won't see betting ads on Homestand")
+            }}
+          >
+            {(Object.keys(PREVIEW_LABELS) as Viewer[]).map((k) => (
+              <ToggleGroupItem key={k} value={k} className="h-auto min-h-8 whitespace-normal py-1 text-[12px]">
+                {PREVIEW_LABELS[k]}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </div>
+        <p className="flex items-start gap-2 text-[12px] leading-[18px] text-muted-foreground" aria-live="polite">
+          {plan.restricted ? <ShieldCheck className="mt-px size-4 shrink-0 text-foreground" aria-hidden /> : <ShieldOff className="mt-px size-4 shrink-0" aria-hidden />}
+          <span>
+            <span className="font-semibold text-foreground">
+              Chapter: {plan.chapter.name} · Half-time: {plan.halftime.name} · Stat card: {plan.stat.name}.
+            </span>{" "}
+            {plan.note}
+          </span>
+        </p>
       </div>
     </div>
   )
 }
 
-function wageringEligible(p: PreviewState, mode: ChannelMode, isLive: boolean) {
-  return p === "verified" && (mode === "triple_lock" || mode === "racing_only") && !isLive
+/** The Half-time break between article sections. Full container width, fixed height. */
+export function HalftimeSlot() {
+  const { plan } = useVideo()
+  return <HalftimeBreak key={plan.halftime.id} sponsor={plan.halftime} />
 }
 
-/** The single in-article unit. Wagering only when every lock passes; otherwise fail closed. */
-export function InArticleAd({ mode, isLive }: { mode: ChannelMode; isLive: boolean }) {
-  const { preview } = useVideo()
-  const wagering = wageringEligible(preview, mode, isLive)
-  return (
-    <div className="my-10 flex justify-center font-sans">
-      <AdSlot
-        key={preview}
-        format="mrec"
-        wagering={wagering}
-        advertiser={wagering ? "Harbour Bet (licensed)" : "Southern Cross Utes"}
-      />
-    </div>
-  )
+export function StatSlot({ className }: { className?: string }) {
+  const { plan } = useVideo()
+  return <StatCard key={plan.stat.id} sponsor={plan.stat} className={className} />
 }
 
 function highlight(text: string, q: string) {
@@ -311,7 +228,7 @@ export function Transcript({ lines }: { lines: TranscriptLine[] }) {
   const shown = query ? lines.filter((l) => l.text.toLowerCase().includes(query.toLowerCase())) : lines
   if (!lines.length) return null
   return (
-    <details className="group rounded-lg border bg-card">
+    <details className="group rounded-lg border bg-card font-sans">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-4 text-[15px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring md:px-5 [&::-webkit-details-marker]:hidden">
         <span>Transcript</span>
         <span className="text-[13px] font-medium text-muted-foreground group-open:hidden">Show transcript</span>

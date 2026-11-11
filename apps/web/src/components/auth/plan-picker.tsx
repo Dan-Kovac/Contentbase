@@ -19,8 +19,8 @@ const SELF_SERVE = PLANS.filter((p) => p.price != null)
 
 const SUMMARY: Record<string, string> = {
   starter: "1 channel · subdomain · 10 video hours a month",
-  pro: "Your own domain · 40 video hours · triple lock · ad revenue share",
-  publisher: "3 channels · team roles · 150 video hours · AdSense · migration help",
+  pro: "Your own domain · 40 video hours · age-verified ads · ad revenue share",
+  publisher: "3 channels · team roles · 150 video hours · migration help",
 }
 
 /** Step 5: choose a plan. 14-day trial, card optional. */

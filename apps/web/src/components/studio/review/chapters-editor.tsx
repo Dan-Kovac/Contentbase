@@ -1,29 +1,35 @@
 "use client"
 
 import { useState } from "react"
-import { Plus, X, SquarePlay } from "lucide-react"
+import { Play, Plus, X, SquarePlay } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { VideoThumb } from "@/components/brand/media"
 import { formatDuration } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { Chapter } from "@/lib/types"
 import { parseTimecode } from "./types"
+import { chapterAt, VideoPlayer } from "./player"
 
 /** Embedded video with editable chapters (ING-05). */
 export function ChaptersEditor({
   chapters,
   onChange,
   tone,
+  poster,
+  title,
   durationSec,
   source,
 }: {
   chapters: Chapter[]
   onChange: (c: Chapter[]) => void
   tone: string
+  poster?: string
+  title: string
   durationSec: number
   source: "youtube" | "upload"
 }) {
-  const [active, setActive] = useState(0)
+  const [time, setTime] = useState(0)
+  const active = chapters.length ? chapterAt(chapters, time) : -1
+  const setActive = (i: number) => setTime(chapters[i]?.start ?? 0)
   const [drafts, setDrafts] = useState<Record<number, string>>({})
   const [error, setError] = useState<string | null>(null)
 
@@ -53,20 +59,7 @@ export function ChaptersEditor({
   return (
     <div className="overflow-hidden rounded-lg border bg-card">
       <div className="p-3 pb-0">
-        <VideoThumb tone={tone} durationSec={durationSec}>
-          <div className="absolute inset-x-3 bottom-9 flex h-1 gap-[3px]" aria-hidden>
-            {chapters.map((c, i) => {
-              const end = chapters[i + 1]?.start ?? durationSec
-              return (
-                <span
-                  key={i}
-                  className={cn("h-full rounded-full bg-white/40", i < active && "bg-white", i === active && "bg-white/80")}
-                  style={{ flexGrow: Math.max(1, end - c.start) }}
-                />
-              )
-            })}
-          </div>
-        </VideoThumb>
+        <VideoPlayer title={title} poster={poster} tone={tone} durationSec={durationSec} chapters={chapters} time={time} onTime={setTime} />
         <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
           {source === "youtube" ? (
             <>
@@ -91,18 +84,19 @@ export function ChaptersEditor({
               key={i}
               className={cn("group/ch flex items-center gap-1 rounded-md pr-1 transition-colors", i === active ? "bg-accent" : "hover:bg-accent/60")}
             >
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="icon-xs"
                 onClick={() => setActive(i)}
-                className="sr-only focus:not-sr-only focus:px-1 focus:text-xs"
+                aria-label={`Play from ${formatDuration(c.start)}, ${c.title}`}
+                className={cn("ml-0.5 text-muted-foreground", i === active && "text-foreground")}
               >
-                Play from {formatDuration(c.start)}
-              </button>
+                <Play className="fill-current" />
+              </Button>
               <input
                 value={drafts[i] ?? formatDuration(c.start)}
                 onChange={(e) => setDrafts((d) => ({ ...d, [i]: e.target.value }))}
                 onBlur={() => commitTime(i)}
-                onFocus={() => setActive(i)}
                 onKeyDown={(e) => e.key === "Enter" && (e.currentTarget as HTMLInputElement).blur()}
                 aria-label={`Chapter ${i + 1} start time`}
                 className="w-[58px] shrink-0 rounded-sm bg-transparent px-1.5 py-1.5 font-mono text-xs font-medium tabular outline-none focus-visible:bg-background focus-visible:ring-1 focus-visible:ring-input"
@@ -110,7 +104,6 @@ export function ChaptersEditor({
               <input
                 value={c.title}
                 onChange={(e) => onChange(chapters.map((x, j) => (j === i ? { ...x, title: e.target.value } : x)))}
-                onFocus={() => setActive(i)}
                 aria-label={`Chapter ${i + 1} title`}
                 className="min-w-0 flex-1 rounded-sm bg-transparent px-1.5 py-1.5 text-[13px] outline-none focus-visible:bg-background focus-visible:ring-1 focus-visible:ring-input"
               />
@@ -121,7 +114,6 @@ export function ChaptersEditor({
                 className="opacity-0 group-hover/ch:opacity-100 focus-visible:opacity-100"
                 onClick={() => {
                   onChange(chapters.filter((_, j) => j !== i))
-                  setActive(0)
                 }}
               >
                 <X />

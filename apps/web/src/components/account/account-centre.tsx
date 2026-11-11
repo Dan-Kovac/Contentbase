@@ -29,11 +29,11 @@ const VIEWER = { name: "Mia Nguyen", email: "mia.nguyen@example.com", since: "3 
 const NAV = [
   { id: "profile", label: "Profile", Icon: User },
   { id: "following", label: "Following", Icon: Users },
-  { id: "ads", label: "Ad preferences", Icon: Ban },
+  { id: "ads", label: "Age-restricted ads", Icon: ShieldCheck },
   { id: "data", label: "Your data", Icon: KeyRound },
 ]
 
-/** Account centre (AUD-04): profile, following, ad preferences, your data. */
+/** Account centre (AUD-04): profile, following, age-restricted ads, your data. */
 export function AccountCentre({ channels }: { channels: FollowedChannel[] }) {
   const [active, setActive] = useState("profile")
 
@@ -235,62 +235,94 @@ function Following({ channels }: { channels: FollowedChannel[] }) {
   )
 }
 
+const AGE_PREFS = [
+  {
+    id: "no-betting",
+    label: "Don't show me betting ads",
+    on: "On. You won't see betting ads on Homestand. Other ads still show.",
+    off: "Off. Betting ads can show to you because you're signed in and confirmed 18 or over.",
+    toastOn: "You won't see betting ads on Homestand",
+    toastOff: "Betting ads can show again",
+  },
+  {
+    id: "no-alcohol",
+    label: "Don't show me alcohol ads",
+    on: "On. You won't see alcohol ads on Homestand. Other ads still show.",
+    off: "Off. Alcohol ads can show to you because you're signed in and confirmed 18 or over.",
+    toastOn: "You won't see alcohol ads on Homestand",
+    toastOff: "Alcohol ads can show again",
+  },
+] as const
+
 function AdPreferences() {
-  const [optedOut, setOptedOut] = useState(false)
+  const [off, setOff] = useState<Record<string, boolean>>({ "no-betting": false, "no-alcohol": false })
   return (
-    <Panel id="ads" title="Ad preferences" lede="These apply on every Homestand channel, from your next page view.">
-      <div className={cn("flex flex-col gap-4 rounded-lg border-2 p-5", optedOut ? "border-foreground" : "border-border")}>
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="no-betting" className="text-[18px] font-bold leading-6">
-              Don&apos;t show me betting ads
-            </Label>
-            <p id="no-betting-note" className="text-[14px] leading-[21px] text-muted-foreground" aria-live="polite">
-              {optedOut
-                ? "On. You won't see betting ads on Homestand. Other ads still show."
-                : "Off. Betting ads can show to you because you're signed in and confirmed 18 or over."}
+    <Panel
+      id="ads"
+      title="Age-restricted ads"
+      lede="Some ads are for adults only, such as alcohol and betting. They show only to signed-in viewers confirmed 18 or over who haven't turned them off. These settings apply on every Homestand channel, from your next page view."
+    >
+      <div className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          <span className="grid size-9 shrink-0 place-items-center rounded-[4px] bg-muted" aria-hidden>
+            <ShieldCheck className="size-4" />
+          </span>
+          <div className="flex flex-col gap-0.5">
+            <p className="text-[13px] font-semibold text-muted-foreground">Age assurance</p>
+            <p className="flex items-center gap-1.5 text-[15px] font-semibold">
+              <CircleCheck className="size-4 text-pop-ink" aria-hidden />
+              Confirmed 18 or over
             </p>
+            <p className="text-[13px] leading-5 text-muted-foreground">4 November 2026 · Digital ID. We keep the result, never your ID.</p>
           </div>
-          <Switch
-            id="no-betting"
-            checked={optedOut}
-            onCheckedChange={(v) => {
-              setOptedOut(v)
-              toast(v ? "You won't see betting ads on Homestand" : "Betting ads can show again")
-            }}
-            aria-describedby="no-betting-note"
-            className="mt-1 data-[size=default]:h-6 data-[size=default]:w-11 *:data-[slot=switch-thumb]:size-5"
-          />
         </div>
+        <Button asChild variant="outline" size="sm" className="w-fit">
+          <Link href="/account/verify-age">Check again</Link>
+        </Button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-2 rounded-lg border p-4">
-          <p className="flex items-center gap-2 text-[14px] font-semibold">
-            <ShieldCheck className="size-4" aria-hidden />
-            Age assurance
-          </p>
-          <p className="flex items-center gap-1.5 text-[13px] font-medium">
-            <CircleCheck className="size-4 text-pop-ink" aria-hidden />
-            Confirmed 18 or over
-          </p>
-          <p className="text-[13px] leading-5 text-muted-foreground">4 November 2026 · Digital ID. We keep the result, never your ID.</p>
-          <Link href="/account/verify-age" className="mt-auto w-fit text-[13px] font-semibold underline-offset-4 hover:underline">
-            Check again
-          </Link>
-        </div>
-        <div className="flex flex-col gap-2 rounded-lg border p-4">
-          <p className="flex items-center gap-2 text-[14px] font-semibold">
-            <Ban className="size-4" aria-hidden />
-            AdStop register
-          </p>
-          <p className="text-[13px] leading-5 text-muted-foreground">
-            When the national AdStop register goes live, we&apos;ll check it too. If you&apos;re on it, you won&apos;t see betting ads here, whatever this switch says.
-          </p>
-        </div>
-      </div>
+      <ul className="flex flex-col divide-y rounded-lg border">
+        {AGE_PREFS.map((p) => {
+          const on = off[p.id]
+          return (
+            <li key={p.id} className={cn("flex flex-col gap-3 p-4 sm:p-5", on && "bg-muted/60")}>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor={p.id} className="text-[17px] font-bold leading-6">
+                    {p.label}
+                  </Label>
+                  <p id={`${p.id}-note`} className="text-[14px] leading-[21px] text-muted-foreground" aria-live="polite">
+                    {on ? p.on : p.off}
+                  </p>
+                </div>
+                <Switch
+                  id={p.id}
+                  checked={on}
+                  onCheckedChange={(v) => {
+                    setOff((o) => ({ ...o, [p.id]: v }))
+                    toast(v ? p.toastOn : p.toastOff)
+                  }}
+                  aria-describedby={`${p.id}-note`}
+                  className="mt-1 data-[size=default]:h-6 data-[size=default]:w-11 *:data-[slot=switch-thumb]:size-5"
+                />
+              </div>
+              {p.id === "no-betting" && (
+                <p className="flex items-start gap-2 rounded-md bg-muted px-3 py-2 text-[13px] leading-5 text-muted-foreground">
+                  <Ban className="mt-0.5 size-4 shrink-0" aria-hidden />
+                  <span>
+                    <span className="font-semibold text-foreground">AdStop register.</span> When the national AdStop register goes live, we&apos;ll check it too.
+                    If you&apos;re on it, you won&apos;t see betting ads here, whatever this switch says.
+                  </span>
+                </p>
+              )}
+            </li>
+          )
+        })}
+      </ul>
+
       <p className="text-[13px] leading-5 text-muted-foreground">
-        Betting ads only ever show to signed-in adults who haven&apos;t opted out, and never on live sport. Need support? Gambling Help Online is free and confidential on 1800 858 858.
+        Age-restricted ads never show to anyone signed out or not yet confirmed, and betting ads never show on live sport. Need support? Gambling Help
+        Online is free and confidential on 1800 858 858, and the National Alcohol and Other Drug Hotline is on 1800 250 015.
       </p>
     </Panel>
   )

@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { ArrowRight, ArrowUpRight, Ghost, Globe, LayoutTemplate, Mail, Newspaper, Rss, Search, Users } from "lucide-react"
-import { AdSlot } from "@/components/brand/ad-slot"
 import { Button } from "@/components/ui/button"
 import { YouTubeIcon } from "@/components/auth/provider-icons"
 import { Container, DarkHero, Section, SectionHeading, TickList } from "@/components/marketing/section"
@@ -9,9 +8,11 @@ import {
   RedirectMock,
   ReviewCardMock,
   SearchResultMock,
-  TripleLockPanel,
+  AgeVerifiedPanel,
 } from "@/components/marketing/product-visuals"
+import { FormatStage, HalftimeExample, SponsoredShortExample, StatCardExample } from "@/components/marketing/native-formats"
 import { PricingTeaser } from "@/components/marketing/pricing-cards"
+import { cn } from "@/lib/utils"
 
 const STEPS = [
   {
@@ -99,7 +100,7 @@ export default function HomePage() {
             points={[
               "Import from WordPress, Ghost, Substack or RSS",
               "Every old URL redirects to its new page",
-              "Earn from wagering ads legally from 1 January 2027",
+              "Age-verified advertising, so alcohol and wagering brands can reach adults only",
             ]}
             cta="Import your site"
             href="/publishers"
@@ -165,34 +166,50 @@ export default function HomePage() {
             <SectionHeading
               id="earn-title"
               kicker="Earn"
-              title="Premium ads, designed into the page."
-              lede="Every ad sits in a fixed, labelled slot. No pop-ups, no autoplay with sound, nothing between a headline and its first paragraph."
+              title="Ads that look like they belong."
+              lede="Homestand Native Formats replace banners. Advertisers send a brief, and we render it in your channel's design: labelled, fast and with no layout shift."
             />
             <TickList
               items={[
-                "Billboard, MREC, sponsor band and sponsored shorts card",
+                "Five formats, from a chapter sponsor to a sponsored short",
                 "Ad revenue share on Pro and above",
-                "Google AdSense in the same slots on Publisher",
-                "Block any category you don't want, such as alcohol",
+                "Block any category you don't want on your channel",
+                "No pop-ups, no autoplay with sound, nothing between a headline and its first paragraph",
               ]}
             />
+            <Link href="/advertisers#formats" className="inline-flex w-fit items-center gap-1.5 text-[14px] font-semibold underline-offset-4 hover:underline">
+              See all five formats
+              <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          </div>
+          <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-3 rounded-lg border bg-card p-5">
-              <p className="text-[15px] font-semibold">The triple lock</p>
+              <p className="text-[15px] font-semibold">Adults-only ads, checked every time</p>
               <p className="text-[15px] leading-[23px] text-muted-foreground">
-                Wagering ads only reach signed-in, age-verified adults who haven&apos;t opted out, so you can earn from them legally from 1 January 2027.
+                Some ads should only reach adults. Switch on the triple lock and those ads show only to viewers who are signed in, confirmed 18 or over
+                and haven&apos;t opted out. That opens your channel to advertisers in age-restricted categories, such as alcohol and wagering.
               </p>
-              <Link href="/advertisers#triple-lock" className="inline-flex items-center gap-1.5 text-[14px] font-semibold underline-offset-4 hover:underline">
+              <Link href="/advertisers#triple-lock" className="inline-flex w-fit items-center gap-1.5 text-[14px] font-semibold underline-offset-4 hover:underline">
                 How the triple lock works
                 <ArrowRight className="size-4" aria-hidden />
               </Link>
             </div>
+            <AgeVerifiedPanel />
           </div>
-          <div className="flex flex-col gap-4">
-            <TripleLockPanel />
-            <div className="flex justify-center rounded-lg border bg-background p-2 sm:p-6">
-              <AdSlot format="mrec" advertiser="Southern Cross Utes" />
+        </div>
+
+        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-12">
+          <FormatFigure className="md:col-span-2 lg:col-span-6" name="Half-time break" where="Between article sections">
+            <HalftimeExample withCopy={false} />
+          </FormatFigure>
+          <FormatFigure className="lg:col-span-3" name="Stat card" where="In a row of key numbers, 18+ shown">
+            <StatCardExample editorial={false} />
+          </FormatFigure>
+          <FormatFigure className="lg:col-span-3" name="Sponsored short" where="In the shorts row, one in eight at most">
+            <div className="mx-auto w-full max-w-[200px]">
+              <SponsoredShortExample context={false} />
             </div>
-          </div>
+          </FormatFigure>
         </div>
       </Section>
 
@@ -309,6 +326,18 @@ function PathCard({
         </Link>
       </Button>
     </div>
+  )
+}
+
+function FormatFigure({ name, where, className, children }: { name: string; where: string; className?: string; children: React.ReactNode }) {
+  return (
+    <figure className={cn("flex min-w-0 flex-col gap-3", className)}>
+      <FormatStage className="flex flex-1 flex-col justify-center">{children}</FormatStage>
+      <figcaption className="flex flex-wrap items-baseline gap-x-2 text-[14px]">
+        <span className="font-semibold">{name}</span>
+        <span className="text-muted-foreground">{where}</span>
+      </figcaption>
+    </figure>
   )
 }
 

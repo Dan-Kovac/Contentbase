@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-const CATEGORIES = ["Automotive", "Sportswear and equipment", "Food and drink", "Financial services", "Travel", "Wagering (licensed)", "Other"]
+const CATEGORIES = ["Automotive", "Sportswear and equipment", "Food and drink", "Financial services", "Travel", "Alcohol (18+)", "Wagering, licensed (18+)", "Other"]
 const BUDGETS = ["Under $10,000", "$10,000 to $50,000", "$50,000 to $150,000", "Over $150,000"]
 
 export function AdvertiserContactForm() {

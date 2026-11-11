@@ -78,6 +78,7 @@ export function ReviewWorkspace({ video, channel, shorts }: { video: Video; chan
       start: s.startSec ?? 0,
       end: s.endSec ?? (s.startSec ?? 0) + s.durationSec,
       tone: s.posterTone,
+      poster: s.poster,
       include: true,
     })),
   )
@@ -94,8 +95,9 @@ export function ReviewWorkspace({ video, channel, shorts }: { video: Video; chan
 
   const frames = useMemo(() => {
     const at = video.chapters.length >= 3 ? video.chapters.slice(0, 3).map((c) => c.start + 8) : [12, Math.round(video.durationSec / 3), Math.round((video.durationSec * 2) / 3)]
-    const tones = [video.posterTone, "#262626", shorts[1]?.posterTone ?? "#0e5a3a"]
-    return at.map((a, i) => ({ at: a, tone: tones[i] }))
+    const tones = [video.posterTone, shorts[1]?.posterTone ?? "#262626", shorts[2]?.posterTone ?? "#0e5a3a"]
+    const srcs = [video.poster, shorts[1]?.poster, shorts[2]?.poster]
+    return at.map((a, i) => ({ at: a, tone: tones[i], src: srcs[i] ?? video.poster }))
   }, [video, shorts])
 
   // ----- Status -----
@@ -198,6 +200,7 @@ export function ReviewWorkspace({ video, channel, shorts }: { video: Video; chan
             update={update}
             title={video.title}
             videoTone={video.posterTone}
+            poster={video.poster}
             durationSec={video.durationSec}
             source={video.source}
             canUndo={hist.past.length > 0}
@@ -214,6 +217,7 @@ export function ReviewWorkspace({ video, channel, shorts }: { video: Video; chan
             slug={video.slug}
             durationSec={video.durationSec}
             chapters={article.chapters}
+            poster={video.poster}
           />
         </TabsContent>
         <TabsContent value="seo" className="pt-2">
@@ -306,7 +310,7 @@ export function ReviewWorkspace({ video, channel, shorts }: { video: Video; chan
         channelName={channel.name}
         exclusive={exclusive}
       />
-      <GatePreview open={gateOpen} onOpenChange={setGateOpen} headline={article.headline} standfirst={article.standfirst} tone={video.posterTone} exclusive={exclusive} />
+      <GatePreview open={gateOpen} onOpenChange={setGateOpen} headline={article.headline} standfirst={article.standfirst} tone={video.posterTone} poster={video.poster} exclusive={exclusive} />
 
       <AlertDialog open={blocked} onOpenChange={setBlocked}>
         <AlertDialogContent>

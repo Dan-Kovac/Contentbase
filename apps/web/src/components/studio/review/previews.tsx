@@ -45,7 +45,7 @@ export function ArticlePreview({
             By <span className="font-semibold text-foreground">{video.article.author}</span> · {video.article.readMinutes} min read
           </p>
           <div className="mt-6">
-            <VideoThumb tone={video.posterTone} durationSec={video.durationSec} />
+            <VideoThumb tone={video.posterTone} src={video.poster} durationSec={video.durationSec} />
             {article.chapters.length > 0 && (
               <ol className="mt-3 flex flex-wrap gap-2">
                 {article.chapters.map((c, i) => (
@@ -94,6 +94,14 @@ export function ArticlePreview({
                   )
                 case "divider":
                   return <hr key={id} className="my-2" />
+                case "image":
+                  return b.src ? (
+                    <figure key={id} className="grid gap-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- prototype media */}
+                      <img src={b.src} alt={b.caption} className="aspect-[3/2] w-full rounded-lg object-cover" />
+                      {b.caption && <figcaption className="font-sans text-[13px] text-muted-foreground">{b.caption}</figcaption>}
+                    </figure>
+                  ) : null
                 default:
                   return null
               }
@@ -112,6 +120,7 @@ export function GatePreview({
   headline,
   standfirst,
   tone,
+  poster,
   exclusive,
 }: {
   open: boolean
@@ -119,6 +128,7 @@ export function GatePreview({
   headline: string
   standfirst: string
   tone: string
+  poster?: string
   exclusive: boolean
 }) {
   return (
@@ -135,7 +145,7 @@ export function GatePreview({
           <p className="mt-2 font-serif text-[16px] leading-[24px] text-muted-foreground">{standfirst}</p>
           <div className="relative mt-4">
             <div className="blur-[6px]" aria-hidden>
-              <VideoThumb tone={tone} />
+              <VideoThumb tone={tone} src={poster} />
             </div>
             <div className="absolute inset-0 grid place-items-center p-4">
               <div className="w-full max-w-[320px] rounded-lg border bg-background p-5 text-center shadow-popover">

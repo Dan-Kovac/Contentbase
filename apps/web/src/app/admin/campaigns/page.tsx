@@ -13,11 +13,19 @@ import {
 } from "@/components/ui/table"
 import { listCampaigns } from "@/lib/data"
 import { aud, number } from "@/lib/format"
-import type { Campaign } from "@/lib/types"
+import type { AgeCategory, Campaign, NativeFormat } from "@/lib/types"
 
 export const metadata: Metadata = { title: "Campaigns" }
 
-const PRICING: Record<Campaign["pricing"], string> = { cpm: "CPM", flat: "Flat fee", cpc: "CPC" }
+const PRICING: Record<Campaign["pricing"], string> = { cpm: "CPM", flat: "Flat sponsorship", cpc: "CPC" }
+const FORMAT: Record<NativeFormat, string> = {
+  chapter_sponsor: "Chapter sponsor",
+  halftime: "Half-time break",
+  stat_card: "Stat card",
+  sponsored_short: "Sponsored short",
+  presented_by: "Presented by",
+}
+const AGE: Record<AgeCategory, string> = { alcohol: "Alcohol", wagering: "Wagering" }
 const STATUS: Record<Campaign["status"], React.ReactNode> = {
   live: <StatusBadge tone="published">Live</StatusBadge>,
   scheduled: <StatusBadge tone="scheduled" />,
@@ -40,14 +48,14 @@ export default function CampaignsPage() {
     <div>
       <PageHeader
         title="Campaigns"
-        description="Direct-sold campaigns managed by our team. Creators never sell or contract wagering placements."
+        description="Direct-sold campaigns in Homestand Native Formats, managed by our team. Age-restricted campaigns serve only on age-verified channels, behind the triple lock."
       />
 
       <div className="mb-6 flex items-start gap-3 rounded-lg border bg-muted/50 px-4 py-3 text-[14px] leading-[21px]">
         <Info className="mt-0.5 size-4 shrink-0" aria-hidden />
         <p>
           <span className="font-semibold">Pricing is never tied to sign-ups, deposits or bets.</span>{" "}
-          Campaigns are sold on CPM, a flat fee or CPC only (ADS-05). Wagering CPC needs legal sign-off before it can go live.
+          Campaigns are sold on CPM, flat sponsorship or CPC only (ADS-05). Wagering CPC needs legal sign-off before it can go live.
         </p>
       </div>
 
@@ -56,11 +64,11 @@ export default function CampaignsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Advertiser</TableHead>
-              <TableHead>Wagering</TableHead>
+              <TableHead>Format</TableHead>
+              <TableHead>Age category</TableHead>
               <TableHead>Pricing</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Flight</TableHead>
-              <TableHead>Channels</TableHead>
+              <TableHead>Flight and channels</TableHead>
               <TableHead className="text-right">Budget</TableHead>
               <TableHead className="text-right">Spent</TableHead>
               <TableHead className="text-right">Impressions</TableHead>
@@ -75,16 +83,25 @@ export default function CampaignsPage() {
                   <div className="font-medium">{c.advertiser}</div>
                   <div className="font-mono text-[12px] text-muted-foreground">{c.id}</div>
                 </TableCell>
-                <TableCell>{c.isWagering ? <StatusBadge tone="wagering">Yes</StatusBadge> : <span className="text-muted-foreground">No</span>}</TableCell>
+                <TableCell className="whitespace-nowrap">{FORMAT[c.format]}</TableCell>
+                <TableCell>
+                  {c.ageCategory ? (
+                    <StatusBadge tone="wagering">18+ · {AGE[c.ageCategory]}</StatusBadge>
+                  ) : (
+                    <span className="text-muted-foreground">Everyday</span>
+                  )}
+                </TableCell>
                 <TableCell>
                   {PRICING[c.pricing]}
-                  {c.pricing === "cpc" && c.isWagering && (
+                  {c.pricing === "cpc" && c.ageCategory === "wagering" && (
                     <div className="text-[12px] text-muted-foreground">Pending legal sign-off</div>
                   )}
                 </TableCell>
                 <TableCell>{STATUS[c.status]}</TableCell>
-                <TableCell className="whitespace-nowrap">{c.flight}</TableCell>
-                <TableCell className="text-muted-foreground">{c.channels.join(", ")}</TableCell>
+                <TableCell className="whitespace-nowrap">
+                  {c.flight}
+                  <div className="text-[12px] text-muted-foreground">{c.channels.join(", ")}</div>
+                </TableCell>
                 <TableCell className="text-right tabular">{aud(c.budget, false)}</TableCell>
                 <TableCell className="text-right tabular">
                   {aud(c.spent)}

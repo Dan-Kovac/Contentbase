@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import type { AccentName, Pairing, Plan, Template } from "@/lib/types"
+import type { Pairing, Plan, Template } from "@/lib/types"
 
 /** Choices carried between sign-up steps. Prototype only: kept in sessionStorage. */
 export interface SignupDraft {
@@ -11,7 +11,11 @@ export interface SignupDraft {
   name: string
   subdomain: string
   template: Template
-  accent: AccentName
+  /** The creator's own accent as typed (validated with checkAccent before continuing). */
+  accentHex: string
+  /** Logo and icon as data URLs, so they survive moving between steps. */
+  logoUrl: string | null
+  iconUrl: string | null
   pairing: Pairing
   plan: Plan
 }
@@ -23,7 +27,9 @@ export const DEFAULT_DRAFT: SignupDraft = {
   name: "Footy Fix",
   subdomain: "footyfix",
   template: "editorial",
-  accent: "pitch",
+  accentHex: "#1C4FB8",
+  logoUrl: null,
+  iconUrl: null,
   pairing: "minimal",
   plan: "pro",
 }
@@ -33,7 +39,11 @@ const KEY = "homestand.signup"
 function read(): SignupDraft {
   try {
     const raw = window.sessionStorage.getItem(KEY)
-    return raw ? { ...DEFAULT_DRAFT, ...JSON.parse(raw) } : DEFAULT_DRAFT
+    if (!raw) return DEFAULT_DRAFT
+    const d: SignupDraft = { ...DEFAULT_DRAFT, ...JSON.parse(raw) }
+    // Drafts saved before templates were cut to two.
+    if (d.template !== "editorial" && d.template !== "broadcast") d.template = "editorial"
+    return d
   } catch {
     return DEFAULT_DRAFT
   }
@@ -53,7 +63,7 @@ export function useSignupDraft() {
       try {
         window.sessionStorage.setItem(KEY, JSON.stringify(next))
       } catch {
-        /* storage unavailable: the prototype still works with defaults */
+        /* storage unavailable or full (a large logo): the prototype still works in memory */
       }
       return next
     })

@@ -28,6 +28,7 @@ export interface Clip {
   start: number
   end: number
   tone: string
+  poster?: string
   include: boolean
 }
 
@@ -41,6 +42,7 @@ export function ShortsReview({
   slug,
   durationSec,
   chapters,
+  poster,
 }: {
   clips: Clip[]
   setClips: (fn: (c: Clip[]) => Clip[]) => void
@@ -48,6 +50,8 @@ export function ShortsReview({
   slug: string
   durationSec: number
   chapters: Chapter[]
+  /** The video's poster, used for clips we suggest from it. */
+  poster?: string
 }) {
   const [render, setRender] = useState<{ state: "none" } | { state: "uploading"; pct: number } | { state: "done" }>(
     source === "upload" ? { state: "done" } : { state: "none" },
@@ -85,6 +89,7 @@ export function ShortsReview({
           start: ch.start,
           end: Math.min(durationSec, ch.start + 40),
           tone: TONES[(c.length + i) % TONES.length],
+          poster,
           include: true,
         }))
         return [...c, ...add]
@@ -169,9 +174,9 @@ export function ShortsReview({
             <div className="grid gap-5 md:grid-cols-[auto_minmax(0,1fr)]">
               <div className={cn("mx-auto", rendered ? "w-[150px]" : "w-full max-w-[300px] md:w-[260px]")}>
                 {rendered ? (
-                  <VerticalPreview tone={c.tone} caption={c.caption} durationSec={c.end - c.start} />
+                  <VerticalPreview tone={c.tone} src={c.poster} caption={c.caption} durationSec={c.end - c.start} />
                 ) : (
-                  <SegmentPreview tone={c.tone} start={c.start} end={c.end} />
+                  <SegmentPreview tone={c.tone} src={c.poster} start={c.start} end={c.end} />
                 )}
                 <p className="mt-2 text-center text-xs text-muted-foreground">
                   {rendered ? "9:16 · burned-in captions" : "YouTube segment · 16:9"}

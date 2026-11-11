@@ -1,10 +1,10 @@
 import Link from "next/link"
-import { ArrowRight, Clock, Eye, RefreshCw, Search, UserCheck, SquarePlay } from "lucide-react"
+import { ArrowRight, ChevronRight, Clock, Eye, FileStack, PenLine, RefreshCw, Search, UserCheck, SquarePlay } from "lucide-react"
 import { PageHeader } from "@/components/shell/page-header"
 import { VideoThumb } from "@/components/brand/media"
 import { StatusBadge } from "@/components/brand/status-badge"
 import { Button } from "@/components/ui/button"
-import { allShorts, allVideos, DEMO_CHANNEL_SLUG, getChannel, getChannelById, listVideos } from "@/lib/data"
+import { allShorts, allVideos, DEMO_CHANNEL_SLUG, getChannel, getChannelById, listArticles, listPages, listVideos } from "@/lib/data"
 import { compact, formatDuration, number } from "@/lib/format"
 import { PipelineSteps } from "@/components/studio/pipeline"
 import { ReviewQueue } from "@/components/studio/review-queue"
@@ -32,6 +32,8 @@ export default function StudioHome() {
   const inFlight = listVideos(channel.id, "processing")
   const published = listVideos(channel.id, "published")
   const scheduled = listVideos(channel.id, "scheduled")
+  const writtenLive = listArticles(channel.id).filter((a) => a.status === "published")
+  const drafts = listArticles(channel.id).filter((a) => a.status === "draft").length + listPages(channel.id).filter((p) => p.status === "draft").length
   const recentShorts = allShorts().filter((s) => s.channelId === channel.id && s.status === "published").slice(0, 2)
 
   const days = studioDays()
@@ -55,9 +57,16 @@ export default function StudioHome() {
         }
         className="pb-0"
         actions={
-          <Button variant="outline" asChild>
-            <Link href="/studio/analytics">View analytics</Link>
-          </Button>
+          <>
+            <Button variant="outline" asChild className="hidden sm:inline-flex">
+              <Link href="/studio/analytics">View analytics</Link>
+            </Button>
+            <Button asChild>
+              <Link href="/studio/articles/new">
+                <PenLine /> Write an article
+              </Link>
+            </Button>
+          </>
         }
       />
 
@@ -77,7 +86,38 @@ export default function StudioHome() {
           <ReviewQueue packs={packs} compact />
         </section>
 
-        <aside className="grid content-start gap-4" aria-label="YouTube connection">
+        <aside className="grid content-start gap-4" aria-label="Create and connections">
+          <section aria-labelledby="create-h" className="overflow-hidden rounded-lg border bg-card">
+            <div className="flex items-baseline justify-between gap-2 px-4 pb-1 pt-4">
+              <h2 id="create-h" className="text-sm font-semibold">
+                Create
+              </h2>
+              {drafts > 0 && <span className="text-xs text-muted-foreground tabular">{drafts} drafts in progress</span>}
+            </div>
+            <ul className="p-1.5">
+              {[
+                { href: "/studio/articles/new", icon: PenLine, title: "Write an article", body: "A column, preview or ladder that doesn't start from a video" },
+                { href: "/studio/pages#templates", icon: FileStack, title: "Create a page", body: "About, Contact or Work with us, from a template" },
+              ].map((a) => (
+                <li key={a.href}>
+                  <Link
+                    href={a.href}
+                    className="group flex items-start gap-3 rounded-md p-2.5 transition-colors hover:bg-accent focus-visible:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <span className="grid size-8 shrink-0 place-items-center rounded-md border bg-background">
+                      <a.icon className="size-4" aria-hidden />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold">{a.title}</span>
+                      <span className="mt-0.5 block text-xs leading-[18px] text-muted-foreground">{a.body}</span>
+                    </span>
+                    <ChevronRight className="mt-2 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+
           <div className="rounded-lg border bg-card p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -207,6 +247,25 @@ export default function StudioHome() {
                 <div className="text-right">
                   <p className="text-sm font-semibold tabular">{compact(v.views)}</p>
                   <p className="text-xs text-muted-foreground">views</p>
+                </div>
+              </Link>
+            </li>
+          ))}
+          {writtenLive.map((a) => (
+            <li key={a.id}>
+              <Link href={`/studio/articles/${a.id}`} className="flex items-center gap-4 p-3 hover:bg-accent/60 focus-visible:bg-accent focus-visible:outline-none sm:px-4">
+                <div className="w-[88px] shrink-0">
+                  <VideoThumb tone="#262626" src={a.hero} className="[&_span.rounded-full]:hidden" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold">{a.headline}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Written article · {sectionLabel(a.section)} · {a.publishedAt}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-semibold tabular">{a.readMinutes} min</p>
+                  <p className="text-xs text-muted-foreground">read</p>
                 </div>
               </Link>
             </li>

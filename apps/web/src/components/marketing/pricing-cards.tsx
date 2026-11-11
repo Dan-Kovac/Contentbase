@@ -49,7 +49,7 @@ export function PricingCards() {
 
 const TEASER: Record<string, string> = {
   starter: "One channel on your subdomain. 10 video hours a month.",
-  pro: "Your own domain, the triple lock and an ad revenue share.",
+  pro: "Your own domain, age-verified advertising and an ad revenue share.",
   publisher: "Three channels, team roles and migration assistance.",
   enterprise: "Unlimited channels and white-glove migration.",
 }

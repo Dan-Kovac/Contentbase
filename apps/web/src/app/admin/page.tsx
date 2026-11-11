@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { listChannels, listVideos, listShorts } from "@/lib/data"
 import { compact } from "@/lib/format"
 import { cn } from "@/lib/utils"
+import type { ChannelMode } from "@/lib/types"
 
 export const metadata: Metadata = { title: "Overview" }
 
@@ -16,7 +17,7 @@ const STATUS: Record<KpiStatus, { label: string; Icon: typeof CircleCheck; cls: 
   off_track: { label: "Off track", Icon: CircleAlert, cls: "text-destructive" },
 }
 
-const MODE_LABEL = { standard: "Standard", triple_lock: "Triple lock", racing_only: "Racing-only" } as const
+const MODE_LABEL: Record<ChannelMode, string> = { standard: "Standard", age_verified: "Age-verified" }
 
 export default function AdminOverview() {
   const kpis = pilotKpis()

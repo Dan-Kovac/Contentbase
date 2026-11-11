@@ -73,6 +73,7 @@ export type Reframe = "centre" | "left" | "right" | "auto"
 /** A 9:16 short with burned-in captions. */
 export function VerticalPreview({
   tone,
+  src,
   caption,
   durationSec,
   reframe = "centre",
@@ -80,6 +81,7 @@ export function VerticalPreview({
   className,
 }: {
   tone: string
+  src?: string
   caption: string
   durationSec?: number
   reframe?: Reframe
@@ -88,11 +90,17 @@ export function VerticalPreview({
 }) {
   const pos = reframe === "left" ? 20 : reframe === "right" ? 80 : reframe === "auto" ? 42 : offset
   return (
-    <div className={cn("relative", className)}>
-      <VideoThumb tone={tone} ratio="9/16" durationSec={durationSec} className="[&>svg]:transition-[object-position]">
+    <div className={cn("relative", className)} style={{ ["--x" as string]: `${pos}%` }}>
+      <VideoThumb
+        tone={tone}
+        src={src}
+        ratio="9/16"
+        durationSec={durationSec}
+        className="[&>img]:[object-position:var(--x)_50%] [&>img]:transition-[object-position] [&>img]:duration-200 motion-reduce:[&>img]:transition-none"
+      >
         <div
           className="pointer-events-none absolute inset-0 transition-[background-position] duration-200"
-          style={{ backgroundImage: "radial-gradient(60% 40% at var(--x) 40%, rgba(255,255,255,0.18), transparent 70%)", ["--x" as string]: `${pos}%` }}
+          style={{ backgroundImage: "radial-gradient(60% 40% at var(--x) 40%, rgba(255,255,255,0.18), transparent 70%)" }}
           aria-hidden
         />
         {caption && (
@@ -106,10 +114,10 @@ export function VerticalPreview({
 }
 
 /** A 16:9 preview of a segment that plays in the YouTube player. */
-export function SegmentPreview({ tone, start, end, className }: { tone: string; start: number; end: number; className?: string }) {
+export function SegmentPreview({ tone, src, start, end, className }: { tone: string; src?: string; start: number; end: number; className?: string }) {
   return (
     <div className={cn("relative", className)}>
-      <VideoThumb tone={tone}>
+      <VideoThumb tone={tone} src={src}>
         <span className="absolute bottom-2 left-2 flex items-center gap-1 rounded-[2px] bg-black/80 px-1.5 py-0.5 font-mono text-[11px] font-medium text-white tabular">
           <SquarePlay className="size-3" aria-hidden />
           {formatDuration(start)}–{formatDuration(end)}

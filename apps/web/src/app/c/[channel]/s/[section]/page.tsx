@@ -3,9 +3,9 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ChevronLeft, ChevronRight, Film } from "lucide-react"
-import { ShortCard, VideoCard } from "@/components/brand/media"
-import { ModuleHeading } from "@/components/channel/home-modules"
-import { DISPLAY, SITE, displayDate, publicShorts, publicVideos, shortPath, videoPath } from "@/components/channel/lib"
+import { ShortCard } from "@/components/brand/media"
+import { DISPLAY, SITE, channelStories, publicShorts, shortPath } from "@/components/channel/lib"
+import { ModuleHeading, StoryCard } from "@/components/channel/story"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { ChannelPageSkeleton } from "@/components/channel/skeleton"
 import { getChannel, listChannels } from "@/lib/data"
@@ -41,37 +41,39 @@ async function SectionPageContent({ params }: { params: Params }) {
   if (!data) notFound()
   const { channel, section } = data
 
-  const videos = publicVideos(channel).filter((v) => v.section === section.slug)
-  const ids = new Set(videos.map((v) => v.id))
+  const stories = channelStories(channel, { section: section.slug })
+  const videoCount = stories.filter((x) => x.kind === "video").length
+  const articleCount = stories.length - videoCount
+  const ids = new Set(stories.map((v) => v.id))
   const shorts = publicShorts(channel).filter((x) => x.videoId && ids.has(x.videoId))
+  const [first, ...rest] = stories
 
   return (
     <div className="mx-auto max-w-[1280px] px-4 pt-10 md:px-8 md:pt-14">
       <header className="mb-10 flex flex-col gap-3 md:mb-14">
         <span className="kicker text-foreground">{channel.name}</span>
-        <h1 className={cn(DISPLAY, "text-[48px] leading-[1] md:text-[72px]")}>{section.label}</h1>
+        <h1 className={cn(DISPLAY, "text-[56px] leading-[0.95] md:text-[96px]", channel.template === "broadcast" && "uppercase")}>{section.label}</h1>
         <p className="text-[15px] text-muted-foreground">
-          {videos.length === 1 ? "1 video" : `${videos.length} videos`}, each with an article
+          {videoCount === 1 ? "1 video" : `${videoCount} videos`}, each with an article
+          {articleCount ? ` · ${articleCount === 1 ? "1 article" : `${articleCount} articles`}` : ""}
           {shorts.length ? ` · ${shorts.length} shorts` : ""}
         </p>
       </header>
 
-      {videos.length ? (
+      {first ? (
         <>
-          <ul className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {videos.map((v) => (
-              <li key={v.id}>
-                <VideoCard
-                  href={videoPath(channel, v)}
-                  title={v.article.headline}
-                  tone={v.posterTone}
-                  durationSec={v.durationSec}
-                  exclusive={v.exclusive}
-                  meta={`${v.article.author} · ${displayDate(v)} · ${v.article.readMinutes} min read`}
-                />
-              </li>
-            ))}
-          </ul>
+          <div className="mb-12 border-b pb-12">
+            <StoryCard story={first} size="lg" standfirst />
+          </div>
+          {rest.length > 0 && (
+            <ul className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+              {rest.map((x) => (
+                <li key={x.id}>
+                  <StoryCard story={x} standfirst ratio={x.kind === "video" ? "16/9" : "3/2"} />
+                </li>
+              ))}
+            </ul>
+          )}
           <nav aria-label="Pagination" className="mt-12 flex items-center justify-between border-t pt-4 text-[14px]">
             <span className="inline-flex items-center gap-1 text-muted-foreground opacity-50" aria-disabled>
               <ChevronLeft className="size-4" aria-hidden /> Newer
@@ -102,7 +104,7 @@ async function SectionPageContent({ params }: { params: Params }) {
           <ul className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0">
             {shorts.map((x) => (
               <li key={x.id}>
-                <ShortCard href={shortPath(channel, x)} title={x.title} tone={x.posterTone} durationSec={x.durationSec} />
+                <ShortCard href={shortPath(channel, x)} title={x.title} tone={x.posterTone} src={x.poster} durationSec={x.durationSec} />
               </li>
             ))}
           </ul>
