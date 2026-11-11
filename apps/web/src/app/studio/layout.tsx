@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { Suspense } from "react"
 import { ExternalLink, Plus } from "lucide-react"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
@@ -13,9 +12,7 @@ export default function StudioLayout({ children }: { children: React.ReactNode }
   const channel = getChannel(DEMO_CHANNEL_SLUG)!
   return (
     <SidebarProvider>
-      <Suspense>
-        <StudioSidebar />
-      </Suspense>
+      <StudioSidebar />
       <SidebarInset>
         <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur md:px-6">
           <SidebarTrigger className="-ml-1" />
