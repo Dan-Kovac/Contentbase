@@ -24,6 +24,7 @@ export function AdSlot({
   advertiser,
   className,
   responsiveBand = false,
+  onOptOut,
 }: {
   format?: AdFormat
   wagering?: boolean
@@ -33,6 +34,8 @@ export function AdSlot({
   className?: string
   /** For the homepage band: 970×250 on desktop, 320×100 below md. */
   responsiveBand?: boolean
+  /** Called after the viewer taps "Don't show me betting ads" (TLK-03). */
+  onOptOut?: () => void
 }) {
   const [optedOut, setOptedOut] = useState(false)
   const isWagering = wagering && !optedOut
@@ -68,7 +71,10 @@ export function AdSlot({
         {isWagering && (
           <button
             type="button"
-            onClick={() => setOptedOut(true)}
+            onClick={() => {
+              setOptedOut(true)
+              onOptOut?.()
+            }}
             className="text-xs font-medium text-foreground underline underline-offset-2 outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             Don&apos;t show me betting ads

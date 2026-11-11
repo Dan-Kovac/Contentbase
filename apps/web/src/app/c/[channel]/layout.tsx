@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { notFound } from "next/navigation"
 import { ChannelFooter, ChannelHeader } from "@/components/shell/channel-chrome"
 import { getChannel, listChannels } from "@/lib/data"
@@ -7,7 +8,7 @@ export function generateStaticParams() {
   return listChannels().map((c) => ({ channel: c.slug }))
 }
 
-export default async function ChannelLayout({
+async function ChannelFrame({
   children,
   params,
 }: {
@@ -23,5 +24,19 @@ export default async function ChannelLayout({
       <main className="flex-1">{children}</main>
       <ChannelFooter channel={channel} />
     </div>
+  )
+}
+
+export default function ChannelLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ channel: string }>
+}) {
+  return (
+    <Suspense fallback={<div className="min-h-svh bg-background" />}>
+      <ChannelFrame params={params}>{children}</ChannelFrame>
+    </Suspense>
   )
 }

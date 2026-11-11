@@ -9,7 +9,16 @@ const LOCKS = [
 ] as const
 
 /** Triple-lock result for one ad request (TLK-01–06). Admin and advertiser views only. */
-export function LockStatus({ locks, compact = false }: { locks: AdDecision["locks"]; compact?: boolean }) {
+export function LockStatus({
+  locks,
+  compact = false,
+  verdict,
+}: {
+  locks: AdDecision["locks"]
+  compact?: boolean
+  /** Overrides the summary line, e.g. when wagering was excluded for another reason (live page, blocked category). */
+  verdict?: string
+}) {
   const allPass = locks.session.pass && locks.age.pass && locks.optout.pass
   return (
     <div className={cn("grid gap-2", compact ? "grid-cols-3" : "grid-cols-1 sm:grid-cols-3")} role="group" aria-label="Triple lock">
@@ -31,7 +40,7 @@ export function LockStatus({ locks, compact = false }: { locks: AdDecision["lock
       })}
       {!compact && (
         <div className="col-span-full rounded-md bg-muted px-3 py-2 text-[13px] font-semibold">
-          {allPass ? "Wagering creative eligible. Evidence written before serve." : "Fail closed: non-wagering ad served."}
+          {verdict ?? (allPass ? "Wagering creative eligible. Evidence written before serve." : "Fail closed: non-wagering ad served.")}
         </div>
       )}
     </div>
