@@ -36,9 +36,9 @@ flowchart LR
     REN[Render shorts]
   end
   subgraph Data
-    PG[(Postgres, Neon Sydney<br/>RLS per organisation)]
+    PG[(Supabase Postgres, Sydney<br/>RLS per organisation)]
     EV[(Evidence schema<br/>append-only)]
-    R2[(Cloudflare R2<br/>logos, thumbnails, exports)]
+    ST2[(Supabase Storage<br/>logos, thumbnails, exports)]
     TB[(Tinybird<br/>analytics events)]
   end
   subgraph External
@@ -82,18 +82,18 @@ Ads: every slot asks `/api/ads/decide`. That route is the only code path that ca
 | Monorepo | pnpm workspaces (Turborepo when there's more than one app) | One repo, shared UI and types |
 | Web | Next.js 16 App Router, React 19, Cache Components, TypeScript strict | Server rendering for SEO; one app for every surface; tag-based revalidation on publish |
 | UI | shadcn/ui (Radix) on Tailwind v4, Lucide icons | Themed from the brand tokens 1:1 |
-| Database | Postgres on Neon (aws-ap-southeast-2), Drizzle ORM and migrations, row-level security | Data stays in Australia; branching for previews; RLS for tenancy |
-| Auth | Better Auth: creators (Google, email magic link, MFA for admins) and viewers (magic link, Google, Apple) | One viewer identity across every channel, in our own database |
+| Database | **Supabase** Postgres in Sydney (ap-southeast-2), via the Vercel integration you already use. Migrations with the Supabase CLI; typed queries with Drizzle (or supabase-js); row-level security on every tenant table | Already in your stack; data stays in Australia; preview branches per pull request; RLS ties straight to the signed-in user |
+| Auth | **Supabase Auth**: creators (Google with YouTube scopes, email magic link, MFA for admins) and viewers (magic link, Google, Apple) | One viewer identity across every channel; `auth.uid()` and custom JWT claims (org, role) drive the RLS policies directly |
 | Jobs | Inngest | Durable steps, retries, cron (push renewals, nightly evidence export) |
 | Video | Mux for uploads (resumable upload, HLS, thumbnails, clipping) plus a render worker (ffmpeg) for 9:16 reframing and burned-in captions; YouTube IFrame player for YouTube-sourced videos | YouTube video can't be re-hosted (see research) |
 | Speech-to-text | YouTube captions first; Deepgram (word timings, speakers, en-AU) for uploads and as the fallback | Cheapest and fastest path for most videos |
 | LLM | Claude API | Article drafts, headlines, chapters, SEO, clip suggestions, rewrites, compliance pre-check |
-| Files | Cloudflare R2 | Logos, generated thumbnails, evidence exports |
+| Files | **Supabase Storage** (private buckets with signed URLs; public bucket behind the CDN for logos and thumbnails) | Logos, generated thumbnails, evidence exports; one vendor fewer |
 | Analytics | First-party events into Tinybird | Fast dashboards, no third-party trackers |
 | Payments | Stripe Billing (AUD, GST via Stripe Tax), Stripe Connect later | Tiers, trials, invoices |
 | Age assurance | A certified provider behind an interface (shortlist in milestone 6) | We never handle ID documents |
-| Email | Resend | Magic links, digests, notices |
-| Hosting | Vercel (Sydney functions) | Edge cache, preview deployments |
+| Email | Resend (Supabase Auth sends its sign-in emails through it via custom SMTP) | Magic links, digests, notices |
+| Hosting | **Vercel** (Sydney functions), linked to Supabase through the Vercel integration | Edge cache, preview deployments with matching Supabase branches |
 | Observability | OpenTelemetry → Axiom or Datadog; Sentry for errors | Alerts on ad-decision errors and pipeline backlog |
 
 Every external provider sits behind an interface in `packages/providers` with a fake for tests: `VideoHost`, `SpeechToText`, `Llm`, `AgeAssurance`, `Payments`, `YouTubeSource`.
@@ -110,7 +110,8 @@ apps/web                  Next.js app (built): marketing, auth, studio, channel,
   src/app/admin           creative review, campaigns, evidence, channels, moderation, audit
   src/app/api             (to build) webhooks, ad decisions, uploads
   src/lib/data            data access: today sample data, next Drizzle queries
-packages/db               (to build) Drizzle schema, migrations, RLS policies, seed
+supabase/                 (to build) migrations, RLS policies, seed, edge config (Supabase CLI)
+packages/db               (to build) typed schema and queries
 packages/pipeline         (to build) Inngest functions
 packages/ads              (to build) ad decision service, triple lock, evidence writer
 packages/providers        (to build) provider interfaces and fakes
@@ -119,7 +120,7 @@ docs/                     PID, brief, brand, screens, research, this plan
 
 ## Data model
 
-Tenant tables carry `org_id` and have an RLS policy `org_id = current_setting('app.org_id')`. Viewer data is global (one identity across channels). Evidence lives in its own schema, where the app role has `INSERT` and `SELECT` only.
+Tenant tables carry `org_id` and have an RLS policy that checks the signed-in user's membership, e.g. `org_id in (select org_id from memberships where user_id = auth.uid())`. Server-side jobs use the service role and set `org_id` explicitly. Viewer data is global (one identity across channels). Evidence lives in its own schema, where the app role has `INSERT` and `SELECT` only.
 
 | Table | Key columns | Notes |
 | --- | --- | --- |
@@ -142,7 +143,7 @@ Tenant tables carry `org_id` and have an RLS policy `org_id = current_setting('a
 | `ad_preferences` | viewer_id, wagering_opt_out, source (account, ad_unit, adstop), updated_at | TLK-03, TLK-04 |
 | `advertisers`, `campaigns`, `creatives` | as in PID 9; creatives hold review_status, reviewer, reasons, checklist jsonb | ADS-04–06 |
 | `ad_decisions` | id, at, channel_id, page, slot, creative_id, outcome, reason_codes[] | Every request |
-| `evidence.compliance_evidence` | decision_id, lock1_session_ref, lock2_assurance_ref, lock3_optout_state, adstop_checked, at | TLK-05; append-only, exported nightly to R2 (object lock) |
+| `evidence.compliance_evidence` | decision_id, lock1_session_ref, lock2_assurance_ref, lock3_optout_state, adstop_checked, at | TLK-05; append-only, exported nightly to a locked Supabase Storage bucket (and a cold copy off-platform) |
 | `audit_log` | actor, action, target, before jsonb, after jsonb, reason, at | ADM-01; append-only |
 | `reports` | content_id, viewer_id, reason, status, actioned_by | ADM-04 |
 
@@ -204,7 +205,7 @@ A server action checks the creator's role, sets `published` (or `scheduled`, pic
 
 | Route | Kind | Purpose | IDs |
 | --- | --- | --- | --- |
-| `/api/auth/*` | Better Auth | Creator and viewer sign-in, OAuth callbacks (Google with YouTube scopes) | AUD-01 |
+| `/auth/callback` | Supabase Auth | Creator and viewer sign-in, OAuth callbacks (Google with YouTube scopes); the Google provider token is stored encrypted for YouTube calls | AUD-01 |
 | `/api/webhooks/youtube` | GET (hub challenge) + POST (Atom) | New-upload push | MIG-01 |
 | `/api/webhooks/mux` | POST, signed | Upload and asset events | ING-01–02 |
 | `/api/webhooks/stripe` | POST, signed | Subscriptions, invoices | BIL-01 |
@@ -219,7 +220,7 @@ A server action checks the creator's role, sets `published` (or `scheduled`, pic
 
 ## Environment and secrets
 
-Stored in Vercel and Inngest, never in code: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID/SECRET`, `APPLE_*`, `YOUTUBE_API_KEY`, `MUX_TOKEN_ID/SECRET`, `MUX_WEBHOOK_SECRET`, `DEEPGRAM_API_KEY`, `ANTHROPIC_API_KEY`, `INNGEST_EVENT_KEY/SIGNING_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `R2_*`, `TINYBIRD_TOKEN`, `RESEND_API_KEY`, `AGE_PROVIDER_*`, `VERCEL_API_TOKEN` (custom domains).
+Stored in Vercel (the Supabase integration adds its own) and Inngest, never in code: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL`, `GOOGLE_CLIENT_ID/SECRET` (configured in Supabase Auth), `APPLE_*`, `YOUTUBE_API_KEY`, `MUX_TOKEN_ID/SECRET`, `MUX_WEBHOOK_SECRET`, `DEEPGRAM_API_KEY`, `ANTHROPIC_API_KEY`, `INNGEST_EVENT_KEY/SIGNING_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `TINYBIRD_TOKEN`, `RESEND_API_KEY`, `AGE_PROVIDER_*`, `VERCEL_API_TOKEN` (custom domains).
 
 ## Milestones
 
@@ -228,7 +229,7 @@ The front end exists, so each milestone wires real data and services into screen
 | # | Milestone | Requirement IDs | Done when | Target |
 | --- | --- | --- | --- | --- |
 | 0 | Spikes (1 week) | — | Proven: owner caption download incl. auto-captions; push webhook round trip; Mux clip + 9:16 render; a Claude draft-pack prompt producing article-quality output on 5 real transcripts | 20 Nov 2026 |
-| 1 | Foundations | — | `packages/db` with schema, migrations, RLS and tests; Better Auth for creators; staging and prod in Sydney; CI (typecheck, lint, tests, Playwright smoke); `lib/data` reading Postgres via the seed | 11 Dec 2026 |
+| 1 | Foundations | — | Supabase project in Sydney linked to Vercel; migrations, RLS and tests; Supabase Auth for creators; staging and prod; CI (typecheck, lint, tests, Playwright smoke); `lib/data` reading Postgres via the seed | 11 Dec 2026 |
 | 2 | YouTube-first sign-up and import | CHN-01, MIG-01, MIG-07 | Sign up with Google, pick a channel, live subdomain within 1 minute, all public videos imported with progress | 22 Jan 2027 |
 | 3 | Draft packs | ING-03–11, MIG-08 | A new YouTube upload becomes a Ready-to-review pack automatically: transcript, article, chapters, SEO, clip suggestions, compliance flags | 12 Feb 2027 |
 | 4 | Review, publish and channel pages | EDT-01–06, CHN-02–07, SEO-01–07 | Edit in the review workspace, publish, the page goes live on the subdomain and custom domain, sitemaps update within 5 minutes, Lighthouse SEO ≥ 95 | 5 Mar 2027 |
@@ -254,7 +255,7 @@ Pilot starts 3 May 2027 (Gate 1).
 
 | Decision | Blocks | Owner |
 | --- | --- | --- |
-| Approve this stack | Milestone 1 | Dan |
+| ~~Approve this stack~~ Vercel + Supabase confirmed (11 Nov 2026). Remaining picks: Inngest, Mux, Deepgram | Milestone 1 | Dan |
 | Age-assurance provider | Milestone 7 (TLK-02) | Dan + counsel |
 | Evidence retention (12 months minimum, 7 years recommended) | Milestone 7 (TLK-05) | Counsel |
 | Wagering CPC allowed? | Milestone 7 (ADS-05) | Counsel |
