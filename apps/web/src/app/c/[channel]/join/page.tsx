@@ -5,7 +5,7 @@ import { Bell, Lock, Plus } from "lucide-react"
 import { JoinForm } from "@/components/channel/channel-cta"
 import { DISPLAY } from "@/components/channel/lib"
 import { ChannelPageSkeleton } from "@/components/channel/skeleton"
-import { getChannel } from "@/lib/data"
+import { getChannel, listEmailStreams } from "@/lib/data"
 import { cn } from "@/lib/utils"
 
 type Params = Promise<{ channel: string }>
@@ -29,10 +29,11 @@ async function JoinContent({ params, searchParams }: { params: Params; searchPar
   const channel = getChannel(slug)
   if (!channel) notFound()
   const signin = mode === "signin"
+  const lead = listEmailStreams(channel.id).find((x) => x.defaultOn)
   const broadcast = channel.template === "broadcast"
   const benefits = [
     { Icon: Lock, title: "Members-only videos", text: `Watch everything ${channel.name} keeps for members.` },
-    { Icon: Bell, title: "A weekly digest", text: "New episodes and articles from the channels you follow, every Monday." },
+    { Icon: Bell, title: lead ? lead.name : "Newsletters", text: lead ? `${lead.description} Choose more on the Newsletters page.` : "Choose the newsletters you want after you join." },
     { Icon: Plus, title: `Follow ${channel.name}`, text: "One free account works on every Homestand channel." },
   ]
   return (

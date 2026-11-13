@@ -85,9 +85,14 @@ export function ChannelFooter({ channel, nav = defaultNav(channel) }: { channel:
       </div>
       <div className="border-t">
         <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-4 px-4 py-5 text-[13px] text-muted-foreground md:px-8">
-          <Link href="/account#ads" className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
-            Don&apos;t show me betting ads
-          </Link>
+          <span className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <Link href="/account#ads" className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
+              Don&apos;t show me betting ads
+            </Link>
+            <Link href={`/c/${channel.slug}/newsletters`} className="rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
+              Newsletters
+            </Link>
+          </span>
           <Link href="/" className="flex items-center gap-1.5 rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
             Powered by <Wordmark height={13} />
           </Link>

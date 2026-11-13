@@ -258,6 +258,71 @@ export interface Earnings {
   byViewer: { state: string; impressions: number; amount: number }[]
 }
 
+/**
+ * Email: each publication has its own streams (a weekly summary, big news, tips), sent from its
+ * own domain. Viewers subscribe once they're signed in. No third-party newsletter tool.
+ */
+export interface EmailStream {
+  id: string
+  channelId: string
+  name: string
+  description: string
+  cadence: string
+  subscribers: number
+  /** Share of delivered emails opened and clicked, last 90 days. */
+  openRate: number
+  clickRate: number
+  /** Ticked for new members when they join. */
+  defaultOn: boolean
+  /** Drafted automatically from the week's published stories. */
+  autoDraft: boolean
+  /** Only for members (signed in); every stream needs an account to subscribe. */
+  membersOnly: boolean
+  lastSent?: string
+}
+
+export interface EmailCampaign {
+  id: string
+  channelId: string
+  streamId: string
+  subject: string
+  previewText: string
+  status: "sent" | "scheduled" | "draft"
+  date: string
+  recipients: number
+  opens: number
+  clicks: number
+  unsubscribes: number
+}
+
+export interface SendingDomain {
+  channelId: string
+  /** The domain mail is sent from; Homestand's shared domain until the publication adds its own. */
+  domain: string
+  managed: boolean
+  fromName: string
+  fromAddress: string
+  replyTo: string
+  /** The Spam Act wants senders identified; we show this in every footer. */
+  postalAddress: string
+  status: "verified" | "pending"
+  records: { type: "TXT" | "CNAME" | "MX"; host: string; value: string; purpose: string; status: "verified" | "pending" }[]
+  bounceRate: number
+  complaintRate: number
+}
+
+export interface SubscriberImport {
+  id: string
+  channelId: string
+  file: string
+  at: string
+  rows: number
+  imported: number
+  duplicates: number
+  invalid: number
+  suppressed: number
+}
+
 /** Words to video. A template is a motion style; the publication's brand kit and voice are applied to it. */
 export type VideoFormat = "long" | "short" | "inapp"
 

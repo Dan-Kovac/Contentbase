@@ -8,6 +8,10 @@ import type {
   VideoTemplate,
   CreditAccount,
   MadeVideo,
+  EmailStream,
+  EmailCampaign,
+  SendingDomain,
+  SubscriberImport,
   StandaloneArticle,
   Article,
   Block,
@@ -726,3 +730,64 @@ export const customPages: CustomPage[] = [
     blocks: [{ type: "paragraph", text: "Sponsorship enquiries go through Homestand's partnerships team, so every partner buys on the same terms." }],
   },
 ]
+
+/* ---------------------------------------------------------------------------------------------
+ * Email
+ * ------------------------------------------------------------------------------------------- */
+
+export const emailStreams: EmailStream[] = [
+  { id: "es_weekly", channelId: "ch_footyfix", name: "The Weekly Fix", description: "Every Monday: the week's videos, the one stat that matters and what to watch.", cadence: "Mondays, 7 am", subscribers: 12840, openRate: 0.52, clickRate: 0.091, defaultOn: true, autoDraft: true, membersOnly: false, lastSent: "10 November 2026" },
+  { id: "es_bignews", channelId: "ch_footyfix", name: "Big news", description: "Only when something big lands: trades, injuries, finals team news. Once a week at most.", cadence: "When it matters", subscribers: 6210, openRate: 0.61, clickRate: 0.124, defaultOn: false, autoDraft: false, membersOnly: false, lastSent: "4 November 2026" },
+  { id: "es_tips", channelId: "ch_footyfix", name: "Tuesday tips", description: "SuperCoach and selection notes for the round ahead. Never betting tips.", cadence: "Tuesdays, 6 pm", subscribers: 4380, openRate: 0.47, clickRate: 0.152, defaultOn: false, autoDraft: false, membersOnly: false, lastSent: "11 November 2026" },
+  { id: "es_members", channelId: "ch_footyfix", name: "Members' notes", description: "The extra cut: what didn't make the show, from Sam and Jess.", cadence: "Monthly", subscribers: 2104, openRate: 0.66, clickRate: 0.108, defaultOn: false, autoDraft: false, membersOnly: true, lastSent: "1 November 2026" },
+  { id: "es_form", channelId: "ch_trackside", name: "Friday form", description: "Saturday's form on Friday: fields, barriers and the horses to watch.", cadence: "Fridays, 4 pm", subscribers: 8450, openRate: 0.48, clickRate: 0.11, defaultOn: true, autoDraft: true, membersOnly: false, lastSent: "7 November 2026" },
+  { id: "es_carnival", channelId: "ch_trackside", name: "Carnival daily", description: "Every race day of the Spring Carnival, the morning of.", cadence: "Race days, 8 am", subscribers: 3120, openRate: 0.55, clickRate: 0.13, defaultOn: false, autoDraft: true, membersOnly: false, lastSent: "8 November 2026" },
+  { id: "es_wrap", channelId: "ch_trackside", name: "Weekly wrap", description: "The week in racing in five minutes, every Sunday night.", cadence: "Sundays, 7 pm", subscribers: 5600, openRate: 0.44, clickRate: 0.07, defaultOn: false, autoDraft: true, membersOnly: false, lastSent: "9 November 2026" },
+]
+
+export const emailCampaigns: EmailCampaign[] = [
+  { id: "ec_w45", channelId: "ch_footyfix", streamId: "es_weekly", subject: "Round 7, and the Blues' centre-bounce problem", previewText: "Plus the ladder that's lying to you.", status: "sent", date: "10 November 2026, 7:00 am", recipients: 12790, opens: 6780, clicks: 1190, unsubscribes: 14 },
+  { id: "ec_tips8", channelId: "ch_footyfix", streamId: "es_tips", subject: "Round 8: three SuperCoach moves and one to wait on", previewText: "The mid-price rookie everyone's missing.", status: "sent", date: "11 November 2026, 6:00 pm", recipients: 4370, opens: 2050, clicks: 660, unsubscribes: 3 },
+  { id: "ec_big", channelId: "ch_footyfix", streamId: "es_bignews", subject: "AFLW finals: all four sides named", previewText: "Three changes, one forced.", status: "scheduled", date: "13 November 2026, 6:00 pm", recipients: 6210, opens: 0, clicks: 0, unsubscribes: 0 },
+  { id: "ec_w46", channelId: "ch_footyfix", streamId: "es_weekly", subject: "The Weekly Fix: draft notes and the run home", previewText: "Drafted from this week's stories. Ready to review.", status: "draft", date: "17 November 2026, 7:00 am", recipients: 12840, opens: 0, clicks: 0, unsubscribes: 0 },
+  { id: "ec_form", channelId: "ch_trackside", streamId: "es_form", subject: "Cox Plate form: why barrier one matters", previewText: "Four from ten. The numbers behind the draw.", status: "sent", date: "7 November 2026, 4:00 pm", recipients: 8420, opens: 4040, clicks: 930, unsubscribes: 11 },
+]
+
+export const sendingDomains: SendingDomain[] = [
+  {
+    channelId: "ch_footyfix",
+    domain: "send.footyfix.com.au",
+    managed: false,
+    fromName: "Footy Fix",
+    fromAddress: "hello@footyfix.com.au",
+    replyTo: "sam@footyfix.com.au",
+    postalAddress: "Footy Fix, PO Box 412, Fitzroy VIC 3065",
+    status: "verified",
+    records: [
+      { type: "TXT", host: "send.footyfix.com.au", value: "v=spf1 include:spf.homestand.email ~all", purpose: "SPF: lets Homestand send for you", status: "verified" },
+      { type: "CNAME", host: "hs1._domainkey.footyfix.com.au", value: "hs1.dkim.homestand.email", purpose: "DKIM: signs every email so it can't be faked", status: "verified" },
+      { type: "MX", host: "send.footyfix.com.au", value: "feedback.homestand.email (priority 10)", purpose: "Bounces and complaints come back to us", status: "verified" },
+      { type: "TXT", host: "_dmarc.footyfix.com.au", value: "v=DMARC1; p=quarantine; rua=mailto:dmarc@homestand.email", purpose: "DMARC: tells inboxes what to do with fakes", status: "verified" },
+    ],
+    bounceRate: 0.004,
+    complaintRate: 0.0003,
+  },
+  {
+    channelId: "ch_trackside",
+    domain: "trackside.homestand.email",
+    managed: true,
+    fromName: "Trackside",
+    fromAddress: "form@trackside.homestand.email",
+    replyTo: "editor@trackside.com.au",
+    postalAddress: "Trackside Media Pty Ltd, Level 2, 80 Flinders Street, Melbourne VIC 3000",
+    status: "verified",
+    records: [],
+    bounceRate: 0.006,
+    complaintRate: 0.0004,
+  },
+]
+
+export const subscriberImports: SubscriberImport[] = [
+  { id: "si_wp", channelId: "ch_footyfix", file: "footyfix-wordpress-subscribers.csv", at: "2 November 2026", rows: 4210, imported: 3980, duplicates: 142, invalid: 61, suppressed: 27 },
+]
+

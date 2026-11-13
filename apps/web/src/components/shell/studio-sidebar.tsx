@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { BarChart3, Clapperboard, Coins, Inbox, LayoutDashboard, LayoutGrid, Library, Settings } from "lucide-react"
+import { BarChart3, Clapperboard, Coins, Inbox, LayoutDashboard, LayoutGrid, Library, Mail, Settings } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -24,6 +24,7 @@ export const STUDIO_NAV = [
   { href: "/studio/review", label: "Review", icon: Inbox, badge: true },
   { href: "/studio/library", label: "Library", icon: Library, also: ["/studio/articles", "/studio/shorts", "/studio/pages", "/studio/upload"] },
   { href: "/studio/video", label: "Video", icon: Clapperboard, also: ["/studio/credits"] },
+  { href: "/studio/email", label: "Email", icon: Mail },
   { href: "/studio/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/studio/settings", label: "Settings", icon: Settings, also: ["/studio/imports"] },
 ]

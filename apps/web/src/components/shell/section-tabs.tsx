@@ -31,6 +31,12 @@ const VIDEO: Tab[] = [
   { href: "/studio/credits", label: "AI credits" },
 ]
 
+const EMAIL: Tab[] = [
+  { href: "/studio/email", label: "Email" },
+  { href: "/studio/email/subscribers", label: "Subscribers" },
+  { href: "/studio/email/sending", label: "Sending" },
+]
+
 const SETTINGS: Tab[] = [
   { href: "/studio/settings", label: "Channel" },
   { href: "/studio/settings/design", label: "Design" },
@@ -48,9 +54,10 @@ export function StudioSectionTabs() {
   const pathname = usePathname() ?? ""
   const library = LIBRARY.some((t) => t.href === pathname)
   const video = VIDEO.some((t) => t.href === pathname)
+  const email = EMAIL.some((t) => t.href === pathname)
   const settings = [...SETTINGS, ...SETTINGS_MORE].some((t) => t.href === pathname)
-  if (!library && !settings && !video) return null
-  const tabs = library ? LIBRARY : video ? VIDEO : SETTINGS
+  if (!library && !settings && !video && !email) return null
+  const tabs = library ? LIBRARY : video ? VIDEO : email ? EMAIL : SETTINGS
   const moreActive = SETTINGS_MORE.find((t) => t.href === pathname)
   const tabClass = (active: boolean) =>
     cn(
@@ -58,7 +65,7 @@ export function StudioSectionTabs() {
       active ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
     )
   return (
-    <nav aria-label={library ? "Library" : video ? "Video" : "Settings"} className="mb-8 flex items-center gap-5 overflow-x-auto border-b [scrollbar-width:none]">
+    <nav aria-label={library ? "Library" : video ? "Video" : email ? "Email" : "Settings"} className="mb-8 flex items-center gap-5 overflow-x-auto border-b [scrollbar-width:none]">
       {tabs.map((t) => (
         <Link key={t.href} href={t.href} className={tabClass(t.href === pathname)} aria-current={t.href === pathname ? "page" : undefined}>
           {t.label}

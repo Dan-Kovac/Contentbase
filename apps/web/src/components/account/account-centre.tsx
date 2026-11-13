@@ -231,6 +231,23 @@ function Following({ channels }: { channels: FollowedChannel[] }) {
           aria-describedby="digest-note"
         />
       </div>
+      <div className="flex flex-col gap-2 rounded-lg border p-4">
+        <p className="text-[15px] font-semibold">Newsletters</p>
+        <p className="text-[13px] leading-5 text-muted-foreground">Each channel has its own: a weekly summary, big news, tips. Choose them channel by channel.</p>
+        <ul className="mt-1 flex flex-wrap gap-2">
+          {[
+            ["Footy Fix", "/c/footyfix/newsletters", "The Weekly Fix and 1 more"],
+            ["Trackside", "/c/trackside/newsletters", "Friday form"],
+          ].map(([name, href, note]) => (
+            <li key={href}>
+              <a href={href} className="inline-flex flex-col rounded-md border px-3 py-2 text-[13px] outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring">
+                <span className="font-semibold">{name}</span>
+                <span className="text-muted-foreground">{note}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </Panel>
   )
 }

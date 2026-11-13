@@ -14,6 +14,10 @@ import {
   videoTemplates,
   creditAccount,
   madeVideos,
+  emailStreams,
+  emailCampaigns,
+  sendingDomains,
+  subscriberImports,
   importJobs,
   shorts,
   videos,
@@ -55,6 +59,18 @@ export function listVideoTemplates() {
 }
 export function getCreditAccount() {
   return creditAccount
+}
+export function listEmailStreams(channelId: string) {
+  return emailStreams.filter((s) => s.channelId === channelId)
+}
+export function listEmailCampaigns(channelId: string) {
+  return emailCampaigns.filter((c) => c.channelId === channelId)
+}
+export function getSendingDomain(channelId: string) {
+  return sendingDomains.find((d) => d.channelId === channelId)
+}
+export function listSubscriberImports(channelId: string) {
+  return subscriberImports.filter((i) => i.channelId === channelId)
 }
 export function listMadeVideos(channelId: string) {
   return madeVideos.filter((v) => v.channelId === channelId)
