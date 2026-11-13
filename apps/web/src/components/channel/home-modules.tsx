@@ -16,6 +16,7 @@ import {
   type Viewer,
 } from "./lib"
 import { SponsorSlot } from "./viewer"
+import { ScrollRow } from "./scroll-row"
 
 export { ModuleHeading } from "./story"
 
@@ -82,7 +83,7 @@ export function ShortsList({
   const items: ({ kind: "short"; short: Short } | { kind: "ad" })[] = shorts.map((short) => ({ kind: "short", short }))
   if (sponsor) items.splice(sponsorAt, 0, { kind: "ad" })
   return (
-    <div className={cn("-mx-4 overflow-x-auto px-4 pb-3 md:-mx-8 md:px-8 [scrollbar-width:thin]", className)} data-shorts-row>
+    <ScrollRow label="shorts" className={cn("-mx-4 overflow-x-auto px-4 pb-3 md:-mx-8 md:px-8 [scrollbar-width:thin]", className)}>
       <ul className="flex w-max items-start gap-4">
         {items.map((item) =>
           item.kind === "ad" ? (
@@ -102,7 +103,7 @@ export function ShortsList({
           ),
         )}
       </ul>
-    </div>
+    </ScrollRow>
   )
 }
 

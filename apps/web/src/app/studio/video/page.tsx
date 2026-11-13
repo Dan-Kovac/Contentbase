@@ -22,7 +22,7 @@ export default async function VideoHubPage() {
   const ready = listArticles(channel.id).filter((a) => a.status === "published" && a.blocks.length > 2)
 
   return (
-    <div className="grid gap-10">
+    <div className="grid grid-cols-1 gap-10">
       <PageHeader
         title="Video"
         description="Your videos become articles automatically. This goes the other way: write once, and get a long-form video for YouTube, a short for the feed or a clip for apps, in your brand and your voice."
@@ -36,13 +36,13 @@ export default async function VideoHubPage() {
         }
       />
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         <section aria-labelledby="next-h" className="min-w-0">
           <h2 id="next-h" className="mb-3 text-lg font-semibold tracking-[-0.2px]">
             Articles ready to become videos
           </h2>
           {ready.length ? (
-            <ul className="grid gap-4 sm:grid-cols-2">
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {ready.map((a) => {
                 const scenes = buildStoryboard({ headline: a.headline, standfirst: a.standfirst, hero: a.hero, blocks: a.blocks }, "long", channel.cta.label)
                 const chart = scenes.find((s) => s.rows) ?? scenes[1]

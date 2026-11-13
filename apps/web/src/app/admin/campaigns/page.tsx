@@ -43,6 +43,7 @@ export default function CampaignsPage() {
     (t, c) => ({ budget: t.budget + c.budget, spent: t.spent + c.spent, impressions: t.impressions + c.impressions, clicks: t.clicks + c.clicks }),
     { budget: 0, spent: 0, impressions: 0, clicks: 0 },
   )
+  const verifiedImpressions = campaigns.filter((c) => c.ageCategory).reduce((n, c) => n + c.impressions, 0)
 
   return (
     <div>
@@ -50,6 +51,21 @@ export default function CampaignsPage() {
         title="Campaigns"
         description="Direct-sold campaigns in Homestand Native Formats, managed by our team. Age-restricted campaigns serve only on age-verified channels, behind the triple lock."
       />
+
+      <dl className="mb-6 grid grid-cols-1 gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-3">
+        <div className="flex flex-col gap-1 bg-card p-4">
+          <dt className="order-2 text-[13px] text-muted-foreground">Age-restricted impressions to confirmed adults</dt>
+          <dd className="order-1 text-[28px] font-bold leading-8 tracking-[-0.6px]">{number(verifiedImpressions)}</dd>
+        </div>
+        <div className="flex flex-col gap-1 bg-card p-4">
+          <dt className="order-2 text-[13px] text-muted-foreground">Age-restricted impressions outside a valid triple-lock session (target 0)</dt>
+          <dd className="order-1 text-[28px] font-bold leading-8 tracking-[-0.6px]">0</dd>
+        </div>
+        <div className="flex flex-col gap-1 bg-card p-4">
+          <dt className="order-2 text-[13px] text-muted-foreground">Delivered so far, all campaigns (ex GST)</dt>
+          <dd className="order-1 text-[28px] font-bold leading-8 tracking-[-0.6px]">{aud(totals.spent)}</dd>
+        </div>
+      </dl>
 
       <div className="mb-6 flex items-start gap-3 rounded-lg border bg-muted/50 px-4 py-3 text-[14px] leading-[21px]">
         <Info className="mt-0.5 size-4 shrink-0" aria-hidden />

@@ -131,7 +131,7 @@ export function HeaderActions({ channel }: { channel: CtaChannel }) {
       ) : (
         <CtaLink
           href={ctaHref(channel, pathname)}
-          className="ml-1 inline-flex h-8 items-center whitespace-nowrap rounded-full bg-[var(--chan)] px-4 text-[13px] font-bold text-[var(--chan-on)] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="ml-1 inline-block h-8 max-w-[38vw] truncate leading-8 whitespace-nowrap rounded-full bg-[var(--chan)] px-3 text-[13px] sm:max-w-none sm:px-4 font-bold text-[var(--chan-on)] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           {channel.cta.label}
         </CtaLink>

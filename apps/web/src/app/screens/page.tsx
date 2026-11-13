@@ -12,10 +12,10 @@ const GROUPS: Group[] = [
     title: "Marketing site",
     who: "Prospective creators, publishers and advertisers",
     screens: [
-      { href: "/", name: "Landing", what: "Your channel. Your audience. Creator and publisher paths, how it works, native formats and age-verified advertising, migrate." },
-      { href: "/publishers", name: "For publishers", what: "Migration with rankings kept, why age verification matters (wagering from 2027, alcohol code), white-glove move." },
+      { href: "/", name: "Landing", what: "Turn your channel into a publication you own: who wins, one account for every publication, how it works, words to video, the page rethought, age-verified advertising." },
+      { href: "/publishers", name: "For publishers", what: "Keep the revenue (sample earnings), migration with rankings kept, age-verified advertising, white-glove move." },
       { href: "/pricing", name: "Pricing", what: "Starter, Pro, Publisher, Enterprise in AUD inc. GST, 14-day trial, comparison, FAQ.", ids: "BIL-01, BIL-02" },
-      { href: "/advertisers", name: "For advertisers", what: "Reach verified adults: the five Native Formats, the triple lock, categories, evidence pack, pricing, contact.", ids: "ADS-01, ADS-07, TLK-09" },
+      { href: "/advertisers", name: "For advertisers", what: "The rule in one line, an interactive triple lock, the five same-shape formats, evidence pack, network numbers, buying, contact.", ids: "ADS-01, ADS-07, TLK-09" },
     ],
   },
   {
@@ -24,10 +24,8 @@ const GROUPS: Group[] = [
     screens: [
       { href: "/signup", name: "1. Connect YouTube", what: "Continue with Google; read-only access to public videos.", ids: "MIG-01" },
       { href: "/signup/channel", name: "2. Pick your channel", what: "Which YouTube channel, what to import, auto-import on." },
-      { href: "/signup/name", name: "3. Name and address", what: "Channel name and subdomain with availability check.", ids: "CHN-01" },
-      { href: "/signup/style", name: "4. Choose your look", what: "Template, accent and type pairing with a live preview.", ids: "CHN-02, CHN-03" },
-      { href: "/signup/plan", name: "5. Plan", what: "Pick a plan, 14-day trial, card optional." },
-      { href: "/signup/importing", name: "6. You're live", what: "Live URL and import progress; drafts arrive in Ready to review.", ids: "MIG-07" },
+      { href: "/signup/name", name: "3. Make it yours", what: "Name and address, template, colour and the channel's button, with a live preview. Every channel starts on a Pro trial.", ids: "CHN-01, CHN-02, CHN-03" },
+      { href: "/signup/importing", name: "4. You're live", what: "Live URL and import progress; ends on Review your first draft.", ids: "MIG-07" },
       { href: "/signin", name: "Creator sign-in", what: "Google or email magic link." },
     ],
   },
@@ -35,7 +33,8 @@ const GROUPS: Group[] = [
     title: "Creator studio",
     who: "Creators, after sign-up",
     screens: [
-      { href: "/studio", name: "Home", what: "Ready to review queue, pipeline, YouTube status, 30-day numbers.", ids: "ANL-01" },
+      { href: "/studio", name: "Home", what: "The open publication's queue, pipeline, sponsor earnings and 30-day numbers.", ids: "ANL-01" },
+      { href: "/studio/publications", name: "All publications", what: "One account, every brand: totals, a card per publication and one review queue. The header switcher moves between them." },
       { href: "/studio/review", name: "Ready to review", what: "Draft packs from new YouTube uploads, with compliance flags.", ids: "ING-11, MIG-08" },
       { href: "/studio/review/v_blues", name: "Review workspace", what: "Article editor with AI assist, shorts, SEO and thumbnail, transcript, publish.", ids: "ING-04–10, EDT-01, EDT-02, EDT-04, EDT-05" },
       { href: "/studio/review/v_coxplate", name: "Review with compliance flags", what: "Odds and a call to bet flagged inline, publishing blocked until resolved.", ids: "ING-10" },
@@ -43,7 +42,11 @@ const GROUPS: Group[] = [
       { href: "/studio/shorts", name: "Shorts", what: "Clips cut from your videos and your YouTube Shorts.", ids: "ING-07" },
       { href: "/studio/shorts/s_blues1", name: "Shorts editor", what: "9:16 preview, trim, reframe, captions.", ids: "EDT-06" },
       { href: "/studio/upload", name: "Upload", what: "Resumable upload, then the processing pipeline.", ids: "ING-01–03" },
-      { href: "/studio/analytics", name: "Analytics", what: "Views, watch time, sign-ups, search traffic, top content, sources.", ids: "ANL-01" },
+      { href: "/studio/analytics", name: "Analytics", what: "Earnings by format, sponsor and viewer, then views, watch time, sign-ups, search traffic and top content.", ids: "ANL-01" },
+      { href: "/studio/video", name: "Video", what: "Words to video: articles ready to become videos, what's been made, credit balance." },
+      { href: "/studio/video/new?article=a_ladder", name: "Make a video", what: "Article to video: template, format, voice and brand kit, an editable storyboard, credit cost, render." },
+      { href: "/studio/video/templates", name: "Video templates", what: "Three included, three to buy, each drawn in the publication's brand." },
+      { href: "/studio/credits", name: "AI credits", what: "Balance for the account, allowance, top-ups, spend cap, usage by publication, prices." },
       { href: "/studio/imports", name: "Imports", what: "Import history with counts.", ids: "MIG-07" },
       { href: "/studio/imports/new", name: "New import", what: "YouTube, WordPress, Ghost, Substack or RSS.", ids: "MIG-02–04" },
       { href: "/studio/imports/imp_yt_initial", name: "Import report", what: "Problems with retry, redirect map, generate articles for all.", ids: "MIG-05, MIG-07, MIG-08" },
@@ -64,7 +67,7 @@ const GROUPS: Group[] = [
     who: "Creators setting up and running their channel",
     screens: [
       { href: "/studio/settings", name: "Channel", what: "Name, tagline, address, time zone, sections, danger zone." },
-      { href: "/studio/settings/design", name: "Design", what: "Logo, accent (with contrast check), type pairing, Editorial or Broadcast template, homepage modules, navigation.", ids: "CHN-02, CHN-03, CHN-05, CHN-07" },
+      { href: "/studio/settings/design", name: "Design", what: "Logo, accent, call to action, type pairing, Editorial or Broadcast template, homepage modules, navigation.", ids: "CHN-02, CHN-03, CHN-05, CHN-07" },
       { href: "/studio/settings/connections", name: "Connections", what: "YouTube (auto-import), source files, TikTok and Instagram later.", ids: "MIG-01, MIG-10" },
       { href: "/studio/settings/domain", name: "Custom domain", what: "DNS records, verification, SSL, go live.", ids: "MIG-06" },
       { href: "/studio/settings/monetisation", name: "Monetisation", what: "Standard or Age-verified mode, alcohol and wagering allowed or blocked, where native formats appear, category blocks.", ids: "CHN-06, ADS-01, ADS-08, ADS-09" },
@@ -76,9 +79,11 @@ const GROUPS: Group[] = [
     title: "Public channel",
     who: "Viewers. Footy Fix uses the Editorial template; Trackside uses Broadcast.",
     screens: [
-      { href: "/c/footyfix", name: "Channel home", what: "Editorial template: lead story with Presented by, shorts row with a sponsored short, article grid, sections.", ids: "CHN-04, CHN-05, ADS-01" },
-      { href: "/c/footyfix/v/blues-centre-bounce-problem", name: "Video page", what: "Player with a chapter sponsor, article with a half-time break and stat card, transcript, related, Preview-as ad states.", ids: "SEO-02, SEO-05, SEO-06, TLK-01–03" },
-      { href: "/c/footyfix/v/inside-blues-pre-season", name: "Exclusive (logged out)", what: "Sign in to watch gate, no ads.", ids: "AUD-03" },
+      { href: "/c/footyfix", name: "Channel home", what: "Editorial: Presented by on the lead, a sponsored short among shorts, a sponsored story among stories, the channel's call to action.", ids: "CHN-04, CHN-05, ADS-01" },
+      { href: "/c/footyfix/join", name: "Join", what: "The channel's own call to action and join page, in its brand. One account for every channel.", ids: "AUD-01" },
+      { href: "/c/footyfix/v/blues-centre-bounce-problem", name: "Video page", what: "Chapter sponsor, a half-time break the width of the article, a sponsored short in related. The demo bar switches viewer state.", ids: "SEO-02, SEO-05, SEO-06, TLK-01–03" },
+      { href: "/c/footyfix/v/blues-centre-bounce-problem?as=verified", name: "Video page, confirmed 18+", what: "The same page for a signed-in adult: the wagering sponsor shows, with 18+ and the opt-out.", ids: "TLK-01–03" },
+      { href: "/c/footyfix/v/inside-blues-pre-season", name: "Members-only (logged out)", what: "Join free to watch, in the channel's accent; unlocks once joined. No ads.", ids: "AUD-03" },
       { href: "/c/footyfix/shorts", name: "Shorts feed", what: "Vertical player, next and previous, a sponsored short at most every 8.", ids: "ING-07" },
       { href: "/c/footyfix/s/afl", name: "Section", what: "Section grid." },
       { href: "/c/footyfix/live", name: "Live coverage", what: "Live blog; wagering ads switched off.", ids: "TLK-08" },
@@ -122,6 +127,9 @@ export default function ScreensPage() {
         <div className="mx-auto flex max-w-[1280px] flex-col gap-4 px-4 py-14 md:px-8">
           <Wordmark height={26} />
           <h1 className="text-[44px] font-extrabold leading-[46px] tracking-[-1.1px]">Every screen</h1>
+          <Link href="/demo" className="w-fit rounded-full bg-pitch px-4 py-2 text-[14px] font-semibold text-pop-foreground">
+            Start with the demo guide
+          </Link>
           <p className="max-w-[60ch] text-[17px] leading-[26px] text-brand-muted">
             {total} screens across the marketing site, sign-up, creator studio, public channel, viewer account and admin. Each one is a working page on sample data. Requirement IDs refer to the PID.
           </p>

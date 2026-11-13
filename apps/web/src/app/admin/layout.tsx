@@ -4,11 +4,8 @@ import { Monogram } from "@/components/brand/wordmark"
 const NAV = [
   ["Overview", "/admin"],
   ["Creative review", "/admin/review"],
+  ["Evidence", "/admin/evidence"],
   ["Campaigns", "/admin/campaigns"],
-  ["Ad decisions", "/admin/evidence"],
-  ["Channels", "/admin/channels"],
-  ["Moderation", "/admin/moderation"],
-  ["Audit log", "/admin/audit"],
 ]
 
 export const metadata = { title: { default: "Admin", template: "%s · Admin · Homestand" } }

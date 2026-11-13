@@ -46,7 +46,7 @@ export default async function PublicationsPage() {
   const queue = pubs.flatMap((p) => p.ready.map((pack) => ({ pack, p })))
 
   return (
-    <div className="grid gap-10">
+    <div className="grid grid-cols-1 gap-10">
       <PageHeader
         title="All publications"
         description="Every brand on your account, side by side. Open one to work on it; the switcher at the top of the studio takes you between them from anywhere."
@@ -69,13 +69,13 @@ export default async function PublicationsPage() {
         ))}
       </dl>
 
-      <section aria-labelledby="pubs-h">
+      <section aria-labelledby="pubs-h" className="min-w-0">
         <h2 id="pubs-h" className="sr-only">
           Your publications
         </h2>
-        <ul className="grid gap-4 md:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {pubs.map(({ c, views, verified, earnings, ready, flagged, domain }) => (
-            <li key={c.id} className={cn("flex flex-col overflow-hidden rounded-lg border bg-card", c.id === current.id && "ring-1 ring-foreground")}>
+            <li key={c.id} className={cn("flex min-w-0 flex-col overflow-hidden rounded-lg border bg-card", c.id === current.id && "ring-1 ring-foreground")}>
               <div className="relative border-b bg-muted/40 p-3" aria-hidden>
                 <TemplatePreview template={c.template} accentHex={c.accentHex} pairing={c.pairing} name={c.name} nav={c.nav.map((n) => n.label)} ctaLabel={c.cta.label} lead={previewLead(c)} maxHeight={300} />
               </div>
@@ -91,7 +91,7 @@ export default async function PublicationsPage() {
                   </div>
                   <span className="shrink-0 text-[12px] text-muted-foreground">{c.template === "editorial" ? "Editorial" : "Broadcast"} · {c.mode === "age_verified" ? "Age-verified" : "Standard"}</span>
                 </div>
-                <dl className="grid grid-cols-4 gap-3 border-y py-3">
+                <dl className="grid grid-cols-2 gap-3 border-y py-3 sm:grid-cols-4">
                   {[
                     ["Views", compact(views)],
                     ["Followers", compact(c.followers)],

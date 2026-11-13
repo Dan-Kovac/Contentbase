@@ -97,3 +97,12 @@ Show each screen in the **Editorial** template first. Broadcast and Minimal foll
 - Toasts: Published, Scheduled, Saved, Import finished, Opted out of betting ads
 - Error pages: 404, 500, suspended channel
 - Confirmation dialogs: take down, delete, change channel mode
+
+## Changes on 13 November 2026
+
+From [demo-clarity-plan.md](demo-clarity-plan.md) and the follow-up requests. The app's `/screens` page is the current list (61 screens).
+
+- **New:** channel Join pages (`/c/[channel]/join`), All publications (`/studio/publications`), Video, Make a video, Video templates and AI credits (`/studio/video`, `/studio/video/new`, `/studio/video/templates`, `/studio/credits`), and the unlisted demo guide (`/demo`).
+- **Merged:** sign-up steps Name and Look became Make it yours; the Plan step is gone (routes redirect).
+- **Parked from navigation, still built:** Upload, Imports, Articles, Pages and Shorts sit under Library and Settings tabs; admin Channels, Moderation and Audit log are reachable from `/screens`.
+- **Changed everywhere:** sponsor units take the shape of the content beside them; every channel has its own call to action and "Sign in" in words; one viewer state per channel drives which sponsors show.

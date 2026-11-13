@@ -17,6 +17,7 @@ The brand works at two levels, and every rule below says which one it governs:
 | Pages | Build their own pages (About, Work with us, anything) from blocks, and choose which appear in the navigation | Page layout, type and spacing |
 | Navigation | Up to 8 items, named by the client | Header layout and mobile menu |
 | Article formatting | Headings, paragraphs, lists, pull quotes, images, video, shorts embeds, dividers and embeds in the block editor; mark any item Exclusive | Fonts, sizes and spacing come from the pairing; no colour or font controls inside articles |
+| Call to action | The button's words (presets or their own, 20 characters), one supporting line, and where it goes (join the channel, or their own link) | Where it appears: header, footer, end of every article, members-only gate. "Sign in" always beside it in words |
 | Ads | Standard or Age-verified mode; block age-restricted categories (alcohol, wagering) | The five native formats, where they sit, labels, density caps and opt-outs |
 
 The `ChannelPreview` component shows three channels built from these choices.
@@ -37,8 +38,8 @@ Real strings to copy:
 
 | Where | Copy |
 | --- | --- |
-| Exclusive gate | Sign in to watch · Free. One account for every Homestand channel. |
-| Wagering ad frame | Advertisement · Don't show me betting ads |
+| Members-only gate | Join free to watch · the channel's own supporting line · Sign in |
+| Age-restricted sponsor label | Sponsored · Brand 18+ · Don't show me betting ads |
 | Sponsor band | Presented by |
 | Import report | 214 imported · 6 skipped · 2 failed. Retry failed items |
 | Draft ready | Your article draft is ready to review. Nothing goes live until you publish. |
@@ -58,7 +59,7 @@ Homestand is black, white and grey with one radiant pop. The neutrals do the wor
 - **Black and white.** Set page grounds in `background`, text in `foreground`, and raised panels in `card` with a `border` hairline. Cards take no shadow; only `popover` surfaces get `shadow-popover`.
 - **Grey.** Use `secondary`, `muted` and `accent` for quiet fills and hovers, `muted-foreground` for metadata, and `input` for control borders. Every text token passes AA on the grounds its note names, in both themes.
 - **Actions are black.** `primary` is black in light and white in dark: primary buttons, active navigation and selected states. The focus `ring` follows `foreground`.
-- **Pitch is the pop.** The `pitch` gradient runs lime (`pop-start`) to mint (`pop`) to electric blue (`pop-end`). Use it on the logo's full stop, the monogram, the `pop` button, the Exclusive badge, progress fills and marketing hero panels, and no more than twice a screen.
+- **Pitch is the pop.** The `pitch` gradient runs lime (`pop-start`) to mint (`pop`) to electric blue (`pop-end`). Use it on the logo's full stop, the monogram, the `pop` button, the Exclusive badge on platform screens, progress fills and marketing hero panels, and no more than twice a screen. On a client's channel the Exclusive badge takes the channel accent instead, so a channel carries one brand.
 - **Text on Pitch is always `pop-foreground` (black)**, at 8.8:1 or better on every stop. Never put white text on Pitch, and never set Pitch colours as text.
 - **On white, small marks use `pop-ink`.** Pitch is too pale on white for a chart line or a 7px square (1.2–2.3:1). Use `pop-ink` (deep mint, 3.1:1) for kicker squares, chart series 1, the LIVE dot on light badges and selected ticks. In dark, `pop-ink` is the mint itself.
 - `pitch-glow` is an ambient radial wash for the top of dark heroes and sign-in. `pitch-soft` is a tint for feature panels and empty states. `shadow-glow` sits only under the pop button.
@@ -94,10 +95,10 @@ Homestand is black, white and grey with one radiant pop. The neutrals do the wor
 
 **Page anatomy** (from the PID, Section 8):
 
-- Channel home: lead story (video hero and headline), then a shorts row, an article grid, section rows and the footer. Ads allowed: one sponsor band and one sponsored card in the shorts row.
-- Video page: player with chapters, then headline and standfirst, article body, collapsed transcript and related items. Ads allowed: non-wagering pre-roll, one in-article unit and one end-of-page unit.
-- Article page: headline, standfirst and byline, hero media, then the long-form body at `measure` with pull quotes, then related items. Ads allowed: one in-article unit after a natural break and one at the end.
-- Short page: full-height vertical player, caption below, swipe for the next. Ads allowed: a sponsored card every 8 shorts at most.
+- Channel home: lead story (video hero and headline), then a shorts row, an article grid, section rows and the footer. Ads allowed: Presented by on the lead, one sponsored short in the shorts row, one sponsored story in a story grid.
+- Video page: player with chapters, then headline and standfirst, article body, collapsed transcript and related items. Ads allowed: one chapter sponsor, one half-time break in the article column, one sponsored short in related items (non-wagering pre-roll on uploads only).
+- Article page: headline, standfirst, byline and hero at 920px, then the long-form body at `measure` with pull quotes, then related items. Ads allowed: one half-time break after a natural break, one sponsored short in related items.
+- Short page: full-height vertical player, caption below, swipe for the next. Ads allowed: a sponsored short every 8 shorts at most, filling the same frame.
 - Exclusive, logged out: the `ExclusiveGate` only, with no ads.
 
 ## Advertising: Homestand Native Formats
@@ -105,14 +106,16 @@ Homestand is black, white and grey with one radiant pop. The neutrals do the wor
 Ads are designed into the page, never added on top of it, and never look like a standard banner. Advertisers supply a brief; we render it in the channel's design (`components/brand/native-ads.tsx`).
 
 - **Chapter sponsor**: a brand owns a chapter. Its colour marks that segment of the player timeline; the chapter list reads "The fix on the list · presented by Kick Boots Co."
-- **Half-time break**: an editorial pause between article sections, styled like a broadcast break: the sponsor's photo or muted loop, its colour washed across, one line, one button. Fixed 340px tall, full container width, never between a headline and its first paragraph.
-- **Stat card**: a scoreboard tile with one big number or claim, a 4px top rule in the sponsor colour, sitting beside the key points.
+- **Half-time break**: a pause between article sections, set as an image block of the article: the width of the reading column, 16:9, the sponsor's colour (or photo or muted loop) with one line and one button, and its label where a figure caption sits. Never between a headline and its first paragraph.
+- **Sponsored story**: one card in a story grid or Broadcast rail, built from the same picture box and headline sizes as the stories beside it; the kicker reads "Sponsored · Brand".
 - **Sponsored short**: exactly the size of every other short (168px wide in rows, full size in the feed), with a "Sponsored" tag top left.
-- **Presented by**: a 2px rule in the sponsor colour across the top of a module header, with "Presented by" and the brand name.
+- **Presented by**: a 2px rule in the sponsor colour with "Presented by" and the brand name, under the lead story, like a byline.
+- **The rule**: a sponsor unit never has a size of its own. It is rendered in the same cell or column as its sibling, so it matches that sibling's width (and height, for shorts and story pictures). No content unit to match, no sponsor there.
 - Every format carries a visible "Sponsored" label. Age-restricted sponsors add an `18+` tag and a one-tap opt-out ("Don't show me betting ads", "Don't show me alcohol ads").
 - Sponsor colours get the same automatic contrast check as channel accents; text on them is black or white, whichever reads better.
 - Banned everywhere: banners in standard sizes, pop-ups, interstitials, sticky overlays, autoplay with sound, third-party ad scripts.
 - Density: 1 format per 600 words and 3 per page.
+- Sponsor creative is type on the sponsor's colour by default. Stadium and match photography stays editorial, so a sponsor unit is recognisable at a glance.
 
 ## Imagery and video
 

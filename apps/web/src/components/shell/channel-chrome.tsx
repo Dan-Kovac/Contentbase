@@ -37,7 +37,7 @@ export function ChannelHeader({ channel, nav = defaultNav(channel) }: { channel:
   const broadcast = channel.template === "broadcast"
   return (
     <header className={cn("sticky top-0 z-30 border-b backdrop-blur", broadcast ? "border-t-[3px] border-t-[var(--chan)] bg-background/90" : "bg-background/95")}>
-      <div className="mx-auto flex h-14 max-w-[1280px] items-center gap-6 px-4 md:h-16 md:gap-8 md:px-8">
+      <div className="mx-auto flex h-14 max-w-[1280px] items-center gap-3 px-4 md:h-16 md:gap-8 md:px-8">
         <ChannelLogo channel={channel} />
         <ChannelNavLinks
           items={nav}

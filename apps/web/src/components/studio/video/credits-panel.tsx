@@ -24,8 +24,8 @@ export function CreditsPanel({
   const usedPct = Math.min(100, (account.usedThisMonth / cap) * 100)
 
   return (
-    <div className="grid gap-8">
-      <section aria-label="Balance" className="grid gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-[1.2fr_1fr_1fr]">
+    <div className="grid grid-cols-1 gap-8">
+      <section aria-label="Balance" className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-[1.2fr_1fr_1fr]">
         <div className="flex flex-col gap-2 bg-card p-5">
           <p className="text-[13px] font-medium text-muted-foreground">Balance</p>
           <p className="text-[40px] font-bold leading-[44px] tracking-[-1px]">{n(balance)}</p>
@@ -52,7 +52,7 @@ export function CreditsPanel({
         <h2 id="topup-h" className="mb-3 text-lg font-semibold tracking-[-0.2px]">
           Top up
         </h2>
-        <ul className="grid gap-3 sm:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {topUps.map((t, i) => (
             <li key={t.credits} className={cn("flex flex-col gap-3 rounded-lg border bg-card p-5", i === 1 && "ring-1 ring-foreground")}>
               <p className="flex items-baseline justify-between gap-2">
@@ -88,7 +88,7 @@ export function CreditsPanel({
         <Slider className="mt-4" min={1000} max={20000} step={500} value={[cap]} onValueChange={([v]) => setCap(v)} aria-label="Monthly spend cap" />
       </section>
 
-      <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr]">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.3fr_1fr]">
         <section aria-labelledby="ledger-h">
           <h2 id="ledger-h" className="mb-3 text-lg font-semibold tracking-[-0.2px]">
             Usage

@@ -269,7 +269,7 @@ export function TypicalPageSketch() {
           <span className="block aspect-video rounded-[4px] bg-neutral-200" />
           {bar("100%")}
           {bar("94%")}
-          <AdBox label="300 × 250" className="h-16" />
+          <AdBox label="MREC banner" className="h-16" />
           {bar("100%")}
           {bar("80%")}
           <AdBox label="Autoplay video" className="h-12" />

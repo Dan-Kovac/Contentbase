@@ -1,5 +1,7 @@
 # Homestand demo: clarity plan
 
+> **Status, 13 November 2026: built.** All nine phases are in the app on branch `claude/optimistic-allen-cuqy4o`, with the six decisions taken as recommended. Where the build differs from this plan: the home page's sponsored story sits in the first section row's four-up grid (the Latest grid only gets it when there are no sections), because the Latest grid has an odd number of cards; and three requests that came later are built too, outside these sections: one account running several publications, words to video with templates, and metered AI credits. See [revenue-model.md](revenue-model.md) for the commercial side.
+
 Written 11 November 2026 after a review of all 56 screens at 1440px and 390px, plus the code behind them. It is a brief for an implementation session. Read sections 1 to 4 for the argument, then build from section 5 in the order given in section 8.
 
 **Ground rules for the implementing session**
