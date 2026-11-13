@@ -3,6 +3,7 @@ import { getVideo, listArticles, listPages, listShorts, listSponsors, listVideos
 import type { AgeCategory, Block, Channel, CustomPage, Short, Sponsor, StandaloneArticle, Video } from "@/lib/types"
 
 export { ACCENT_LINK, BODY, COLUMN, CONTAINER, DISPLAY, WIDE } from "./styles"
+import { formatDuration } from "@/lib/format"
 
 export const SITE = "https://homestand.com.au"
 
@@ -314,4 +315,18 @@ export function slotPlans(channel: Channel, isLive: boolean): Record<Viewer, Slo
 /** The chapter a sponsor owns: the second chapter when there is one. */
 export function sponsoredChapterIndex(chapters: { start: number }[]) {
   return chapters.length > 1 ? 1 : chapters.length - 1
+}
+
+/** A publication's real lead story, shaped for the small homepage previews. */
+export function previewLead(c: Channel) {
+  const v = leadStory(c)
+  if (!v) return undefined
+  return {
+    kicker: sectionLabel(c, v.section),
+    headline: v.article.headline,
+    standfirst: v.article.standfirst,
+    byline: `${v.article.author} · ${v.article.readMinutes} min read`,
+    photo: v.poster ?? "/media/mcg-night.jpg",
+    duration: formatDuration(v.durationSec),
+  }
 }

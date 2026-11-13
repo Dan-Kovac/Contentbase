@@ -2,7 +2,8 @@ import Link from "next/link"
 import { PenLine, Upload } from "lucide-react"
 import { PageHeader } from "@/components/shell/page-header"
 import { Button } from "@/components/ui/button"
-import { DEMO_CHANNEL_SLUG, getChannel, listArticles, listShorts, listVideos } from "@/lib/data"
+import { listArticles, listShorts, listVideos } from "@/lib/data"
+import { currentPublication } from "@/lib/publication"
 import { formatDuration } from "@/lib/format"
 import type { Video } from "@/lib/types"
 import { LibraryTable, type LibraryRow } from "@/components/studio/library-table"
@@ -18,8 +19,8 @@ function dateFor(v: Video) {
   return v.sourcePublishedAt
 }
 
-export default function LibraryPage() {
-  const channel = getChannel(DEMO_CHANNEL_SLUG)!
+export default async function LibraryPage() {
+  const channel = (await currentPublication())
   const videos = listVideos(channel.id)
   const rows: LibraryRow[] = [
     ...videos.map<LibraryRow>((v) => ({

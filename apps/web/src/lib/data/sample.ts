@@ -574,6 +574,30 @@ export const earnings: Earnings[] = [
       { state: "Confirmed 18+", impressions: 71000, amount: 2420 },
     ],
   },
+  {
+    channelId: "ch_trackside",
+    period: "13 October to 11 November 2026",
+    total: 3260,
+    ageVerified: 2210,
+    previousTotal: 2480,
+    byFormat: [
+      { format: "chapter_sponsor", amount: 1310 },
+      { format: "halftime", amount: 980 },
+      { format: "sponsored_story", amount: 420 },
+      { format: "sponsored_short", amount: 290 },
+      { format: "presented_by", amount: 260 },
+    ],
+    bySponsor: [
+      { name: "Harbour Bet", amount: 1640, ageCategory: "wagering" },
+      { name: "Riverside Brewing", amount: 570, ageCategory: "alcohol" },
+      { name: "Southern Cross Utes", amount: 1050 },
+    ],
+    byViewer: [
+      { state: "Logged out", impressions: 188000, amount: 690 },
+      { state: "Signed in", impressions: 52000, amount: 360 },
+      { state: "Confirmed 18+", impressions: 49000, amount: 2210 },
+    ],
+  },
 ]
 
 export const sponsors: Sponsor[] = [

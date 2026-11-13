@@ -3,13 +3,14 @@ import { ArrowRight, Newspaper, PenLine } from "lucide-react"
 import { PageHeader } from "@/components/shell/page-header"
 import { StatusBadge } from "@/components/brand/status-badge"
 import { Button } from "@/components/ui/button"
-import { DEMO_CHANNEL_SLUG, getChannel, listArticles, listVideos } from "@/lib/data"
+import { listArticles, listVideos } from "@/lib/data"
+import { currentPublication } from "@/lib/publication"
 import { sectionLabel } from "@/components/studio/lib"
 
 export const metadata = { title: "Articles" }
 
-export default function ArticlesPage() {
-  const channel = getChannel(DEMO_CHANNEL_SLUG)!
+export default async function ArticlesPage() {
+  const channel = (await currentPublication())
   const articles = listArticles(channel.id)
   const fromVideos = listVideos(channel.id).filter((v) => v.status !== "processing").length
   const cols = "md:grid-cols-[minmax(0,1fr)_130px_90px_130px_150px]"

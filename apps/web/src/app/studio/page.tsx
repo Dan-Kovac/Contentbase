@@ -1,10 +1,11 @@
 import Link from "next/link"
-import { ArrowRight, ChevronRight, Clock, Eye, FileStack, PenLine, RefreshCw, Search, UserCheck, SquarePlay } from "lucide-react"
+import { ArrowRight, Clock, Eye, PenLine, Search, UserCheck, SquarePlay, Wallet } from "lucide-react"
 import { PageHeader } from "@/components/shell/page-header"
 import { VideoThumb } from "@/components/brand/media"
 import { StatusBadge } from "@/components/brand/status-badge"
 import { Button } from "@/components/ui/button"
-import { allShorts, allVideos, DEMO_CHANNEL_SLUG, getChannel, getChannelById, listArticles, listPages, listVideos } from "@/lib/data"
+import { allShorts, getEarnings, listArticles, listVideos } from "@/lib/data"
+import { currentPublication } from "@/lib/publication"
 import { compact, formatDuration, number } from "@/lib/format"
 import { PipelineSteps } from "@/components/studio/pipeline"
 import { ReviewQueue } from "@/components/studio/review-queue"
@@ -16,6 +17,7 @@ import {
   IMPORT_STEPS,
   importStepIndex,
   pctChange,
+  pubScale,
   sectionLabel,
   studioDays,
   sum,
@@ -24,19 +26,17 @@ import {
 
 export const metadata = { title: "Home" }
 
-export default function StudioHome() {
-  const channel = getChannel(DEMO_CHANNEL_SLUG)!
-  const packs = allVideos()
-    .filter((v) => v.status === "ready")
-    .map((v) => toPack(v, getChannelById(v.channelId)?.name ?? ""))
+export default async function StudioHome() {
+  const channel = (await currentPublication())
+  const packs = listVideos(channel.id, "ready").map((v) => toPack(v, channel.name))
+  const earn = getEarnings(channel.id)
   const inFlight = listVideos(channel.id, "processing")
   const published = listVideos(channel.id, "published")
   const scheduled = listVideos(channel.id, "scheduled")
   const writtenLive = listArticles(channel.id).filter((a) => a.status === "published")
-  const drafts = listArticles(channel.id).filter((a) => a.status === "draft").length + listPages(channel.id).filter((p) => p.status === "draft").length
   const recentShorts = allShorts().filter((s) => s.channelId === channel.id && s.status === "published").slice(0, 2)
 
-  const days = studioDays()
+  const days = studioDays(pubScale(channel.slug))
   const now = days.slice(-30)
   const before = days.slice(-60, -30)
   const kpis = [
@@ -49,10 +49,10 @@ export default function StudioHome() {
   return (
     <div className="grid grid-cols-1 gap-10">
       <PageHeader
-        title={`Welcome back, ${channel.owner.split(" ")[0]}`}
+        title="Welcome back, Sam"
         description={
           packs.length
-            ? `${packs.length === 2 ? "Two" : packs.length} draft packs are ready to review and ${inFlight.length === 2 ? "two" : inFlight.length} more are on the way. Nothing goes live until you publish.`
+            ? `${channel.name}: ${packs.length === 1 ? "one draft pack is" : `${packs.length} draft packs are`} ready to review${inFlight.length ? ` and ${inFlight.length} more ${inFlight.length === 1 ? "is" : "are"} on the way` : ""}. Nothing goes live until you publish.`
             : "You're all caught up. New YouTube uploads arrive here as draft packs."
         }
         className="pb-0"
@@ -86,69 +86,37 @@ export default function StudioHome() {
           <ReviewQueue packs={packs} compact />
         </section>
 
-        <aside className="grid content-start gap-4" aria-label="Create and connections">
-          <section aria-labelledby="create-h" className="overflow-hidden rounded-lg border bg-card">
-            <div className="flex items-baseline justify-between gap-2 px-4 pb-1 pt-4">
-              <h2 id="create-h" className="text-sm font-semibold">
-                Create
-              </h2>
-              {drafts > 0 && <span className="text-xs text-muted-foreground tabular">{drafts} drafts in progress</span>}
-            </div>
-            <ul className="p-1.5">
-              {[
-                { href: "/studio/articles/new", icon: PenLine, title: "Write an article", body: "A column, preview or ladder that doesn't start from a video" },
-                { href: "/studio/pages#templates", icon: FileStack, title: "Create a page", body: "About, Contact or Work with us, from a template" },
-              ].map((a) => (
-                <li key={a.href}>
-                  <Link
-                    href={a.href}
-                    className="group flex items-start gap-3 rounded-md p-2.5 transition-colors hover:bg-accent focus-visible:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    <span className="grid size-8 shrink-0 place-items-center rounded-md border bg-background">
-                      <a.icon className="size-4" aria-hidden />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold">{a.title}</span>
-                      <span className="mt-0.5 block text-xs leading-[18px] text-muted-foreground">{a.body}</span>
-                    </span>
-                    <ChevronRight className="mt-2 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
+        <aside className="grid content-start gap-4" aria-label="Earnings and connections">
 
-          <div className="rounded-lg border bg-card p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <span className="grid size-9 place-items-center rounded-md bg-muted">
-                  <SquarePlay className="size-[18px]" aria-hidden />
+          {earn && (
+            <Link
+              href="/studio/analytics#earnings"
+              className="group flex flex-col gap-2 rounded-lg border bg-card p-4 outline-none transition-colors hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <span className="flex items-center justify-between text-[13px] font-medium text-muted-foreground">
+                <span className="flex items-center gap-2">
+                  <Wallet className="size-4" aria-hidden /> Sponsor earnings, 30 days
                 </span>
-                <div>
-                  <p className="text-sm font-semibold">YouTube</p>
-                  <p className="font-mono text-xs text-muted-foreground">{channel.youtube?.handle}</p>
-                </div>
-              </div>
-              <StatusBadge tone="connected" />
-            </div>
-            <dl className="mt-4 grid gap-2 text-[13px]">
-              <div className="flex justify-between gap-2">
-                <dt className="text-muted-foreground">Auto-import</dt>
-                <dd className="font-medium">On</dd>
-              </div>
-              <div className="flex justify-between gap-2">
-                <dt className="text-muted-foreground">Last synced</dt>
-                <dd className="text-right font-medium tabular">{channel.youtube?.lastSyncedAt.replace(", ", " · ")}</dd>
-              </div>
-              <div className="flex justify-between gap-2">
-                <dt className="text-muted-foreground">Subscribers</dt>
-                <dd className="font-medium tabular">{compact(channel.youtube?.subscribers ?? 0)}</dd>
-              </div>
-            </dl>
-            <p className="mt-4 flex items-center gap-1.5 border-t pt-3 text-xs text-muted-foreground">
-              <RefreshCw className="size-3" aria-hidden /> Auto-import on · checks for new uploads every 15 minutes
-            </p>
-          </div>
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+              </span>
+              <span className="text-[30px] font-bold leading-9 tracking-[-0.6px]">${earn.total.toLocaleString("en-AU")}</span>
+              <span className="text-xs leading-[18px] text-muted-foreground">
+                <span className="font-semibold text-foreground">{formatPct(pctChange(earn.total, earn.previousTotal))}</span> vs previous 30 days.{" "}
+                ${earn.ageVerified.toLocaleString("en-AU")} from age-verified sponsors. Sample data.
+              </span>
+            </Link>
+          )}
+
+          <p className="flex items-start gap-2 rounded-lg border bg-card p-3 text-[13px] leading-5 text-muted-foreground">
+            <SquarePlay className="mt-0.5 size-4 shrink-0 text-foreground" aria-hidden />
+            <span>
+              <span className="font-semibold text-foreground">YouTube connected</span> · {channel.youtube?.handle} · auto-import on, last checked{" "}
+              {channel.youtube?.lastSyncedAt.split(", ")[1]}.{" "}
+              <Link href="/studio/settings/connections" className="font-medium text-foreground underline-offset-4 hover:underline">
+                Connections
+              </Link>
+            </span>
+          </p>
 
           {scheduled.length > 0 && (
             <div className="rounded-lg border bg-card p-4">

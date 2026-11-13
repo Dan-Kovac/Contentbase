@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { StatusBadge } from "@/components/brand/status-badge"
 import { SourceMark, SOURCE_LABEL } from "@/components/imports/source-meta"
-import { DEMO_CHANNEL_SLUG, getChannel, listChannels, listImportJobs } from "@/lib/data"
+import { listChannels, listImportJobs } from "@/lib/data"
+import { currentPublication } from "@/lib/publication"
 import { number } from "@/lib/format"
 import type { ImportJob } from "@/lib/types"
 
@@ -17,8 +18,8 @@ function JobStatus({ job }: { job: ImportJob }) {
   return <StatusBadge tone="connected">Finished</StatusBadge>
 }
 
-export default function ImportsPage() {
-  const demo = getChannel(DEMO_CHANNEL_SLUG)!
+export default async function ImportsPage() {
+  const demo = (await currentPublication())
   const jobs = listChannels().flatMap((c) => listImportJobs(c.id).map((j) => ({ job: j, channel: c })))
   // Own channel first, the running sync at the top.
   jobs.sort((a, b) => Number(b.channel.id === demo.id) - Number(a.channel.id === demo.id) || Number(b.job.status === "running") - Number(a.job.status === "running"))

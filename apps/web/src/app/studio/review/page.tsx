@@ -2,16 +2,16 @@ import Link from "next/link"
 import { Upload } from "lucide-react"
 import { PageHeader } from "@/components/shell/page-header"
 import { Button } from "@/components/ui/button"
-import { allVideos, getChannelById } from "@/lib/data"
+import { listVideos } from "@/lib/data"
+import { currentPublication } from "@/lib/publication"
 import { ReviewQueue } from "@/components/studio/review-queue"
 import { toPack } from "@/components/studio/lib"
 
 export const metadata = { title: "Ready to review" }
 
-export default function ReviewQueuePage() {
-  const packs = allVideos()
-    .filter((v) => v.status === "ready")
-    .map((v) => toPack(v, getChannelById(v.channelId)?.name ?? ""))
+export default async function ReviewQueuePage() {
+  const channel = await currentPublication()
+  const packs = listVideos(channel.id, "ready").map((v) => toPack(v, channel.name))
   const flagged = packs.filter((p) => p.flags.length).length
 
   return (

@@ -1,12 +1,13 @@
 import { Suspense } from "react"
-import { DEMO_CHANNEL_SLUG, getChannel, listPages } from "@/lib/data"
+import { listPages } from "@/lib/data"
+import { currentPublication } from "@/lib/publication"
 import { Skeleton } from "@/components/ui/skeleton"
 import { PageEditor } from "@/components/studio/pages/page-editor"
 import { channelDomain, embedVideos } from "@/components/studio/editor/channel-props"
 
 export const metadata = { title: "New page" }
 
-export default function NewPagePage({ searchParams }: { searchParams: Promise<{ template?: string }> }) {
+export default async function NewPagePage({ searchParams }: { searchParams: Promise<{ template?: string }> }) {
   return (
     <Suspense fallback={<EditorSkeleton />}>
       <Editor searchParams={searchParams} />
@@ -16,7 +17,7 @@ export default function NewPagePage({ searchParams }: { searchParams: Promise<{ 
 
 async function Editor({ searchParams }: { searchParams: Promise<{ template?: string }> }) {
   const { template } = await searchParams
-  const channel = getChannel(DEMO_CHANNEL_SLUG)!
+  const channel = (await currentPublication())
   return (
     <PageEditor
       key={template ?? "blank"}

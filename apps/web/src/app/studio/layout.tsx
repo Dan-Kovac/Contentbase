@@ -1,32 +1,44 @@
+import { Suspense } from "react"
 import Link from "next/link"
 import { ExternalLink, Plus } from "lucide-react"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { StudioSidebar } from "@/components/shell/studio-sidebar"
-import { allVideos, getChannel, DEMO_CHANNEL_SLUG } from "@/lib/data"
+import { PublicationSwitcher, type PublicationSummary } from "@/components/shell/publication-switcher"
+import { StudioSectionTabs } from "@/components/shell/section-tabs"
+import { listChannels, listVideos } from "@/lib/data"
+import { currentPublication } from "@/lib/publication"
 
 export const metadata = { title: { default: "Studio", template: "%s · Studio · Homestand" } }
 
-export default function StudioLayout({ children }: { children: React.ReactNode }) {
-  const channel = getChannel(DEMO_CHANNEL_SLUG)!
-  // The demo studio shows both sample channels' draft packs in its queue.
-  const reviewCount = allVideos().filter((v) => v.status === "ready").length
+function publications(): PublicationSummary[] {
+  return listChannels().map((c) => ({
+    slug: c.slug,
+    name: c.name,
+    accentHex: c.accentHex,
+    domain: c.customDomain ?? `${c.slug}.homestand.com.au`,
+    ready: listVideos(c.id, "ready").length,
+    template: c.template,
+  }))
+}
+
+/** The studio for the publication this account is working on (read from the session). */
+async function StudioFrame({ children }: { children: React.ReactNode }) {
+  const channel = await currentPublication()
+  const pubs = publications()
+  const reviewCount = pubs.find((p) => p.slug === channel.slug)?.ready ?? 0
   return (
     <SidebarProvider>
-      <StudioSidebar reviewCount={reviewCount} />
+      <StudioSidebar reviewCount={reviewCount} publications={pubs.length} />
       <SidebarInset>
-        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur md:px-6">
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur md:px-6">
           <SidebarTrigger className="-ml-1" />
-          <div className="flex min-w-0 items-center gap-2">
-            <span className="size-4 shrink-0 rounded-[4px] bg-pitch" aria-hidden />
-            <span className="truncate text-[15px] font-semibold">{channel.name}</span>
-            <span className="hidden truncate font-mono text-xs text-muted-foreground sm:inline">{channel.customDomain}</span>
-          </div>
+          <PublicationSwitcher current={channel.slug} publications={pubs} />
           <div className="ml-auto flex items-center gap-2">
             <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
               <Link href={`/c/${channel.slug}`}>
-                View channel <ExternalLink />
+                View site <ExternalLink />
               </Link>
             </Button>
             <Button size="sm" asChild>
@@ -39,8 +51,19 @@ export default function StudioLayout({ children }: { children: React.ReactNode }
             </Avatar>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 py-8 md:px-8">{children}</main>
+        <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 py-8 md:px-8">
+          <StudioSectionTabs />
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
+  )
+}
+
+export default function StudioLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<div className="min-h-svh bg-background" />}>
+      <StudioFrame>{children}</StudioFrame>
+    </Suspense>
   )
 }

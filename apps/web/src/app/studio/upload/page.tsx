@@ -1,13 +1,14 @@
 import Link from "next/link"
 import { Clapperboard, RefreshCw } from "lucide-react"
 import { PageHeader } from "@/components/shell/page-header"
-import { DEMO_CHANNEL_SLUG, getChannel } from "@/lib/data"
+
+import { currentPublication } from "@/lib/publication"
 import { UploadFlow } from "@/components/studio/upload-flow"
 
 export const metadata = { title: "Upload" }
 
-export default function UploadPage() {
-  const channel = getChannel(DEMO_CHANNEL_SLUG)!
+export default async function UploadPage() {
+  const channel = (await currentPublication())
   return (
     <div>
       <PageHeader

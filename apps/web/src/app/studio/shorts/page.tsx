@@ -3,7 +3,8 @@ import { FileVideo, SquarePlay } from "lucide-react"
 import { PageHeader } from "@/components/shell/page-header"
 import { VideoThumb } from "@/components/brand/media"
 import { StatusBadge } from "@/components/brand/status-badge"
-import { DEMO_CHANNEL_SLUG, getChannel, getVideo, listShorts } from "@/lib/data"
+import { getVideo, listShorts } from "@/lib/data"
+import { currentPublication } from "@/lib/publication"
 import { compact, formatDuration } from "@/lib/format"
 import type { Short } from "@/lib/types"
 
@@ -40,8 +41,8 @@ function ShortTile({ s, needsSource, from }: { s: Short; needsSource?: boolean; 
   )
 }
 
-export default function ShortsPage() {
-  const channel = getChannel(DEMO_CHANNEL_SLUG)!
+export default async function ShortsPage() {
+  const channel = (await currentPublication())
   const shorts = listShorts(channel.id)
   const imported = shorts.filter((s) => s.source === "youtube_short")
   const clips = shorts.filter((s) => s.source === "clip")

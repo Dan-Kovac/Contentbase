@@ -12,6 +12,8 @@ import {
   TypicalPageSketch,
 } from "@/components/marketing/product-visuals"
 import { TemplatePreview } from "@/components/settings/template-preview"
+import { previewLead } from "@/components/channel/lib"
+import { PublicationsMock } from "@/components/marketing/product-visuals"
 import { getChannel } from "@/lib/data"
 import { cn } from "@/lib/utils"
 
@@ -93,6 +95,7 @@ export default function HomePage() {
               "Your domain, your sign-ins, your search traffic",
               "Every video becomes a page, an article and shorts",
               "Sponsors pay to reach your verified adults, and you take a share",
+              "Run several publications from one account",
             ]}
           >
             <div className="flex flex-wrap gap-2">
@@ -135,8 +138,54 @@ export default function HomePage() {
         </div>
       </Section>
 
-      {/* 3. How it works */}
-      <Section tone="muted" labelledBy="how-title" className="md:py-20">
+      {/* 3. One account, every publication */}
+      <Section tone="muted" labelledBy="grow-title" className="md:py-20">
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+          <div className="flex flex-col gap-8">
+            <SectionHeading
+              id="grow-title"
+              kicker="One account, every publication"
+              title="From one channel to a media empire."
+              lede="A creator with two YouTube channels, or a business with a stable of in-house brands: set up one account, see every publication at once and switch between them in a click. Each one keeps its own look, domain, audience and call to action."
+            />
+            <ol className="flex flex-col gap-5">
+              <GrowStep n={1} icon={<Tv aria-hidden />} title="A channel" body="Your videos on your own domain, each with an article, shorts and a page that ranks." />
+              <GrowStep n={2} icon={<Newspaper aria-hidden />} title="A publication" body="Sections, writers, standalone articles, your own pages, members and a button that does what you want." />
+              <GrowStep n={3} icon={<Network aria-hidden />} title="A network" body="More publications under one login: three on Publisher, unlimited on Enterprise. One studio, one queue, one set of numbers." />
+            </ol>
+          </div>
+          <PublicationsMock />
+        </div>
+        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
+          {[footy, track].map((c) => (
+            <figure key={c.id} className="flex flex-col gap-3">
+              <TemplatePreview
+                template={c.template}
+                accentHex={c.accentHex}
+                pairing={c.pairing}
+                name={c.name}
+                nav={c.nav.map((n) => n.label)}
+                sectionLabels={c.sections.map((s) => s.label)}
+                domain={c.customDomain ?? `${c.slug}.homestand.com.au`}
+                ctaLabel={c.cta.label}
+                lead={previewLead(c)}
+                maxHeight={380}
+              />
+              <figcaption className="flex flex-wrap items-baseline gap-x-2 text-[14px]">
+                <Link href={`/c/${c.slug}`} className="font-semibold underline-offset-4 hover:underline">
+                  {c.name}
+                </Link>
+                <span className="text-muted-foreground">
+                  {c.template === "editorial" ? "Editorial" : "Broadcast"} template · button: “{c.cta.label}”
+                </span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </Section>
+
+      {/* 4. How it works */}
+      <Section labelledBy="how-title" className="md:py-20">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
           <div className="flex flex-col gap-10">
             <SectionHeading
@@ -163,8 +212,8 @@ export default function HomePage() {
         </div>
       </Section>
 
-      {/* 4. The page, rethought */}
-      <Section labelledBy="page-title" className="md:py-20">
+      {/* 5. The page, rethought */}
+      <Section tone="muted" labelledBy="page-title" className="md:py-20">
         <SectionHeading
           id="page-title"
           kicker="The page, rethought"
@@ -198,8 +247,8 @@ export default function HomePage() {
         </div>
       </Section>
 
-      {/* 5. Age-verified advertising */}
-      <Section tone="muted" labelledBy="lock-title" className="md:py-20">
+      {/* 6. Age-verified advertising */}
+      <Section labelledBy="lock-title" className="md:py-20">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <div className="flex flex-col gap-6">
             <SectionHeading
@@ -214,46 +263,6 @@ export default function HomePage() {
             </Link>
           </div>
           <AgeVerifiedPanel />
-        </div>
-      </Section>
-
-      {/* 6. Growth */}
-      <Section labelledBy="grow-title" className="md:py-20">
-        <SectionHeading
-          id="grow-title"
-          kicker="Grow"
-          title="From one channel to a media empire."
-          lede="Start with the videos you already make. Add writers, sections and your own pages. Then run several brands under one roof, each with its own look and its own call to action."
-        />
-        <ol className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <GrowStep n={1} icon={<Tv aria-hidden />} title="A channel" body="Your videos on your own domain, each with an article, shorts and a page that ranks." />
-          <GrowStep n={2} icon={<Newspaper aria-hidden />} title="A publication" body="Sections, writers, standalone articles, your own pages, members and a button that does what you want." />
-          <GrowStep n={3} icon={<Network aria-hidden />} title="A network" body="More channels under one account: three on Publisher, unlimited on Enterprise, with one sales team behind them." />
-        </ol>
-        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-          {[footy, track].map((c) => (
-            <figure key={c.id} className="flex flex-col gap-3">
-              <TemplatePreview
-                template={c.template}
-                accentHex={c.accentHex}
-                pairing={c.pairing}
-                name={c.name}
-                nav={c.nav.map((n) => n.label)}
-                sectionLabels={c.sections.map((s) => s.label)}
-                domain={c.customDomain ?? `${c.slug}.homestand.com.au`}
-                ctaLabel={c.cta.label}
-                maxHeight={440}
-              />
-              <figcaption className="flex flex-wrap items-baseline gap-x-2 text-[14px]">
-                <Link href={`/c/${c.slug}`} className="font-semibold underline-offset-4 hover:underline">
-                  {c.name}
-                </Link>
-                <span className="text-muted-foreground">
-                  {c.template === "editorial" ? "Editorial" : "Broadcast"} template · button: “{c.cta.label}”
-                </span>
-              </figcaption>
-            </figure>
-          ))}
         </div>
       </Section>
 
@@ -317,15 +326,17 @@ function WhoCard({
 
 function GrowStep({ n, icon, title, body }: { n: number; icon: React.ReactNode; title: string; body: string }) {
   return (
-    <li className={cn("flex flex-col gap-3 rounded-lg border bg-card p-6")}>
-      <span className="flex items-center gap-3">
-        <span className="grid size-10 place-items-center rounded-[4px] bg-muted [&_svg]:size-5" aria-hidden>
-          {icon}
-        </span>
-        <span className="font-mono text-[13px] text-muted-foreground">0{n}</span>
+    <li className={cn("flex gap-4")}>
+      <span className="grid size-10 shrink-0 place-items-center rounded-[4px] bg-background [&_svg]:size-5" aria-hidden>
+        {icon}
       </span>
-      <h3 className="text-[20px] font-bold tracking-[-0.01em]">{title}</h3>
-      <p className="text-[15px] leading-[23px] text-muted-foreground">{body}</p>
+      <span className="flex flex-col gap-1">
+        <span className="flex items-baseline gap-2">
+          <span className="font-mono text-[12px] text-muted-foreground">0{n}</span>
+          <span className="text-[18px] font-bold tracking-[-0.01em]">{title}</span>
+        </span>
+        <span className="text-[15px] leading-[23px] text-muted-foreground">{body}</span>
+      </span>
     </li>
   )
 }

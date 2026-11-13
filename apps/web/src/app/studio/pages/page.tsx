@@ -2,14 +2,15 @@ import Link from "next/link"
 import { ArrowRight, Plus } from "lucide-react"
 import { PageHeader } from "@/components/shell/page-header"
 import { Button } from "@/components/ui/button"
-import { DEMO_CHANNEL_SLUG, getChannel, listPages } from "@/lib/data"
+import { listPages } from "@/lib/data"
+import { currentPublication } from "@/lib/publication"
 import { PagesList, type PageRow } from "@/components/studio/pages/pages-list"
 import { PAGE_TEMPLATES } from "@/components/studio/pages/templates"
 
 export const metadata = { title: "Pages" }
 
-export default function PagesPage() {
-  const channel = getChannel(DEMO_CHANNEL_SLUG)!
+export default async function PagesPage() {
+  const channel = (await currentPublication())
   const rows: PageRow[] = listPages(channel.id).map((p) => ({
     id: p.id,
     title: p.title,

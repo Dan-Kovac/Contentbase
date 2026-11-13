@@ -23,6 +23,8 @@ const display: React.CSSProperties = {
 }
 const body: React.CSSProperties = { fontFamily: "var(--chan-body)" }
 
+export type PreviewLead = typeof LEAD
+
 const LEAD = {
   kicker: "AFL · Round 7",
   headline: "The Blues have a centre-bounce problem",
@@ -211,7 +213,7 @@ function SponsoredShort() {
   )
 }
 
-function Editorial({ modules, sectionLabels }: { modules: HomeModule[]; sectionLabels: string[] }) {
+function Editorial({ modules, sectionLabels, lead: LEAD }: { modules: HomeModule[]; sectionLabels: string[]; lead: PreviewLead }) {
   return (
     <div className="grid gap-10 px-8 py-8">
       {modules.map((m) => {
@@ -324,7 +326,7 @@ function Rail({ title, items, start = 0 }: { title: string; items: typeof STORIE
   )
 }
 
-function Broadcast({ modules, sectionLabels }: { modules: HomeModule[]; sectionLabels: string[] }) {
+function Broadcast({ modules, sectionLabels, lead: LEAD }: { modules: HomeModule[]; sectionLabels: string[]; lead: PreviewLead }) {
   return (
     <div className={cn("grid gap-9 pb-9", modules[0] !== "lead" && "pt-8")}>
       {modules.map((m) => {
@@ -407,7 +409,10 @@ export function TemplatePreview({
   maxHeight,
   className,
   ctaLabel = "Join free",
+  lead,
 }: {
+  /** The channel's own lead story, when there is one. Otherwise a sample. */
+  lead?: Partial<PreviewLead>
   /** The channel's call-to-action button text. */
   ctaLabel?: string
   template: Template
@@ -455,9 +460,9 @@ export function TemplatePreview({
           {on.length === 0 ? (
             <p className={cn("py-24 text-center text-[15px]", dark ? "text-white/60" : "text-neutral-500")}>Turn on at least one module to fill your homepage.</p>
           ) : dark ? (
-            <Broadcast modules={on} sectionLabels={sectionLabels} />
+            <Broadcast modules={on} sectionLabels={sectionLabels} lead={{ ...LEAD, ...lead }} />
           ) : (
-            <Editorial modules={on} sectionLabels={sectionLabels} />
+            <Editorial modules={on} sectionLabels={sectionLabels} lead={{ ...LEAD, ...lead }} />
           )}
           {!maxHeight && (
             <footer className={cn("flex justify-between border-t px-8 py-5 text-[12px]", dark ? "border-white/10 text-white/50" : "border-neutral-200 text-neutral-500")}>

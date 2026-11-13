@@ -1,12 +1,12 @@
-import { ArrowRight, FileText, Film, Globe, Search } from "lucide-react"
+import { ArrowRight, Check, ChevronsUpDown, FileText, Film, Globe, LayoutGrid, Plus, Search } from "lucide-react"
 import { YouTubeIcon } from "@/components/auth/provider-icons"
 import { StatusBadge } from "@/components/brand/status-badge"
 import { VideoThumb } from "@/components/brand/media"
 import { LockStatus } from "@/components/brand/compliance"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { getChannel, getVideo, listShorts } from "@/lib/data"
-import { channelStyle, formatDuration } from "@/lib/format"
+import { getChannel, getEarnings, getVideo, listChannels, listShorts, listVideos } from "@/lib/data"
+import { channelStyle, compact, formatDuration, readableOn } from "@/lib/format"
 import { cn } from "@/lib/utils"
 
 /** A browser window frame for product shots. */
@@ -404,5 +404,82 @@ export function FormatShapes() {
         </li>
       ))}
     </ul>
+  )
+}
+
+/* ---------------------------------------------------------------------------------------------
+ * One account, every publication: the studio's publication switcher, open, over the overview.
+ * Built from the real sample publications.
+ * ------------------------------------------------------------------------------------------- */
+
+function Tile({ name, hex, size = 28 }: { name: string; hex: string; size?: number }) {
+  return (
+    <span
+      aria-hidden
+      className="grid shrink-0 place-items-center rounded-[5px] font-black leading-none"
+      style={{ width: size, height: size, background: hex, color: readableOn(hex), fontSize: size * 0.5 }}
+    >
+      {name[0]}
+    </span>
+  )
+}
+
+export function PublicationsMock({ className }: { className?: string }) {
+  const pubs = listChannels().map((c) => ({
+    c,
+    ready: listVideos(c.id, "ready").length,
+    earnings: getEarnings(c.id)?.total ?? 0,
+  }))
+  const current = pubs[0]
+  return (
+    <div className={cn("relative rounded-lg border bg-background p-4 shadow-popover sm:p-5", className)} aria-label="The studio's publication switcher" role="img">
+      <div className="flex items-center justify-between gap-3 border-b pb-3">
+        <span className="flex items-center gap-2.5 rounded-md bg-accent py-1.5 pl-1.5 pr-2">
+          <Tile name={current.c.name} hex={current.c.accentHex} size={26} />
+          <span className="flex flex-col">
+            <span className="text-[14px] font-semibold leading-5">{current.c.name}</span>
+            <span className="font-mono text-[11px] leading-4 text-muted-foreground">{current.c.customDomain ?? `${current.c.slug}.homestand.com.au`}</span>
+          </span>
+          <ChevronsUpDown className="size-4 text-muted-foreground" />
+        </span>
+        <span className="text-[12px] text-muted-foreground">Studio</span>
+      </div>
+      <div className="mt-3 rounded-lg border bg-popover p-1.5">
+        <p className="flex items-center justify-between px-2 py-1.5 text-[12px] font-semibold text-muted-foreground">
+          Your publications <span className="font-normal">{pubs.length}</span>
+        </p>
+        {pubs.map(({ c, ready, earnings }, i) => (
+          <div key={c.id} className={cn("flex items-center gap-3 rounded-md px-2 py-2", i === 0 && "bg-accent")}>
+            <Tile name={c.name} hex={c.accentHex} size={34} />
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate text-[14px] font-semibold">{c.name}</span>
+              <span className="truncate text-[12px] text-muted-foreground">
+                {ready} ready to review · {compact(c.followers)} followers · ${earnings.toLocaleString("en-AU")} this month
+              </span>
+            </span>
+            {i === 0 && <Check className="size-4" />}
+          </div>
+        ))}
+        <div className="my-1 h-px bg-border" />
+        <div className="flex items-center gap-3 rounded-md px-2 py-2">
+          <span className="grid size-[34px] place-items-center rounded-[5px] border">
+            <LayoutGrid className="size-4" />
+          </span>
+          <span className="flex flex-col">
+            <span className="text-[14px] font-semibold">All publications</span>
+            <span className="text-[12px] text-muted-foreground">Every brand at a glance, one review queue</span>
+          </span>
+        </div>
+        <div className="flex items-center gap-3 rounded-md px-2 py-2">
+          <span className="grid size-[34px] place-items-center rounded-[5px] border border-dashed">
+            <Plus className="size-4" />
+          </span>
+          <span className="flex flex-col">
+            <span className="text-[14px] font-semibold">Add a publication</span>
+            <span className="text-[12px] text-muted-foreground">Another YouTube channel or brand</span>
+          </span>
+        </div>
+      </div>
+    </div>
   )
 }

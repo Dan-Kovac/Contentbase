@@ -2,24 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import {
-  BarChart3,
-  CreditCard,
-  Download,
-  FileStack,
-  Globe,
-  Inbox,
-  LayoutDashboard,
-  Library,
-  Link2,
-  Megaphone,
-  Mic,
-  Newspaper,
-  Palette,
-  Settings,
-  Smartphone,
-  Upload,
-} from "lucide-react"
+import { BarChart3, Inbox, LayoutDashboard, LayoutGrid, Library, Settings } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -38,32 +21,18 @@ import { Monogram, Wordmark } from "@/components/brand/wordmark"
 
 export const STUDIO_NAV = [
   { href: "/studio", label: "Home", icon: LayoutDashboard },
-  { href: "/studio/review", label: "Ready to review", icon: Inbox, badge: true },
-  { href: "/studio/library", label: "Library", icon: Library },
-  { href: "/studio/articles", label: "Articles", icon: Newspaper },
-  { href: "/studio/pages", label: "Pages", icon: FileStack },
-  { href: "/studio/shorts", label: "Shorts", icon: Smartphone },
-  { href: "/studio/upload", label: "Upload", icon: Upload },
-  { href: "/studio/imports", label: "Imports", icon: Download },
+  { href: "/studio/review", label: "Review", icon: Inbox, badge: true },
+  { href: "/studio/library", label: "Library", icon: Library, also: ["/studio/articles", "/studio/shorts", "/studio/pages", "/studio/upload"] },
   { href: "/studio/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/studio/settings", label: "Settings", icon: Settings, also: ["/studio/imports"] },
 ]
 
-export const SETTINGS_NAV = [
-  { href: "/studio/settings", label: "Channel", icon: Settings },
-  { href: "/studio/settings/design", label: "Design", icon: Palette },
-  { href: "/studio/settings/connections", label: "Connections", icon: Link2 },
-  { href: "/studio/settings/domain", label: "Domain", icon: Globe },
-  { href: "/studio/settings/monetisation", label: "Monetisation", icon: Megaphone },
-  { href: "/studio/settings/voice", label: "Brand voice", icon: Mic },
-  { href: "/studio/settings/billing", label: "Billing", icon: CreditCard },
-]
-
-function isActive(pathname: string, href: string) {
-  if (href === "/studio" || href === "/studio/settings") return pathname === href
-  return pathname === href || pathname.startsWith(href + "/")
+function isActive(pathname: string, item: { href: string; also?: string[] }) {
+  if (item.href === "/studio") return pathname === "/studio"
+  return [item.href, ...(item.also ?? [])].some((h) => pathname === h || pathname.startsWith(h + "/"))
 }
 
-export function StudioSidebar({ reviewCount = 0 }: { reviewCount?: number }) {
+export function StudioSidebar({ reviewCount = 0, publications = 1 }: { reviewCount?: number; publications?: number }) {
   const pathname = usePathname() ?? ""
   return (
     <Sidebar collapsible="icon">
@@ -83,7 +52,7 @@ export function StudioSidebar({ reviewCount = 0 }: { reviewCount?: number }) {
             <SidebarMenu>
               {STUDIO_NAV.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={isActive(pathname, item.href)} tooltip={item.label}>
+                  <SidebarMenuButton asChild isActive={isActive(pathname, item)} tooltip={item.label}>
                     <Link href={item.href}>
                       <item.icon />
                       <span>{item.label}</span>
@@ -96,19 +65,18 @@ export function StudioSidebar({ reviewCount = 0 }: { reviewCount?: number }) {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Settings</SidebarGroupLabel>
+          <SidebarGroupLabel>Your account</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {SETTINGS_NAV.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={isActive(pathname, item.href)} tooltip={item.label}>
-                    <Link href={item.href}>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/studio/publications"} tooltip="All publications">
+                  <Link href="/studio/publications">
+                    <LayoutGrid />
+                    <span>All publications</span>
+                  </Link>
+                </SidebarMenuButton>
+                <SidebarMenuBadge className="rounded-sm px-1.5 text-[11px] font-semibold text-muted-foreground">{publications}</SidebarMenuBadge>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

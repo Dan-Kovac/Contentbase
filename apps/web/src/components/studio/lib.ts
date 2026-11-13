@@ -134,7 +134,11 @@ export interface StudioDay {
  * 90 days of stats ending 11 November 2026. The last 30 are the shared sample
  * (getDailyStats); the 60 before are a slower, deterministic lead-in.
  */
-export function studioDays(): StudioDay[] {
+/** Sample only: how big each publication is relative to Footy Fix, so their numbers differ. */
+export const pubScale = (slug: string) => (slug === "footyfix" ? 1 : 0.42)
+
+/** Sample daily numbers; `scale` gives each publication its own size. */
+export function studioDays(scale = 1): StudioDay[] {
   const rows: Omit<StudioDay, "verified">[] = []
   for (let j = 0; j < 60; j++) {
     const k = j - 60
@@ -158,8 +162,9 @@ export function studioDays(): StudioDay[] {
       signUps: d.signUps,
     })
   })
-  let verified = 2380
-  return rows.map((r) => {
+  let verified = Math.round(2380 * scale)
+  return rows.map((raw) => {
+    const r = scale === 1 ? raw : { ...raw, views: Math.round(raw.views * scale), watchMinutes: Math.round(raw.watchMinutes * scale), searchSessions: Math.round(raw.searchSessions * scale), signUps: Math.round(raw.signUps * scale) }
     verified += Math.round(r.signUps * 0.72)
     return { ...r, verified }
   })
