@@ -46,6 +46,8 @@ const TRACKS: Track[] = [
       { href: "/studio/publications", label: "All publications", say: "One account, every brand at once. The switcher at the top moves between them." },
       { href: "/studio/video/new?article=a_ladder", label: "Words to video", say: "Write once, get a long-form video or a short in their brand. AI credits pay for it." },
       { href: "/studio/credits", label: "AI credits", say: "One balance for the account, top-ups and a spend cap. The second revenue line." },
+      { href: "/c/footyfix/newsletters?as=signed_in", label: "Newsletters, as a member", say: "Members choose their streams: the weekly summary, big news, tips. The list belongs to the publication." },
+      { href: "/studio/email/new?stream=es_weekly", label: "Write the newsletter", say: "Draft this week's edition from published stories, in their brand, or paste their own HTML. Sent from their own domain." },
       { href: "/publishers", label: "For publishers", say: "Keep the wagering revenue the 2027 rules would take, and keep the rankings." },
     ],
   },

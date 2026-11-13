@@ -23,7 +23,8 @@ Subscriptions alone don't get there. The PID's own maths puts 3,000 Australian c
 | Memberships | Take rate on fan memberships and paid content | $2.0M |
 | Video templates | Template sales and a cut of third-party templates | $1.5M |
 | Hosting overage | Video hours, storage and bandwidth beyond the plan | $1.5M |
-| **Total** | | **about $48M** |
+| Email | Sends beyond the plan (credits), dedicated sending IPs | $1.0M |
+| **Total** | | **about $49M** |
 
 The assumptions behind each row are below. The sum depends on three things being true at once: the verified audience is large enough for premium CPMs, publishers use AI credits every week, and the platform grows beyond Australian sport (other countries, other sports, clubs and racing bodies). Australia alone, on these assumptions, lands nearer $15–20 million.
 
@@ -101,6 +102,7 @@ Article to video starts with three included templates: Explainer (voiceover, cha
 - **Memberships and paid content:** a take rate of about 8% on fan memberships and paywalled series. Assumption: $25M of membership sales gives **$2M**.
 - **Services:** white-glove migrations, plus a managed branded-video studio where brands commission template videos and Homestand charges a margin over credits. Assumption: **$3M**.
 - **Hosting overage:** video hours, storage and bandwidth beyond the plan, metered like credits. Assumption: **$1.5M**.
+- **Email:** each plan includes subscribers and sends; beyond that, sends draw on credits (1 per 100 emails), and Enterprise can add dedicated sending IPs. The bigger value is retention: newsletters are why members come back, and members are the verified audience. Assumption: **$1M**. See [email.md](email.md).
 
 ## What has to be true
 

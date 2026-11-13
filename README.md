@@ -34,6 +34,7 @@ pnpm typecheck && pnpm lint && pnpm build
 | [docs/research/integrations.md](docs/research/integrations.md) | What YouTube, TikTok and Instagram APIs allow, and what it changes |
 | [docs/build-plan.md](docs/build-plan.md) | Architecture, data model, pipelines, API surface, milestones |
 | [docs/demo-clarity-plan.md](docs/demo-clarity-plan.md) | The demo plan: same-shape ads, channel calls to action, landing page, simplified journey |
+| [docs/email.md](docs/email.md) | Newsletters: streams members choose, the builder, sending domains, deliverability and the Spam Act |
 | [docs/revenue-model.md](docs/revenue-model.md) | Revenue lines beyond subscriptions: ads, AI credits, triple lock licensing, data housing |
 
 ## Layout

@@ -13,6 +13,8 @@ const PRICE_ROWS: [string, string][] = [
   ["Translation and dubbing, per minute", `${CREDIT_PRICES.dubPerMinute}`],
   ["Video-to-article beyond your plan, per video hour", `${CREDIT_PRICES.extraProcessingPerHour}`],
   ["Thumbnail and title set", `${CREDIT_PRICES.thumbnails}`],
+  ["Email sends beyond your plan, per 100", `${CREDIT_PRICES.emailsPer100}`],
+  ["Newsletter drafted from the week's stories", `${CREDIT_PRICES.emailDigest}`],
 ]
 
 /** One credit balance for the whole account: every publication draws on it. */

@@ -103,6 +103,7 @@ export default function HomePage() {
               "Your domain, your sign-ins, your search traffic",
               "Every video becomes a page, an article and shorts",
               "Sponsors pay to reach your verified adults, and you take a share",
+              "Newsletters to your own members, no Mailchimp",
               "Run several publications from one account",
             ]}
           >
@@ -158,7 +159,7 @@ export default function HomePage() {
             />
             <ol className="flex flex-col gap-5">
               <GrowStep n={1} icon={<Tv aria-hidden />} title="A channel" body="Your videos on your own domain, each with an article, shorts and a page that ranks." />
-              <GrowStep n={2} icon={<Newspaper aria-hidden />} title="A publication" body="Sections, writers, standalone articles, your own pages, members and a button that does what you want." />
+              <GrowStep n={2} icon={<Newspaper aria-hidden />} title="A publication" body="Sections, writers, standalone articles, your own pages, members, newsletters and a button that does what you want." />
               <GrowStep n={3} icon={<Network aria-hidden />} title="A network" body="More publications under one login: three on Publisher, unlimited on Enterprise. One studio, one queue, one set of numbers." />
             </ol>
           </div>

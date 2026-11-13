@@ -47,6 +47,10 @@ const GROUPS: Group[] = [
       { href: "/studio/video/new?article=a_ladder", name: "Make a video", what: "Article to video: template, format, voice and brand kit, an editable storyboard, credit cost, render." },
       { href: "/studio/video/templates", name: "Video templates", what: "Three included, three to buy, each drawn in the publication's brand." },
       { href: "/studio/credits", name: "AI credits", what: "Balance for the account, allowance, top-ups, spend cap, usage by publication, prices." },
+      { href: "/studio/email", name: "Email", what: "The publication's newsletters, sent and scheduled emails, sending health." },
+      { href: "/studio/email/new?stream=es_weekly", name: "New email", what: "Blocks in your brand or paste your own HTML, draft from this week, preview, checks, send." },
+      { href: "/studio/email/subscribers", name: "Subscribers", what: "Import a list with consent; duplicates and past unsubscribes skipped." },
+      { href: "/studio/email/sending", name: "Sending", what: "From details, SPF, DKIM, MX and DMARC records, bounce and complaint rates." },
       { href: "/studio/imports", name: "Imports", what: "Import history with counts.", ids: "MIG-07" },
       { href: "/studio/imports/new", name: "New import", what: "YouTube, WordPress, Ghost, Substack or RSS.", ids: "MIG-02–04" },
       { href: "/studio/imports/imp_yt_initial", name: "Import report", what: "Problems with retry, redirect map, generate articles for all.", ids: "MIG-05, MIG-07, MIG-08" },
@@ -81,6 +85,7 @@ const GROUPS: Group[] = [
     screens: [
       { href: "/c/footyfix", name: "Channel home", what: "Editorial: Presented by on the lead, a sponsored short among shorts, a sponsored story among stories, the channel's call to action.", ids: "CHN-04, CHN-05, ADS-01" },
       { href: "/c/footyfix/join", name: "Join", what: "The channel's own call to action and join page, in its brand. One account for every channel.", ids: "AUD-01" },
+      { href: "/c/footyfix/newsletters", name: "Newsletters", what: "The channel's email streams; members choose which they get." },
       { href: "/c/footyfix/v/blues-centre-bounce-problem", name: "Video page", what: "Chapter sponsor, a half-time break the width of the article, a sponsored short in related. The demo bar switches viewer state.", ids: "SEO-02, SEO-05, SEO-06, TLK-01–03" },
       { href: "/c/footyfix/v/blues-centre-bounce-problem?as=verified", name: "Video page, confirmed 18+", what: "The same page for a signed-in adult: the wagering sponsor shows, with 18+ and the opt-out.", ids: "TLK-01–03" },
       { href: "/c/footyfix/v/inside-blues-pre-season", name: "Members-only (logged out)", what: "Join free to watch, in the channel's accent; unlocks once joined. No ads.", ids: "AUD-03" },

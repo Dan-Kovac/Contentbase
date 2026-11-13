@@ -12,6 +12,8 @@ export const CREDIT_PRICES = {
   dubPerMinute: 15,
   extraProcessingPerHour: 20,
   thumbnails: 5,
+  emailsPer100: 1,
+  emailDigest: 5,
 } as const
 
 export const PLAN_CREDITS = { starter: 100, pro: 500, publisher: 2000 } as const

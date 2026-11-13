@@ -34,6 +34,10 @@ const FAQ = [
     a: "On Pro and above. Every channel starts on a homestand.com.au subdomain, and you can point your own domain at it whenever you're ready. We handle SSL.",
   },
   {
+    q: "Can I send newsletters?",
+    a: "Yes, without a separate tool. Each publication has its own newsletters that members choose on your site. Build an email from blocks in your brand or paste your own HTML, import your existing list with consent, and send from your own domain. Each plan includes subscribers and up to four emails per subscriber a month; beyond that, sends come out of AI credits.",
+  },
+  {
     q: "What are AI credits?",
     a: "Your plan turns every YouTube video into a draft pack. Credits pay for the heavier work: turning an article into a video, synthetic voiceover, dubbing and processing beyond your video hours. Each plan includes credits every month, top-ups roll over for 12 months, and a spend cap means no surprises.",
   },
