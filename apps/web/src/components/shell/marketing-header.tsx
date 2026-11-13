@@ -3,10 +3,10 @@ import { Wordmark } from "@/components/brand/wordmark"
 import { Button } from "@/components/ui/button"
 
 const NAV = [
-  { href: "/#creators", label: "For creators" },
-  { href: "/publishers", label: "For publishers" },
-  { href: "/pricing", label: "Pricing" },
+  { href: "/#who", label: "Creators" },
+  { href: "/publishers", label: "Publishers" },
   { href: "/advertisers", label: "Advertisers" },
+  { href: "/pricing", label: "Pricing" },
 ]
 
 /** Marketing chrome is always on brand-black: the brand looks its best there. */
@@ -39,9 +39,9 @@ export function MarketingHeader() {
 
 export function MarketingFooter() {
   const cols = [
-    { title: "Product", links: [["For creators", "/#creators"], ["For publishers", "/publishers"], ["Pricing", "/pricing"], ["See a channel", "/c/footyfix"]] },
-    { title: "Company", links: [["Advertisers", "/advertisers"], ["Sign in", "/signin"], ["Start free trial", "/signup"]] },
-    { title: "Trust", links: [["Privacy", "/pricing#faq"], ["Responsible gambling", "/advertisers#triple-lock"], ["Terms", "/pricing#faq"]] },
+    { title: "Product", links: [["For creators", "/#who"], ["For publishers", "/publishers"], ["Pricing", "/pricing"], ["See a channel", "/c/footyfix"]] },
+    { title: "Company", links: [["For advertisers", "/advertisers"], ["Sign in", "/signin"], ["Start free trial", "/signup"]] },
+    { title: "Trust", links: [["How age-restricted ads work", "/advertisers#triple-lock"], ["Gambling Help Online", "https://www.gamblinghelponline.org.au"]] },
   ]
   return (
     <footer className="bg-brand-black text-brand-muted">
@@ -50,7 +50,7 @@ export function MarketingFooter() {
           <span className="text-brand-white">
             <Wordmark height={24} />
           </span>
-          <p className="max-w-[34ch] text-[14px] leading-[22px]">Your channel. Your audience. Video-first publishing for Australian sport.</p>
+          <p className="max-w-[34ch] text-[14px] leading-[22px]">Your channel. Your audience. Video-first publishing for Australian sport and racing creators and publishers.</p>
         </div>
         {cols.map((c) => (
           <div key={c.title} className="flex flex-col gap-3 text-[14px]">

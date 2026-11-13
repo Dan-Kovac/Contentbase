@@ -54,7 +54,6 @@ const TEASER: Record<string, string> = {
   enterprise: "Unlimited channels and white-glove migration.",
 }
 
-/** Compact four-column teaser for the landing page. */
 export function PricingTeaser() {
   return (
     <div className="grid overflow-hidden rounded-lg border bg-card sm:grid-cols-2 lg:grid-cols-4">

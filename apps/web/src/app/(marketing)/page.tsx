@@ -1,17 +1,18 @@
 import Link from "next/link"
-import { ArrowRight, ArrowUpRight, Ghost, Globe, LayoutTemplate, Mail, Newspaper, Rss, Search, Users } from "lucide-react"
+import { ArrowRight, Building2, Check, Megaphone, Network, Newspaper, Tv, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { YouTubeIcon } from "@/components/auth/provider-icons"
 import { Container, DarkHero, Section, SectionHeading, TickList } from "@/components/marketing/section"
 import {
-  ChannelHomeMock,
-  RedirectMock,
-  ReviewCardMock,
-  SearchResultMock,
   AgeVerifiedPanel,
+  FormatShapes,
+  HomestandPageSketch,
+  OneVideoInMock,
+  ReviewCardMock,
+  TypicalPageSketch,
 } from "@/components/marketing/product-visuals"
-import { FormatStage, HalftimeExample, SponsoredShortExample, SponsoredStoryExample } from "@/components/marketing/native-formats"
-import { PricingTeaser } from "@/components/marketing/pricing-cards"
+import { TemplatePreview } from "@/components/settings/template-preview"
+import { getChannel } from "@/lib/data"
 import { cn } from "@/lib/utils"
 
 const STEPS = [
@@ -32,85 +33,110 @@ const STEPS = [
   },
 ]
 
-const SOURCES = [
-  { name: "WordPress", note: "WXR export or REST API", Icon: Newspaper },
-  { name: "Ghost", note: "JSON export", Icon: Ghost },
-  { name: "Substack", note: "Posts and podcast feed", Icon: Mail },
-  { name: "RSS", note: "Any feed", Icon: Rss },
-]
-
 export default function HomePage() {
+  const footy = getChannel("footyfix")!
+  const track = getChannel("trackside")!
   return (
     <>
+      {/* 1. Hero: what it is, in one line, and the proof beside it */}
       <DarkHero>
-        <div className="flex flex-col items-center gap-6 text-center">
-          <p className="kicker text-brand-white before:bg-pop">For Australian sport and racing creators</p>
-          <h1 className="max-w-[16ch] text-[44px] font-extrabold leading-[44px] tracking-[-0.04em] sm:text-[72px] sm:leading-[70px] lg:text-[88px] lg:leading-[84px]">
-            Your channel. <span className="text-pitch">Your audience.</span>
-          </h1>
-          <p className="max-w-[56ch] text-[17px] leading-[27px] text-brand-muted sm:text-[20px] sm:leading-[30px]">
-            Connect YouTube and every video becomes an article, shorts and a page that ranks. You own all of it.
-          </p>
-          <div className="flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
-            <Button asChild size="xl" className="bg-brand-white text-brand-black hover:bg-brand-white/90">
-              <Link href="/signup">
-                Start free trial
-                <ArrowRight aria-hidden />
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_minmax(0,600px)] lg:gap-14">
+          <div className="flex flex-col items-start gap-6">
+            <p className="kicker text-brand-white before:bg-pop">Video-first publishing for Australian sport and racing</p>
+            <h1 className="max-w-[14ch] text-[44px] font-extrabold leading-[44px] tracking-[-0.04em] sm:text-[60px] sm:leading-[60px] xl:text-[68px] xl:leading-[66px]">
+              Turn your channel into a publication <span className="text-pitch">you own.</span>
+            </h1>
+            <p className="max-w-[48ch] text-[17px] leading-[27px] text-brand-muted sm:text-[19px] sm:leading-[29px]">
+              Connect YouTube. Every video becomes a video page, an article and shorts on your own site, with fans who sign in and sponsors that fit the page.
+            </p>
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+              <Button asChild size="xl" variant="pop">
+                <Link href="/signup">
+                  Start free trial
+                  <ArrowRight aria-hidden />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="xl"
+                variant="outline"
+                className="border-white/25 bg-transparent text-brand-white hover:bg-white/10 hover:text-brand-white dark:bg-transparent"
+              >
+                <Link href="/c/footyfix">See a live channel</Link>
+              </Button>
+            </div>
+            <p className="text-[13px] text-brand-muted">
+              14-day free trial. No card needed. From $29 a month inc. GST.{" "}
+              <Link href="/advertisers" className="font-semibold text-brand-white underline-offset-4 hover:underline">
+                Advertising with us? See the formats
               </Link>
-            </Button>
-            <Button
-              asChild
-              size="xl"
-              variant="outline"
-              className="border-white/25 bg-transparent text-brand-white hover:bg-white/10 hover:text-brand-white dark:bg-transparent"
-            >
-              <Link href="/c/footyfix">See a live channel</Link>
-            </Button>
+            </p>
           </div>
-          <p className="text-[13px] text-brand-muted">14-day free trial. No card needed. From $29 a month inc. GST.</p>
-        </div>
-        <div className="mx-auto mt-14 max-w-[1040px] md:mt-20">
-          <ChannelHomeMock />
+          <OneVideoInMock />
         </div>
       </DarkHero>
 
-      {/* Two equal paths */}
-      <Section labelledBy="paths-title">
-        <h2 id="paths-title" className="sr-only">
-          Choose your path
-        </h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <PathCard
+      {/* 2. Who wins: one column each, equal weight */}
+      <Section id="who" labelledBy="who-title" className="md:py-20">
+        <SectionHeading
+          id="who-title"
+          kicker="Who it's for"
+          title="Better for everyone on the page."
+        />
+        <div className="mt-12 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <WhoCard
             id="creators"
-            kicker="For creators"
-            title="Turn your YouTube channel into a publication you own."
+            icon={<Building2 aria-hidden />}
+            kicker="Creators and publishers"
+            title="Own the audience and the income."
             points={[
+              "Your domain, your sign-ins, your search traffic",
               "Every video becomes a page, an article and shorts",
-              "New uploads arrive as drafts, ready to review",
-              "Your followers and search traffic stay with you",
+              "Sponsors pay to reach your verified adults, and you take a share",
             ]}
-            cta="Connect YouTube"
-            href="/signup"
-            icon={<YouTubeIcon className="size-4" />}
-          />
-          <PathCard
-            id="publishers"
-            kicker="For publishers"
-            title="Move your site in a day, keep your rankings, keep your ad revenue."
+          >
+            <div className="flex flex-wrap gap-2">
+              <Button asChild size="lg">
+                <Link href="/signup">
+                  <YouTubeIcon className="size-4" />
+                  Connect YouTube
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link href="/publishers">Import your site</Link>
+              </Button>
+            </div>
+          </WhoCard>
+          <WhoCard
+            icon={<Users aria-hidden />}
+            kicker="Fans"
+            title="A page worth staying on."
+            points={["No banners and no pop-ups", "Watch, read or skip straight to a chapter", "One free account, and a say over the ads they see"]}
+          >
+            <Link href="/c/footyfix/v/blues-centre-bounce-problem" className="inline-flex w-fit items-center gap-1.5 text-[14px] font-semibold underline-offset-4 hover:underline">
+              See a video page <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          </WhoCard>
+          <WhoCard
+            id="advertisers"
+            icon={<Megaphone aria-hidden />}
+            kicker="Advertisers"
+            title="Verified adults, in formats people watch."
             points={[
-              "Import from WordPress, Ghost, Substack or RSS",
-              "Every old URL redirects to its new page",
-              "Age-verified advertising, so alcohol and wagering brands can reach adults only",
+              "Three checks before every age-restricted ad",
+              "Your brand set in the channel's own design",
+              "Evidence for every impression, ready for your compliance team",
             ]}
-            cta="Import your site"
-            href="/publishers"
-            icon={<LayoutTemplate aria-hidden />}
-          />
+          >
+            <Link href="/advertisers" className="inline-flex w-fit items-center gap-1.5 text-[14px] font-semibold underline-offset-4 hover:underline">
+              See the formats <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          </WhoCard>
         </div>
       </Section>
 
-      {/* How it works */}
-      <Section tone="muted" labelledBy="how-title">
+      {/* 3. How it works */}
+      <Section tone="muted" labelledBy="how-title" className="md:py-20">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
           <div className="flex flex-col gap-10">
             <SectionHeading
@@ -137,138 +163,101 @@ export default function HomePage() {
         </div>
       </Section>
 
-      {/* Own it */}
-      <Section labelledBy="own-title">
+      {/* 4. The page, rethought */}
+      <Section labelledBy="page-title" className="md:py-20">
         <SectionHeading
-          id="own-title"
-          kicker="Own it"
-          title="Your domain. Your audience. Your search traffic."
-          lede="A feed can change its mind overnight. A channel on your own domain keeps working for you."
+          id="page-title"
+          kicker="The page, rethought"
+          title="No banners. Sponsors take the shape of the story."
+          lede="Most publications bolt ads on top of the page. Here a sponsor is a short among shorts, a story among stories, a break the width of the article. Nothing moves, nothing pops up, and every unit is labelled."
         />
-        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <Feature icon={<Globe aria-hidden />} title="Your domain" body="Start on footyfix.homestand.com.au, then move to footyfix.com.au when you're ready. SSL is handled." />
-          <Feature icon={<Users aria-hidden />} title="Your audience" body="Viewers follow your channel and sign in with one free account. You see who follows and they get your weekly digest." />
-          <Feature icon={<Search aria-hidden />} title="Your search traffic" body="Every video gets a fast page with a transcript, chapters and structured data, so Google can find it and send people to you." />
+        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <figure className="flex flex-col gap-3">
+            <div className="rounded-lg bg-muted p-4 sm:p-6">
+              <TypicalPageSketch />
+            </div>
+            <figcaption className="text-[14px]">
+              <span className="font-semibold">A typical sports page.</span> <span className="text-muted-foreground">Seven ad slots in standard sizes, a pop-up and a sticky footer, all fighting the story.</span>
+            </figcaption>
+          </figure>
+          <figure className="flex flex-col gap-3">
+            <div className="rounded-lg bg-muted p-4 sm:p-6">
+              <HomestandPageSketch />
+            </div>
+            <figcaption className="text-[14px]">
+              <span className="font-semibold">The same page on Homestand.</span> <span className="text-muted-foreground">Three sponsors, shown in green, each the shape of what sits beside it.</span>
+            </figcaption>
+          </figure>
         </div>
-        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[1.2fr_1fr]">
-          <SearchResultMock />
-          <div className="flex flex-col justify-center gap-2 rounded-lg border bg-card p-5">
-            <p className="text-[13px] font-semibold text-muted-foreground">What a video page carries</p>
-            <TickList items={["Full transcript and chapters", "Video and article structured data", "Open Graph cards for sharing", "A sitemap that updates on publish"]} />
-          </div>
+        <div className="mt-10 flex flex-col gap-5">
+          <FormatShapes />
+          <Link href="/advertisers#formats" className="inline-flex w-fit items-center gap-1.5 text-[14px] font-semibold underline-offset-4 hover:underline">
+            See all five formats
+            <ArrowRight className="size-4" aria-hidden />
+          </Link>
         </div>
       </Section>
 
-      {/* Earn */}
-      <Section tone="muted" labelledBy="earn-title">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
-          <div className="flex flex-col gap-8">
+      {/* 5. Age-verified advertising */}
+      <Section tone="muted" labelledBy="lock-title" className="md:py-20">
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <div className="flex flex-col gap-6">
             <SectionHeading
-              id="earn-title"
-              kicker="Earn"
-              title="Ads that look like they belong."
-              lede="Homestand Native Formats replace banners. Advertisers send a brief, and we render it in your channel's design: labelled, fast and with no layout shift."
+              id="lock-title"
+              kicker="Age-verified advertising"
+              title="Adults-only ads, checked every time."
+              lede="Switch on the triple lock and age-restricted ads, such as alcohol and wagering, only show to viewers who are signed in, confirmed 18 or over and haven't opted out. Every decision is logged as evidence. If any check fails, an everyday sponsor fills the same space."
             />
-            <TickList
-              items={[
-                "Five formats, from a chapter sponsor to a sponsored short",
-                "Ad revenue share on Pro and above",
-                "Block any category you don't want on your channel",
-                "No pop-ups, no autoplay with sound, nothing between a headline and its first paragraph",
-              ]}
-            />
-            <Link href="/advertisers#formats" className="inline-flex w-fit items-center gap-1.5 text-[14px] font-semibold underline-offset-4 hover:underline">
-              See all five formats
+            <Link href="/advertisers#triple-lock" className="inline-flex w-fit items-center gap-1.5 text-[14px] font-semibold underline-offset-4 hover:underline">
+              How the triple lock works
               <ArrowRight className="size-4" aria-hidden />
             </Link>
           </div>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-3 rounded-lg border bg-card p-5">
-              <p className="text-[15px] font-semibold">Adults-only ads, checked every time</p>
-              <p className="text-[15px] leading-[23px] text-muted-foreground">
-                Some ads should only reach adults. Switch on the triple lock and those ads show only to viewers who are signed in, confirmed 18 or over
-                and haven&apos;t opted out. That opens your channel to advertisers in age-restricted categories, such as alcohol and wagering.
-              </p>
-              <Link href="/advertisers#triple-lock" className="inline-flex w-fit items-center gap-1.5 text-[14px] font-semibold underline-offset-4 hover:underline">
-                How the triple lock works
-                <ArrowRight className="size-4" aria-hidden />
-              </Link>
-            </div>
-            <AgeVerifiedPanel />
-          </div>
-        </div>
-
-        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-12">
-          <FormatFigure className="md:col-span-2 lg:col-span-6" name="Half-time break" where="Between article sections">
-            <HalftimeExample withCopy={false} />
-          </FormatFigure>
-          <FormatFigure className="lg:col-span-3" name="Stat card" where="In a row of key numbers, 18+ shown">
-            <SponsoredStoryExample context={false} />
-          </FormatFigure>
-          <FormatFigure className="lg:col-span-3" name="Sponsored short" where="In the shorts row, one in eight at most">
-            <div className="mx-auto w-full max-w-[200px]">
-              <SponsoredShortExample context={false} />
-            </div>
-          </FormatFigure>
+          <AgeVerifiedPanel />
         </div>
       </Section>
 
-      {/* Move in */}
-      <Section labelledBy="move-title">
-        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:gap-16">
-          <div className="flex flex-col gap-8">
-            <SectionHeading
-              id="move-title"
-              kicker="Move in easily"
-              title="Bring your archive. Keep your rankings."
-              lede="Import posts, pages, authors, categories and images. Every old URL gets a 301 redirect to its new home, so search engines follow you over."
-            />
-            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {SOURCES.map((s) => (
-                <li key={s.name} className="flex items-center gap-3 rounded-lg border p-4">
-                  <span className="grid size-9 place-items-center rounded-[4px] bg-muted" aria-hidden>
-                    <s.Icon className="size-4" />
-                  </span>
-                  <span className="flex flex-col">
-                    <span className="text-[15px] font-semibold">{s.name}</span>
-                    <span className="text-[13px] text-muted-foreground">{s.note}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <Button asChild variant="outline" size="lg" className="w-fit">
-              <Link href="/publishers">
-                See how migration works
-                <ArrowRight aria-hidden />
-              </Link>
-            </Button>
-          </div>
-          <RedirectMock />
+      {/* 6. Growth */}
+      <Section labelledBy="grow-title" className="md:py-20">
+        <SectionHeading
+          id="grow-title"
+          kicker="Grow"
+          title="From one channel to a media empire."
+          lede="Start with the videos you already make. Add writers, sections and your own pages. Then run several brands under one roof, each with its own look and its own call to action."
+        />
+        <ol className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <GrowStep n={1} icon={<Tv aria-hidden />} title="A channel" body="Your videos on your own domain, each with an article, shorts and a page that ranks." />
+          <GrowStep n={2} icon={<Newspaper aria-hidden />} title="A publication" body="Sections, writers, standalone articles, your own pages, members and a button that does what you want." />
+          <GrowStep n={3} icon={<Network aria-hidden />} title="A network" body="More channels under one account: three on Publisher, unlimited on Enterprise, with one sales team behind them." />
+        </ol>
+        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+          {[footy, track].map((c) => (
+            <figure key={c.id} className="flex flex-col gap-3">
+              <TemplatePreview
+                template={c.template}
+                accentHex={c.accentHex}
+                pairing={c.pairing}
+                name={c.name}
+                nav={c.nav.map((n) => n.label)}
+                sectionLabels={c.sections.map((s) => s.label)}
+                domain={c.customDomain ?? `${c.slug}.homestand.com.au`}
+                ctaLabel={c.cta.label}
+                maxHeight={440}
+              />
+              <figcaption className="flex flex-wrap items-baseline gap-x-2 text-[14px]">
+                <Link href={`/c/${c.slug}`} className="font-semibold underline-offset-4 hover:underline">
+                  {c.name}
+                </Link>
+                <span className="text-muted-foreground">
+                  {c.template === "editorial" ? "Editorial" : "Broadcast"} template · button: “{c.cta.label}”
+                </span>
+              </figcaption>
+            </figure>
+          ))}
         </div>
       </Section>
 
-      {/* Pricing teaser */}
-      <Section tone="muted" labelledBy="pricing-title">
-        <div className="flex flex-col gap-10">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <SectionHeading
-              id="pricing-title"
-              kicker="Pricing"
-              title="Plans from $29 a month."
-              lede="All prices in AUD and include GST. Every plan starts with a 14-day free trial."
-            />
-            <Button asChild variant="outline" size="lg">
-              <Link href="/pricing">
-                Compare plans
-                <ArrowUpRight aria-hidden />
-              </Link>
-            </Button>
-          </div>
-          <PricingTeaser />
-        </div>
-      </Section>
-
-      {/* Final CTA */}
+      {/* 7. Close */}
       <section aria-labelledby="final-title" className="relative overflow-hidden bg-brand-black text-brand-white">
         <div className="pointer-events-none absolute inset-0 bg-pitch-glow" aria-hidden />
         <Container className="relative flex flex-col items-center gap-6 py-20 text-center md:py-28">
@@ -279,76 +268,64 @@ export default function HomePage() {
             Connect YouTube now. Your channel is live in a minute, and the first drafts land while you choose a look.
           </p>
           <div className="flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
-            <Button asChild size="xl" className="bg-brand-white text-brand-black hover:bg-brand-white/90">
-              <Link href="/signup">Start free trial</Link>
-            </Button>
-            <Button
-              asChild
-              size="xl"
-              variant="outline"
-              className="border-white/25 bg-transparent text-brand-white hover:bg-white/10 hover:text-brand-white dark:bg-transparent"
-            >
-              <Link href="/pricing">See pricing</Link>
+            <Button asChild size="xl" variant="pop">
+              <Link href="/signup">
+                Start free trial
+                <ArrowRight aria-hidden />
+              </Link>
             </Button>
           </div>
+          <p className="flex flex-wrap items-center justify-center gap-x-2 text-[14px] text-brand-muted">
+            <Check className="size-4 text-pop" aria-hidden /> From $29 a month inc. GST. 14-day free trial.
+            <Link href="/pricing" className="font-semibold text-brand-white underline-offset-4 hover:underline">
+              See pricing
+            </Link>
+          </p>
         </Container>
       </section>
     </>
   )
 }
 
-function PathCard({
+function WhoCard({
   id,
+  icon,
   kicker,
   title,
   points,
-  cta,
-  href,
-  icon,
+  children,
 }: {
-  id: string
+  id?: string
+  icon: React.ReactNode
   kicker: string
   title: string
   points: string[]
-  cta: string
-  href: string
-  icon: React.ReactNode
+  children: React.ReactNode
 }) {
   return (
-    <div id={id} className="flex scroll-mt-24 flex-col gap-6 rounded-lg border bg-card p-6 sm:p-8">
-      <p className="kicker">{kicker}</p>
-      <h3 className="text-[26px] font-extrabold leading-[30px] tracking-[-0.025em] sm:text-[30px] sm:leading-[34px]">{title}</h3>
-      <TickList items={points} />
-      <Button asChild size="lg" className="mt-auto w-full sm:w-fit">
-        <Link href={href}>
-          {icon}
-          {cta}
-        </Link>
-      </Button>
-    </div>
-  )
-}
-
-function FormatFigure({ name, where, className, children }: { name: string; where: string; className?: string; children: React.ReactNode }) {
-  return (
-    <figure className={cn("flex min-w-0 flex-col gap-3", className)}>
-      <FormatStage className="flex flex-1 flex-col justify-center">{children}</FormatStage>
-      <figcaption className="flex flex-wrap items-baseline gap-x-2 text-[14px]">
-        <span className="font-semibold">{name}</span>
-        <span className="text-muted-foreground">{where}</span>
-      </figcaption>
-    </figure>
-  )
-}
-
-function Feature({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
-  return (
-    <div className="flex flex-col gap-3 rounded-lg border bg-card p-6">
+    <div id={id} className="flex scroll-mt-24 flex-col gap-5 rounded-lg border bg-card p-6 sm:p-8">
       <span className="grid size-10 place-items-center rounded-[4px] bg-muted [&_svg]:size-5" aria-hidden>
         {icon}
       </span>
-      <h3 className="text-[18px] font-bold tracking-[-0.01em]">{title}</h3>
-      <p className="text-[15px] leading-[23px] text-muted-foreground">{body}</p>
+      <p className="kicker">{kicker}</p>
+      <h3 className="text-[24px] font-extrabold leading-[28px] tracking-[-0.025em] sm:text-[28px] sm:leading-[32px]">{title}</h3>
+      <TickList items={points} />
+      <div className="mt-auto pt-2">{children}</div>
     </div>
+  )
+}
+
+function GrowStep({ n, icon, title, body }: { n: number; icon: React.ReactNode; title: string; body: string }) {
+  return (
+    <li className={cn("flex flex-col gap-3 rounded-lg border bg-card p-6")}>
+      <span className="flex items-center gap-3">
+        <span className="grid size-10 place-items-center rounded-[4px] bg-muted [&_svg]:size-5" aria-hidden>
+          {icon}
+        </span>
+        <span className="font-mono text-[13px] text-muted-foreground">0{n}</span>
+      </span>
+      <h3 className="text-[20px] font-bold tracking-[-0.01em]">{title}</h3>
+      <p className="text-[15px] leading-[23px] text-muted-foreground">{body}</p>
+    </li>
   )
 }

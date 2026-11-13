@@ -2,11 +2,10 @@ import { ArrowRight, FileText, Film, Globe, Search } from "lucide-react"
 import { YouTubeIcon } from "@/components/auth/provider-icons"
 import { StatusBadge } from "@/components/brand/status-badge"
 import { VideoThumb } from "@/components/brand/media"
-import { PresentedBy } from "@/components/brand/native-ads"
 import { LockStatus } from "@/components/brand/compliance"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { getChannel, getSponsor, getVideo, listShorts } from "@/lib/data"
+import { getChannel, getVideo, listShorts } from "@/lib/data"
 import { channelStyle, formatDuration } from "@/lib/format"
 import { cn } from "@/lib/utils"
 
@@ -27,57 +26,6 @@ export function BrowserFrame({ url, children, className }: { url: string; childr
       </div>
       {children}
     </div>
-  )
-}
-
-/** Footy Fix's channel home, built from the real channel tokens. Used in the landing hero. */
-export function ChannelHomeMock() {
-  const channel = getChannel("footyfix")!
-  const lead = getVideo("v_blues")!
-  const shorts = listShorts("ch_footyfix").slice(0, 6)
-  const sponsor = getSponsor("sp_ute")!
-  return (
-    <BrowserFrame url="footyfix.com.au">
-      <div className="bg-background text-foreground" style={channelStyle(channel.accentHex, channel.pairing)}>
-        <div className="flex items-center gap-3 border-b px-4 py-3 sm:px-6">
-          <span className="grid size-7 place-items-center rounded-[4px] bg-[var(--chan)] text-[13px] font-extrabold text-[var(--chan-on)]" aria-hidden>
-            FF
-          </span>
-          <span className="text-[17px] font-extrabold tracking-[-0.02em]">Footy Fix</span>
-          <nav className="ml-4 hidden gap-4 text-[13px] font-medium text-muted-foreground md:flex" aria-hidden>
-            <span className="text-foreground underline decoration-[var(--chan)] decoration-2 underline-offset-[18px]">Latest</span>
-            <span>AFL</span>
-            <span>AFLW</span>
-            <span>Shorts</span>
-          </nav>
-          <span className="ml-auto rounded-full bg-[var(--chan)] px-3 py-1 text-[12px] font-semibold text-[var(--chan-on)]">Follow</span>
-        </div>
-        <div className="grid gap-4 p-4 sm:grid-cols-[1.4fr_1fr] sm:gap-6 sm:p-6">
-          <VideoThumb tone={lead.posterTone} src={lead.poster} durationSec={lead.durationSec} />
-          <div className="flex flex-col justify-center gap-2">
-            <span className="kicker">AFL</span>
-            <p className="text-[20px] font-extrabold leading-[24px] tracking-[-0.025em] sm:text-[24px] sm:leading-[28px]">{lead.article.headline}</p>
-            <p className="line-clamp-3 font-serif text-[14px] leading-[21px] text-muted-foreground">{lead.article.standfirst}</p>
-            <p className="text-[12px] text-muted-foreground">{lead.article.author} · {lead.article.readMinutes} min read</p>
-            <div className="mt-2 hidden sm:block" inert>
-              <PresentedBy sponsor={sponsor} />
-            </div>
-          </div>
-        </div>
-        <div className="hidden gap-3 px-6 pb-6 md:flex" aria-hidden>
-          <div className="flex w-[180px] shrink-0 flex-col justify-end gap-1 pb-1">
-            <span className="kicker">Shorts</span>
-            <p className="text-[13px] leading-[18px] text-muted-foreground">Cut from this week&apos;s videos and pulled from YouTube Shorts.</p>
-          </div>
-          {shorts.map((s) => (
-            <div key={s.id} className="flex w-[104px] shrink-0 flex-col gap-1.5">
-              <VideoThumb tone={s.posterTone} src={s.poster} ratio="9/16" />
-              <span className="line-clamp-2 text-[12px] font-semibold leading-4">{s.title}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </BrowserFrame>
   )
 }
 
@@ -145,34 +93,6 @@ export function ReviewCardMock({ className }: { className?: string }) {
   )
 }
 
-/** How a channel page shows up in Google. */
-export function SearchResultMock() {
-  const v = getVideo("v_blues")!
-  return (
-    <div className="flex flex-col gap-1.5 rounded-lg border bg-card p-4">
-      <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
-        <span className="grid size-6 place-items-center rounded-full bg-muted text-[10px] font-bold text-foreground" aria-hidden>
-          FF
-        </span>
-        <span className="min-w-0 truncate">
-          <span className="text-foreground">Footy Fix</span> · footyfix.com.au › afl › {v.seo.slug}
-        </span>
-      </div>
-      <p className="text-[18px] font-medium leading-6 text-[#1a0dab] dark:text-[#8ab4f8]">{v.seo.titleTag}</p>
-      <p className="text-[13px] leading-5 text-muted-foreground">
-        <span className="font-mono">{formatDuration(v.durationSec)}</span> · {v.seo.metaDescription}
-      </p>
-      <div className="mt-1 flex flex-wrap gap-1.5 text-[12px]">
-        {v.chapters.slice(0, 3).map((c) => (
-          <span key={c.start} className="rounded-full border px-2 py-0.5">
-            <span className="font-mono text-muted-foreground">{formatDuration(c.start)}</span> {c.title}
-          </span>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 /** A few lines of the 301 redirect map from an import. */
 export function RedirectMock({ className }: { className?: string }) {
   const rows = [
@@ -220,5 +140,269 @@ export function AgeVerifiedPanel({ className }: { className?: string }) {
         All three checks pass, so an age-restricted ad can show to this viewer. If any check fails or times out, an everyday ad fills the same space.
       </p>
     </div>
+  )
+}
+
+/* ---------------------------------------------------------------------------------------------
+ * Landing hero: one video in, a publication out.
+ * ------------------------------------------------------------------------------------------- */
+
+function OutputCard({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
+  return (
+    <figure className={cn("flex min-w-0 flex-col overflow-hidden rounded-lg bg-white text-neutral-950 shadow-[0_1px_0_rgba(255,255,255,0.08)]", className)}>
+      <div className="min-h-0 flex-1 p-3">{children}</div>
+      <figcaption className="flex items-center gap-1.5 border-t border-neutral-200 px-3 py-2 text-[12px] font-semibold">
+        <span className="size-1.5 rounded-full bg-pop-ink" aria-hidden />
+        {label}
+      </figcaption>
+    </figure>
+  )
+}
+
+export function OneVideoInMock({ className }: { className?: string }) {
+  const channel = getChannel("footyfix")!
+  const v = getVideo("v_blues")!
+  const shorts = listShorts("ch_footyfix").filter((s) => v.shorts.includes(s.id)).slice(0, 3)
+  return (
+    <div className={cn("flex flex-col gap-3", className)} style={channelStyle(channel.accentHex, channel.pairing)}>
+      {/* In: one YouTube upload */}
+      <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.06] p-3">
+        <div className="w-[120px] shrink-0">
+          <VideoThumb tone={v.posterTone} src={v.poster} durationSec={v.durationSec} />
+        </div>
+        <div className="flex min-w-0 flex-col gap-1">
+          <span className="flex items-center gap-1.5 text-[12px] font-semibold text-brand-muted">
+            <YouTubeIcon className="size-3.5" /> New upload on YouTube
+          </span>
+          <span className="truncate text-[15px] font-semibold text-brand-white">{v.title}</span>
+          <span className="text-[12px] text-brand-muted">Arrives in Ready to review as a draft pack. You press Publish.</span>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 pl-3 text-[12px] font-semibold uppercase tracking-[1px] text-brand-muted" aria-hidden>
+        <ArrowRight className="size-4 rotate-90 text-pop" /> On your own site, minutes later
+      </div>
+      {/* Out: four things a publication needs */}
+      <div className="grid grid-cols-2 gap-3">
+        <OutputCard label="Video page with chapters">
+          <VideoThumb tone={v.posterTone} src={v.poster} durationSec={v.durationSec} />
+          <div className="mt-2 flex flex-col gap-1" aria-hidden>
+            {v.chapters.slice(0, 2).map((c) => (
+              <span key={c.start} className="flex gap-2 text-[11px]">
+                <span className="font-mono text-neutral-500">{formatDuration(c.start)}</span> {c.title}
+              </span>
+            ))}
+          </div>
+        </OutputCard>
+        <OutputCard label="Article in your voice">
+          <span className="kicker text-[10px]">AFL</span>
+          <p className="mt-1 text-[16px] font-extrabold leading-[19px] tracking-[-0.02em]">{v.article.headline}</p>
+          <p className="mt-1.5 line-clamp-3 font-serif text-[12px] leading-[17px] text-neutral-600">{v.article.standfirst}</p>
+        </OutputCard>
+        <OutputCard label="Shorts from the best moments">
+          <div className="grid grid-cols-3 gap-1.5">
+            {shorts.map((s) => (
+              <VideoThumb key={s.id} tone={s.posterTone} src={s.poster} ratio="9/16" durationSec={s.durationSec} />
+            ))}
+          </div>
+        </OutputCard>
+        <OutputCard label="A page that ranks">
+          <div className="flex flex-col gap-1">
+            <span className="truncate text-[11px] text-neutral-500">footyfix.com.au › afl</span>
+            <span className="text-[14px] font-medium leading-[18px] text-[#1a0dab]">{v.seo.titleTag}</span>
+            <span className="line-clamp-2 text-[11px] leading-[15px] text-neutral-600">{v.seo.metaDescription}</span>
+            <span className="mt-1 flex flex-wrap gap-1">
+              {v.chapters.slice(0, 2).map((c) => (
+                <span key={c.start} className="rounded-full border border-neutral-200 px-1.5 text-[10px]">
+                  {formatDuration(c.start)} {c.title}
+                </span>
+              ))}
+            </span>
+          </div>
+        </OutputCard>
+      </div>
+    </div>
+  )
+}
+
+/* ---------------------------------------------------------------------------------------------
+ * "The page, rethought": a typical ad-heavy page beside a Homestand page, as plain wireframes.
+ * No real publisher is shown.
+ * ------------------------------------------------------------------------------------------- */
+
+const bar = (w: string, tone = "bg-neutral-200") => <span className={cn("block h-2 rounded-full", tone)} style={{ width: w }} />
+
+function AdBox({ label, className }: { label: string; className?: string }) {
+  return (
+    <span className={cn("grid place-items-center rounded-[3px] border border-dashed border-neutral-400 bg-neutral-300/70 text-[10px] font-bold uppercase tracking-[0.8px] text-neutral-600", className)}>
+      {label}
+    </span>
+  )
+}
+
+function Sponsor({ className, children }: { className?: string; children?: React.ReactNode }) {
+  return <span className={cn("relative block rounded-[4px] bg-pop-ink/85", className)}>{children}</span>
+}
+
+/** Both sketches share one frame: a narrow page, cropped at the bottom like a scroll. */
+function SketchFrame({ children, footer }: { children: React.ReactNode; footer?: React.ReactNode }) {
+  return (
+    <div className="relative mx-auto h-[440px] w-full max-w-[360px] overflow-hidden rounded-lg border bg-white p-3 text-neutral-950" aria-hidden>
+      <div className="flex flex-col gap-2.5">{children}</div>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-white" />
+      {footer}
+    </div>
+  )
+}
+
+export function TypicalPageSketch() {
+  return (
+    <SketchFrame footer={<AdBox label="Sticky footer 320 × 50" className="absolute inset-x-3 bottom-3 z-10 h-8" />}>
+      <AdBox label="Leaderboard 728 × 90" className="h-10" />
+      <div className="flex items-center justify-between border-b border-neutral-200 pb-2">
+        {bar("30%", "bg-neutral-800")}
+        {bar("40%")}
+      </div>
+      <div className="grid grid-cols-[1fr_88px] gap-3">
+        <div className="flex flex-col gap-2">
+          {bar("90%", "bg-neutral-800")}
+          {bar("60%", "bg-neutral-800")}
+          <span className="block aspect-video rounded-[4px] bg-neutral-200" />
+          {bar("100%")}
+          {bar("94%")}
+          <AdBox label="300 × 250" className="h-16" />
+          {bar("100%")}
+          {bar("80%")}
+          <AdBox label="Autoplay video" className="h-12" />
+          {bar("96%")}
+        </div>
+        <div className="flex flex-col gap-2">
+          <AdBox label="300 × 600" className="h-40" />
+          <AdBox label="Promo" className="h-16" />
+          <AdBox label="Pop-up" className="h-12" />
+        </div>
+      </div>
+    </SketchFrame>
+  )
+}
+
+export function HomestandPageSketch() {
+  return (
+    <SketchFrame>
+      <div className="flex items-center justify-between border-b border-neutral-200 pb-2">
+        <span className="flex items-center gap-1.5">
+          <span className="size-4 rounded-[3px] bg-[#1c4fb8]" />
+          {bar("56px", "bg-neutral-800")}
+        </span>
+        <span className="h-4 w-12 rounded-full bg-[#1c4fb8]" />
+      </div>
+      <div className="grid grid-cols-[1.6fr_1fr] gap-2">
+        <span className="block aspect-video rounded-[4px] bg-neutral-300" />
+        <div className="flex flex-col gap-1.5">
+          {[0, 1, 2, 3].map((i) => (
+            <span key={i} className={cn("flex h-3 items-center rounded-[2px] px-1", i === 1 ? "bg-pop-ink/85" : "bg-neutral-100")}>
+              {bar(i === 1 ? "70%" : "60%", i === 1 ? "bg-white/80" : "bg-neutral-300")}
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="mx-auto flex w-[64%] flex-col gap-2">
+        {bar("90%", "bg-neutral-800")}
+        {bar("100%")}
+        {bar("96%")}
+        <Sponsor className="aspect-video w-full" />
+        {bar("100%")}
+        {bar("70%")}
+      </div>
+      <div className="grid grid-cols-6 gap-1.5">
+        {[0, 1, 2, 3, 4, 5].map((i) => (i === 3 ? <Sponsor key={i} className="aspect-[9/16]" /> : <span key={i} className="block aspect-[9/16] rounded-[4px] bg-neutral-300" />))}
+      </div>
+    </SketchFrame>
+  )
+}
+
+/** The five formats as wireframes, each beside the content it takes the shape of. */
+export function FormatShapes() {
+  const items: { name: string; shape: string; draw: React.ReactNode }[] = [
+    {
+      name: "Chapter sponsor",
+      shape: "A chapter among chapters",
+      draw: (
+        <div className="flex flex-col gap-1.5">
+          {[0, 1, 2, 3].map((i) => (
+            <span key={i} className={cn("flex h-4 items-center gap-2 rounded-[2px] px-1.5", i === 1 ? "bg-pop-ink/85" : "bg-neutral-100")}>
+              {bar("18%", i === 1 ? "bg-white/70" : "bg-neutral-300")}
+              {bar("50%", i === 1 ? "bg-white/90" : "bg-neutral-300")}
+            </span>
+          ))}
+        </div>
+      ),
+    },
+    {
+      name: "Half-time break",
+      shape: "A photo in the article, the column's width",
+      draw: (
+        <div className="flex flex-col gap-1.5">
+          {bar("100%")}
+          {bar("90%")}
+          <Sponsor className="aspect-video w-full" />
+          {bar("96%")}
+        </div>
+      ),
+    },
+    {
+      name: "Sponsored story",
+      shape: "A story among stories",
+      draw: (
+        <div className="grid grid-cols-3 gap-1.5">
+          {[0, 1, 2].map((i) => (
+            <span key={i} className="flex flex-col gap-1">
+              {i === 1 ? <Sponsor className="aspect-video" /> : <span className="block aspect-video rounded-[4px] bg-neutral-300" />}
+              {bar("90%", "bg-neutral-700")}
+              {bar("60%")}
+            </span>
+          ))}
+        </div>
+      ),
+    },
+    {
+      name: "Sponsored short",
+      shape: "A short among shorts",
+      draw: (
+        <div className="grid grid-cols-4 gap-1.5">
+          {[0, 1, 2, 3].map((i) => (i === 2 ? <Sponsor key={i} className="aspect-[9/16]" /> : <span key={i} className="block aspect-[9/16] rounded-[4px] bg-neutral-300" />))}
+        </div>
+      ),
+    },
+    {
+      name: "Presented by",
+      shape: "A credit, set like a byline",
+      draw: (
+        <div className="flex flex-col gap-1.5">
+          {bar("90%", "bg-neutral-800")}
+          {bar("70%", "bg-neutral-800")}
+          {bar("100%")}
+          <span className="mt-1 flex items-center gap-1.5 border-t-2 border-pop-ink pt-1.5">
+            {bar("22%", "bg-neutral-500")}
+            <span className="size-2.5 rounded-[2px] bg-pop-ink" />
+            {bar("30%", "bg-neutral-700")}
+          </span>
+        </div>
+      ),
+    },
+  ]
+  return (
+    <ul className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      {items.map((it) => (
+        <li key={it.name} className="flex flex-col gap-3 rounded-lg border bg-card p-4">
+          <div className="flex min-h-[96px] flex-col justify-center rounded-md bg-white p-3" aria-hidden>
+            {it.draw}
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[14px] font-semibold">{it.name}</span>
+            <span className="text-[13px] leading-[18px] text-muted-foreground">{it.shape}</span>
+          </div>
+        </li>
+      ))}
+    </ul>
   )
 }

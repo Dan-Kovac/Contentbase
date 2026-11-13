@@ -135,9 +135,9 @@ function Logo({ name, logoUrl, dark }: { name: string; logoUrl?: string | null; 
   )
 }
 
+/** The logo tile shows the channel's first letter, exactly as the live channel header does. */
 function initials(name: string) {
-  const parts = name.trim().split(/\s+/).filter(Boolean)
-  return (parts.length > 1 ? parts[0][0] + parts[1][0] : (parts[0] ?? "H").slice(0, 2)).toUpperCase()
+  return (name.trim()[0] ?? "H").toUpperCase()
 }
 
 function Masthead({ name, logoUrl, nav, dark, ctaLabel }: { name: string; logoUrl?: string | null; nav: string[]; dark: boolean; ctaLabel: string }) {
@@ -168,7 +168,7 @@ function Masthead({ name, logoUrl, nav, dark, ctaLabel }: { name: string; logoUr
   )
 }
 
-function SponsorBand({ dark }: { dark: boolean }) {
+function SponsorBand({ dark, compact = false }: { dark: boolean; compact?: boolean }) {
   return (
     <div className={cn("flex items-center justify-between gap-4 border-t-2 pt-2.5 text-[13px]", dark ? "text-white/70" : "text-neutral-500")} style={{ borderColor: "#0f3d2e" }}>
       <span className="flex items-center gap-2">
@@ -176,7 +176,7 @@ function SponsorBand({ dark }: { dark: boolean }) {
         <span className="grid size-[18px] place-items-center rounded-[4px] bg-[#0f3d2e] text-[8px] font-bold text-white">SC</span>
         <span className={cn("font-semibold", dark ? "text-white" : "text-neutral-950")}>Southern Cross Utes</span>
       </span>
-      <span>Built for the drive to every away game.</span>
+      {!compact && <span>Built for the drive to every away game.</span>}
     </div>
   )
 }
@@ -229,7 +229,7 @@ function Editorial({ modules, sectionLabels }: { modules: HomeModule[]; sectionL
                     {LEAD.standfirst}
                   </p>
                   <p className="text-[12px] text-neutral-500">{LEAD.byline}</p>
-                  <SponsorBand dark={false} />
+                  <SponsorBand dark={false} compact />
                 </div>
               </article>
             )
@@ -347,7 +347,7 @@ function Broadcast({ modules, sectionLabels }: { modules: HomeModule[]; sectionL
                       </span>
                       <span className="text-[12px] text-white/70">{LEAD.byline}</span>
                     </span>
-                    <SponsorBand dark />
+                    <SponsorBand dark compact />
                   </div>
                 </Photo>
               </article>
