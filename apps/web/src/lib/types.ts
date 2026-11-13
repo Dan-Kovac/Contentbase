@@ -244,6 +244,20 @@ export interface AdDecision {
   }
 }
 
+/** A channel's share of sponsor revenue for a period (sample data until billing is wired in). */
+export interface Earnings {
+  channelId: string
+  period: string
+  /** The creator's share, AUD inc. GST. */
+  total: number
+  /** Of the total, what came from age-restricted sponsors behind the triple lock. */
+  ageVerified: number
+  previousTotal: number
+  byFormat: { format: NativeFormat; amount: number }[]
+  bySponsor: { name: string; amount: number; ageCategory?: AgeCategory }[]
+  byViewer: { state: string; impressions: number; amount: number }[]
+}
+
 /** Homestand Native Formats: advertisers supply a brief; we render it in the channel's design. */
 export type NativeFormat = "chapter_sponsor" | "halftime" | "sponsored_story" | "sponsored_short" | "presented_by"
 

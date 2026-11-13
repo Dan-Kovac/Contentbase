@@ -4,6 +4,7 @@ import type {
   AdDecision,
   CustomPage,
   Sponsor,
+  Earnings,
   StandaloneArticle,
   Article,
   Block,
@@ -546,6 +547,33 @@ export const adDecisions: AdDecision[] = [
   { id: "dec_8f216", at: "11 Nov 2026 09:40:51", channel: "Footy Fix", slot: "in-article", outcome: "non_wagering_served", reason: "PAGE_IS_LIVE", locks: { session: { pass: true, ref: "sess_7Hq2f91" }, age: { pass: true, ref: "aa_connectid_20261104" }, optout: { pass: true } } },
   { id: "dec_8f215", at: "11 Nov 2026 09:40:44", channel: "Trackside", slot: "in-article", outcome: "non_wagering_served", reason: "LOCK1_NO_SESSION", locks: { session: { pass: false, ref: "anonymous" }, age: { pass: false }, optout: { pass: true } } },
   { id: "dec_8f214", at: "11 Nov 2026 09:40:39", channel: "Footy Fix", slot: "end-of-article", outcome: "house", reason: "NO_FILL", locks: { session: { pass: false }, age: { pass: false }, optout: { pass: true } } },
+]
+
+export const earnings: Earnings[] = [
+  {
+    channelId: "ch_footyfix",
+    period: "13 October to 11 November 2026",
+    total: 4180,
+    ageVerified: 2420,
+    previousTotal: 2960,
+    byFormat: [
+      { format: "chapter_sponsor", amount: 1420 },
+      { format: "halftime", amount: 1260 },
+      { format: "sponsored_story", amount: 610 },
+      { format: "sponsored_short", amount: 520 },
+      { format: "presented_by", amount: 370 },
+    ],
+    bySponsor: [
+      { name: "Harbour Bet", amount: 2420, ageCategory: "wagering" },
+      { name: "Southern Cross Utes", amount: 1080 },
+      { name: "Kick Boots Co.", amount: 680 },
+    ],
+    byViewer: [
+      { state: "Logged out", impressions: 412000, amount: 1140 },
+      { state: "Signed in", impressions: 96000, amount: 620 },
+      { state: "Confirmed 18+", impressions: 71000, amount: 2420 },
+    ],
+  },
 ]
 
 export const sponsors: Sponsor[] = [

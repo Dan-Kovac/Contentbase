@@ -19,6 +19,8 @@ import {
   TickList,
 } from "@/components/marketing/section";
 import { RedirectMock } from "@/components/marketing/product-visuals";
+import { getEarnings } from "@/lib/data";
+import { compact } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "For publishers",
@@ -112,7 +114,10 @@ const WHITE_GLOVE = [
   },
 ];
 
+const aud = (n: number) => `$${n.toLocaleString("en-AU")}`
+
 export default function PublishersPage() {
+  const earn = getEarnings("ch_footyfix")
   return (
     <>
       <DarkHero>
@@ -155,7 +160,43 @@ export default function PublishersPage() {
         </div>
       </DarkHero>
 
-      <Section labelledBy="migrate-title">
+      {/* Revenue is the reason a publisher moves, so it comes first. Sample figures, labelled. */}
+      <Section labelledBy="earn-title">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+          <SectionHeading
+            id="earn-title"
+            kicker="Keep the revenue"
+            title="Wagering ads leave most sites in 2027. Not yours."
+            lede="From 1 January 2027 a wagering ad needs a signed-in viewer, a confirmed adult and an opt-out. Most sites can't prove that. On Homestand it's a switch, so premium sponsors stay on your pages and you keep your share."
+          />
+          {earn && (
+            <figure className="flex flex-col gap-4 rounded-lg border bg-card p-6">
+              <figcaption className="flex flex-wrap items-baseline justify-between gap-2 text-[13px] text-muted-foreground">
+                <span className="font-semibold text-foreground">Footy Fix, sponsor revenue share</span>
+                <span>{earn.period}</span>
+              </figcaption>
+              <p className="text-[48px] font-extrabold leading-none tracking-[-0.03em]">{aud(earn.total)}</p>
+              <p className="text-[14px] text-muted-foreground">
+                Up {Math.round(((earn.total - earn.previousTotal) / earn.previousTotal) * 100)}% on the month before. {aud(earn.ageVerified)} of it from age-verified sponsors, shown only behind the triple lock.
+              </p>
+              <ul className="flex flex-col divide-y border-t text-[14px]">
+                {earn.byViewer.map((v) => (
+                  <li key={v.state} className="flex items-center justify-between gap-3 py-2.5">
+                    <span>{v.state}</span>
+                    <span className="flex items-baseline gap-4 tabular">
+                      <span className="text-muted-foreground">{compact(v.impressions)} impressions</span>
+                      <span className="w-16 text-right font-semibold">{aud(v.amount)}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[12px] text-muted-foreground">Sample pilot data, AUD inc. GST. Not a forecast. Not legal advice.</p>
+            </figure>
+          )}
+        </div>
+      </Section>
+
+      <Section tone="muted" labelledBy="migrate-title">
         <SectionHeading
           id="migrate-title"
           kicker="Migration"
@@ -200,7 +241,7 @@ export default function PublishersPage() {
         </div>
       </Section>
 
-      <Section tone="muted" id="age-verified" labelledBy="rules-title">
+      <Section id="age-verified" labelledBy="rules-title">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
           <div className="flex flex-col gap-8">
             <SectionHeading

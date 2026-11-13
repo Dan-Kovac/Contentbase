@@ -15,29 +15,24 @@ import {
   ShieldCheck,
   Shirt,
   Tag,
-  Target,
-  UserCheck,
   UtensilsCrossed,
   Wallet,
 } from "lucide-react"
-import { LockStatus } from "@/components/brand/compliance"
 import { HalftimeBreak } from "@/components/brand/native-ads"
 import { Button } from "@/components/ui/button"
 import { DarkHero, Section, SectionHeading, TickList } from "@/components/marketing/section"
 import { AdvertiserContactForm } from "@/components/marketing/advertiser-contact-form"
 import { FORMAT_EXAMPLE, FormatStage, NATIVE_FORMATS } from "@/components/marketing/native-formats"
-import { getSponsor, listAdDecisions } from "@/lib/data"
+import { slotOptions, viewerNotes } from "@/components/channel/lib"
+import { TripleLockDemo } from "@/components/marketing/triple-lock-demo"
+import { getChannel, getDailyStats, getSponsor, listChannels } from "@/lib/data"
+import { compact } from "@/lib/format"
+import { cn } from "@/lib/utils"
 
 export const metadata: Metadata = {
   title: "For advertisers",
   description: "Reach verified adults, in formats people actually watch. Homestand Native Formats on Australian sport channels, with age-verified placements for alcohol and wagering.",
 }
-
-const AUDIENCE = [
-  { Icon: UserCheck, title: "Signed in", body: "Viewers sign in with one free account to watch exclusives and follow channels. You reach people, not cookies." },
-  { Icon: ShieldCheck, title: "Age-verified", body: "Adults confirm they're 18 or over with a certified provider. We keep the result, never the ID." },
-  { Icon: Target, title: "Sport, in context", body: "AFL, AFLW, NRL, cricket and racing channels made by the creators fans already watch." },
-]
 
 const PROMISES = [
   { Icon: Tag, text: "Always labelled Sponsored or Presented by" },
@@ -76,16 +71,22 @@ const PACK = [
 ]
 
 const PRICING = [
-  { Icon: Wallet, name: "CPM", body: "Per thousand viewable impressions, by channel, section or the whole network. Suits stat cards, half-time breaks and sponsored shorts." },
+  { Icon: Wallet, name: "CPM", body: "Per thousand viewable impressions, by channel, section or the whole network. Suits sponsored stories, half-time breaks and sponsored shorts." },
   { Icon: FileDown, name: "Flat sponsorship", body: "A fixed price for a flight: Presented by on a channel or section, or a chapter sponsor across a series." },
   { Icon: MousePointerClick, name: "CPC", body: "Per click, for performance campaigns. Wagering CPC only after legal sign-off." },
 ]
 
 export default function AdvertisersPage() {
-  const decisions = listAdDecisions()
-  const served = decisions.find((d) => d.reason === "ALL_LOCKS_PASS")!
-  const blocked = decisions.find((d) => d.reason === "LOCK2_NO_ASSURANCE")!
   const heroSponsor = getSponsor("sp_ute")!
+  const footy = getChannel("footyfix")!
+  const channels = listChannels()
+  const stats = getDailyStats()
+  const NETWORK: [string, string][] = [
+    [String(channels.length), "Pilot channels, AFL and racing"],
+    [compact(channels.reduce((n, c) => n + c.followers, 0)), "Followers across the network"],
+    [compact(stats.reduce((n, d) => n + d.signUps, 0)), "Viewers confirmed 18+ this month"],
+    ["0", "Age-restricted ads served outside a valid triple-lock session"],
+  ]
 
   return (
     <>
@@ -117,31 +118,63 @@ export default function AdvertisersPage() {
               </Button>
             </div>
           </div>
-          <HalftimeBreak sponsor={heroSponsor} className="ring-1 ring-white/10" />
+          <div className="rounded-lg bg-background p-4 text-foreground sm:p-5">
+            <HalftimeBreak sponsor={heroSponsor} className="my-0" />
+          </div>
         </div>
       </DarkHero>
 
-      <Section labelledBy="aud-title">
-        <SectionHeading
-          id="aud-title"
-          kicker="The audience"
-          title="People who chose to be here."
-          lede="Every advertiser gets the same signed-in audience and the same designed formats. Age-restricted categories get one more guarantee: every viewer is a verified adult."
-        />
-        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3">
-          {AUDIENCE.map(({ Icon, title, body }) => (
-            <div key={title} className="flex flex-col gap-3 rounded-lg border bg-card p-6">
-              <span className="grid size-10 place-items-center rounded-[4px] bg-muted" aria-hidden>
-                <Icon className="size-5" />
-              </span>
-              <h3 className="text-[18px] font-bold">{title}</h3>
-              <p className="text-[15px] leading-[23px] text-muted-foreground">{body}</p>
-            </div>
-          ))}
+      {/* The rule, in one line. Not legal advice: every compliance item needs lawyer sign-off. */}
+      <section aria-label="The rule" className="border-b bg-background">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-2 px-4 py-8 sm:px-6 md:flex-row md:items-baseline md:gap-8 lg:px-8">
+          <p className="kicker shrink-0 text-foreground">From 1 January 2027</p>
+          <p className="text-[19px] font-semibold leading-[28px] tracking-[-0.01em] md:text-[22px] md:leading-[31px]">
+            Wagering ads online need a signed-in viewer, a confirmed adult and an opt-out. We check all three on every impression.
+          </p>
         </div>
-      </Section>
+        <p className="mx-auto max-w-[1280px] px-4 pb-6 text-[12px] text-muted-foreground sm:px-6 lg:px-8">
+          A plain summary of public commentary on the 2026 reforms, not legal advice. Check your own obligations with a lawyer.
+        </p>
+      </section>
 
-      <Section tone="muted" id="formats" labelledBy="formats-title">
+      <Section tone="muted" id="triple-lock" labelledBy="tl-title">
+        <SectionHeading
+          id="tl-title"
+          kicker="The triple lock"
+          title="Three checks before every age-restricted ad."
+          lede="A channel that switches on age-verified advertising can carry ads for adults only. We check all three locks on every request, write the evidence first, and fail closed."
+        />
+        <ol className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3">
+          {LOCKS.map((l) => (
+            <li key={l.n} className="flex flex-col gap-3 rounded-lg border bg-card p-6">
+              <span className="text-[13px] font-bold uppercase tracking-[1px] text-muted-foreground">Lock {l.n}</span>
+              <h3 className="text-[20px] font-bold tracking-[-0.01em]">{l.title}</h3>
+              <p className="text-[15px] leading-[23px] text-muted-foreground">{l.body}</p>
+            </li>
+          ))}
+        </ol>
+        <div className="mt-8 rounded-lg border bg-muted/50 p-4 sm:p-6">
+          <TripleLockDemo
+            chapter={slotOptions(footy, "chapter")}
+            halftime={slotOptions(footy, "halftime")}
+            notes={viewerNotes(footy)}
+            channelName={footy.name}
+            chapterTitle="Chapter 2: Wingers leaving early"
+          />
+        </div>
+        <ul className="mt-8 grid grid-cols-1 gap-x-8 gap-y-3 text-[14px] leading-[21px] text-muted-foreground md:grid-cols-3">
+          <li>
+            <span className="font-semibold text-foreground">Fail closed.</span> If any check errors or times out, no age-restricted ad is served.
+          </li>
+          <li>
+            <span className="font-semibold text-foreground">Off around live sport.</span> Wagering ads switch off on any page marked live or near-live.
+          </li>
+          <li>
+            <span className="font-semibold text-foreground">Standard means standard.</span> Channels without age-verified advertising never receive an age-restricted ad.
+          </li>
+        </ul>
+      </Section>
+      <Section id="formats" labelledBy="formats-title">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeading
             id="formats-title"
@@ -158,9 +191,9 @@ export default function AdvertisersPage() {
             ))}
           </ul>
         </div>
-        <ol className="mt-12 flex flex-col gap-4">
+        <ol className="mt-12 grid grid-cols-1 gap-4 lg:grid-cols-2">
           {NATIVE_FORMATS.map((f, i) => (
-            <li key={f.id} className="grid grid-cols-1 gap-6 rounded-lg border bg-card p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.7fr)] lg:gap-10">
+            <li key={f.id} className={cn("flex flex-col gap-6 rounded-lg border bg-card p-5 sm:p-6", i === 0 && "lg:row-span-2")}>
               <div className="flex flex-col gap-3">
                 <span className="flex items-center gap-2 text-[13px] font-semibold text-muted-foreground">
                   <span className="grid size-7 place-items-center rounded-[4px] bg-muted text-foreground" aria-hidden>
@@ -175,7 +208,7 @@ export default function AdvertisersPage() {
                   {f.where}
                 </p>
               </div>
-              <FormatStage>{FORMAT_EXAMPLE[f.id]()}</FormatStage>
+              <FormatStage className="mt-auto">{FORMAT_EXAMPLE[f.id]()}</FormatStage>
             </li>
           ))}
         </ol>
@@ -183,50 +216,6 @@ export default function AdvertisersPage() {
           Examples use sample brands. The opt-out on an age-restricted format works as it does on a live channel. Try it.
         </p>
       </Section>
-
-      <Section id="triple-lock" labelledBy="tl-title">
-        <SectionHeading
-          id="tl-title"
-          kicker="The triple lock"
-          title="Three checks before every age-restricted ad."
-          lede="A channel that switches on age-verified advertising can carry ads for adults only. We check all three locks on every request, write the evidence first, and fail closed."
-        />
-        <ol className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3">
-          {LOCKS.map((l) => (
-            <li key={l.n} className="flex flex-col gap-3 rounded-lg border bg-card p-6">
-              <span className="text-[13px] font-bold uppercase tracking-[1px] text-muted-foreground">Lock {l.n}</span>
-              <h3 className="text-[20px] font-bold tracking-[-0.01em]">{l.title}</h3>
-              <p className="text-[15px] leading-[23px] text-muted-foreground">{l.body}</p>
-            </li>
-          ))}
-        </ol>
-        <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <DecisionCard
-            title="All three pass"
-            note={"The viewer is signed in, confirmed 18+ and hasn’t opted out."}
-            decision={served}
-            verdict="Age-restricted ad eligible. Evidence written before serve."
-          />
-          <DecisionCard
-            title="Age not confirmed"
-            note="Signed in, but no age assurance on file. The lock fails closed."
-            decision={blocked}
-            verdict="Fail closed: an everyday ad filled the space."
-          />
-        </div>
-        <ul className="mt-8 grid grid-cols-1 gap-x-8 gap-y-3 text-[14px] leading-[21px] text-muted-foreground md:grid-cols-3">
-          <li>
-            <span className="font-semibold text-foreground">Fail closed.</span> If any check errors or times out, no age-restricted ad is served.
-          </li>
-          <li>
-            <span className="font-semibold text-foreground">Off around live sport.</span> Wagering ads switch off on any page marked live or near-live.
-          </li>
-          <li>
-            <span className="font-semibold text-foreground">Standard means standard.</span> Channels without age-verified advertising never receive an age-restricted ad.
-          </li>
-        </ul>
-      </Section>
-
       <Section tone="muted" id="categories" labelledBy="cat-title">
         <SectionHeading
           id="cat-title"
@@ -269,7 +258,6 @@ export default function AdvertisersPage() {
           </div>
         </div>
       </Section>
-
       <Section id="pack" labelledBy="pack-title">
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:gap-16">
           <div className="flex flex-col gap-6">
@@ -297,6 +285,40 @@ export default function AdvertisersPage() {
           </ul>
         </div>
       </Section>
+      <Section labelledBy="net-title">
+        <SectionHeading
+          id="net-title"
+          kicker="The network"
+          title="People who chose to be here."
+          lede="Every viewer you reach on Homestand followed a channel they like. Age-restricted categories get one more guarantee: every viewer is a confirmed adult."
+        />
+        <dl className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-lg border bg-border lg:grid-cols-4">
+          {NETWORK.map(([value, label]) => (
+            <div key={label} className="flex flex-col gap-1 bg-card p-6">
+              <dt className="order-2 text-[14px] leading-[20px] text-muted-foreground">{label}</dt>
+              <dd className="order-1 text-[36px] font-extrabold leading-none tracking-[-0.03em]">{value}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-3 text-[12px] text-muted-foreground">Sample pilot data, last 30 days.</p>
+      </Section>
+
+      <Section tone="muted" labelledBy="own-title">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
+          <SectionHeading
+            id="own-title"
+            kicker="Have content of your own?"
+            title="Give your footy and racing content its own home."
+            lede="Brands with their own shows and analysis can run them as a standalone channel on Enterprise: its own name, domain and audience, with the same review gate and the same rules as every other channel. Whether that suits your business is a question for your own lawyers first."
+          />
+          <div className="flex flex-col gap-3 rounded-lg border bg-card p-6">
+            <TickList items={["A separate channel with its own brand and domain", "White-glove move of your existing videos and articles", "Your editorial team reviews every draft before it goes live"]} />
+            <Button asChild variant="outline" size="lg" className="mt-2 w-fit">
+              <a href="#contact">Talk to us about Enterprise</a>
+            </Button>
+          </div>
+        </div>
+      </Section>
 
       <Section tone="muted" labelledBy="pricing-models-title">
         <SectionHeading
@@ -316,6 +338,11 @@ export default function AdvertisersPage() {
         </div>
       </Section>
 
+
+
+
+
+
       <Section id="contact" labelledBy="contact-title">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.3fr] lg:gap-16">
           <div className="flex flex-col gap-6">
@@ -326,30 +353,5 @@ export default function AdvertisersPage() {
         </div>
       </Section>
     </>
-  )
-}
-
-function DecisionCard({
-  title,
-  note,
-  decision,
-  verdict,
-}: {
-  title: string
-  note: string
-  decision: ReturnType<typeof listAdDecisions>[number]
-  verdict: string
-}) {
-  return (
-    <div className="flex flex-col gap-4 rounded-lg border bg-card p-5">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-[16px] font-bold">{title}</h3>
-        <span className="font-mono text-[12px] text-muted-foreground">
-          {decision.id} · {decision.channel}
-        </span>
-      </div>
-      <p className="text-[14px] text-muted-foreground">{note}</p>
-      <LockStatus locks={decision.locks} verdict={verdict} />
-    </div>
   )
 }
