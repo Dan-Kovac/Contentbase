@@ -25,6 +25,12 @@ const LIBRARY: Tab[] = [
   { href: "/studio/pages", label: "Pages" },
 ]
 
+const VIDEO: Tab[] = [
+  { href: "/studio/video", label: "Video" },
+  { href: "/studio/video/templates", label: "Templates" },
+  { href: "/studio/credits", label: "AI credits" },
+]
+
 const SETTINGS: Tab[] = [
   { href: "/studio/settings", label: "Channel" },
   { href: "/studio/settings/design", label: "Design" },
@@ -41,9 +47,10 @@ const SETTINGS_MORE: Tab[] = [
 export function StudioSectionTabs() {
   const pathname = usePathname() ?? ""
   const library = LIBRARY.some((t) => t.href === pathname)
+  const video = VIDEO.some((t) => t.href === pathname)
   const settings = [...SETTINGS, ...SETTINGS_MORE].some((t) => t.href === pathname)
-  if (!library && !settings) return null
-  const tabs = library ? LIBRARY : SETTINGS
+  if (!library && !settings && !video) return null
+  const tabs = library ? LIBRARY : video ? VIDEO : SETTINGS
   const moreActive = SETTINGS_MORE.find((t) => t.href === pathname)
   const tabClass = (active: boolean) =>
     cn(
@@ -51,7 +58,7 @@ export function StudioSectionTabs() {
       active ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
     )
   return (
-    <nav aria-label={library ? "Library" : "Settings"} className="mb-8 flex items-center gap-5 overflow-x-auto border-b [scrollbar-width:none]">
+    <nav aria-label={library ? "Library" : video ? "Video" : "Settings"} className="mb-8 flex items-center gap-5 overflow-x-auto border-b [scrollbar-width:none]">
       {tabs.map((t) => (
         <Link key={t.href} href={t.href} className={tabClass(t.href === pathname)} aria-current={t.href === pathname ? "page" : undefined}>
           {t.label}

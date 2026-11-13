@@ -23,7 +23,8 @@ export const PLANS: PlanInfo[] = [
       "1 channel on your own subdomain",
       "10 video hours processed a month",
       "Article drafts and shorts from every video",
-      "Editorial, Broadcast and Minimal templates",
+      "Editorial and Broadcast templates",
+      "100 AI credits a month for words to video",
     ],
     cta: "Start free trial",
     href: "/signup",
@@ -39,6 +40,7 @@ export const PLANS: PlanInfo[] = [
       "40 video hours processed a month",
       "Age-verified advertising",
       "Ad revenue share",
+      "500 AI credits a month",
       "Priority processing",
     ],
     cta: "Start free trial",
@@ -52,7 +54,8 @@ export const PLANS: PlanInfo[] = [
     for: "Small media brands and clubs",
     includes: [
       "Everything in Pro",
-      "3 channels",
+      "3 publications under one account",
+      "2,000 AI credits a month",
       "Team roles for editors and producers",
       "150 video hours processed a month",
       "Migration assistance",
@@ -66,7 +69,8 @@ export const PLANS: PlanInfo[] = [
     price: null,
     for: "Large publishers, networks and internal brands",
     includes: [
-      "Unlimited channels",
+      "Unlimited publications",
+      "AI credits at volume pricing",
       "White-glove migration",
       "Service level agreement",
       "Dedicated support",
@@ -85,7 +89,7 @@ export const COMPARISON: { group: string; rows: { label: string; values: [string
   {
     group: "Channel",
     rows: [
-      { label: "Channels", values: ["1", "1", "3", "Unlimited"] },
+      { label: "Publications under one account", values: ["1", "1", "3", "Unlimited"] },
       { label: "Subdomain on homestand.com.au", values: [true, true, true, true] },
       { label: "Your own domain", values: [false, true, true, true] },
       { label: "Templates, accents and type pairings", values: [true, true, true, true] },
@@ -99,6 +103,15 @@ export const COMPARISON: { group: string; rows: { label: string; values: [string
       { label: "YouTube auto-import", values: [true, true, true, true] },
       { label: "Article, shorts and SEO drafts", values: [true, true, true, true] },
       { label: "Priority processing", values: [false, true, true, true] },
+    ],
+  },
+  {
+    group: "Words to video",
+    rows: [
+      { label: "AI credits a month", values: ["100", "500", "2,000", "Custom"] },
+      { label: "Video templates included", values: ["3", "3", "3", "All"] },
+      { label: "Top up credits any time", values: [true, true, true, true] },
+      { label: "Spend caps per publication", values: [false, false, true, true] },
     ],
   },
   {

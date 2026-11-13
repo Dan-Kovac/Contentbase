@@ -1,4 +1,6 @@
 import { Suspense } from "react"
+import Link from "next/link"
+import { ArrowRight } from "lucide-react"
 import { notFound } from "next/navigation"
 import { allArticles, getArticle, getChannelById } from "@/lib/data"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -27,7 +29,21 @@ async function Writer({ params }: { params: Promise<{ id: string }> }) {
   const article = getArticle(id)
   if (!article) notFound()
   const channel = getChannelById(article.channelId)!
-  return <ArticleWriter key={article.id} article={article} channel={writerChannel(channel)} videos={embedVideos(channel.id)} />
+  return (
+    <>
+      {article.status === "published" && (
+        <p className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card px-4 py-3 text-[14px]">
+          <span className="text-muted-foreground">
+            <span className="font-semibold text-foreground">Make a video from this article.</span> A long-form explainer or a short, in {channel.name}&apos;s brand and voice.
+          </span>
+          <Link href={`/studio/video/new?article=${article.id}`} className="inline-flex items-center gap-1 font-semibold underline-offset-4 hover:underline">
+            Make a video <ArrowRight className="size-4" aria-hidden />
+          </Link>
+        </p>
+      )}
+      <ArticleWriter key={article.id} article={article} channel={writerChannel(channel)} videos={embedVideos(channel.id)} />
+    </>
+  )
 }
 
 function WriterSkeleton() {

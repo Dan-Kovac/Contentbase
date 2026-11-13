@@ -14,7 +14,10 @@ import {
 import { TemplatePreview } from "@/components/settings/template-preview"
 import { previewLead } from "@/components/channel/lib"
 import { PublicationsMock } from "@/components/marketing/product-visuals"
-import { getChannel } from "@/lib/data"
+import { SceneFrame } from "@/components/studio/video/scene-frame"
+import { brandKit } from "@/components/studio/video/brand"
+import { buildStoryboard } from "@/components/studio/video/storyboard"
+import { getArticle, getChannel, listVideoTemplates } from "@/lib/data"
 import { cn } from "@/lib/utils"
 
 const STEPS = [
@@ -38,6 +41,11 @@ const STEPS = [
 export default function HomePage() {
   const footy = getChannel("footyfix")!
   const track = getChannel("trackside")!
+  // Words to video: the ladder article as an Explainer storyboard, in Footy Fix's brand.
+  const ladder = getArticle("a_ladder")!
+  const explainer = listVideoTemplates()[0]
+  const scenes = buildStoryboard({ headline: ladder.headline, standfirst: ladder.standfirst, hero: ladder.hero, blocks: ladder.blocks }, "long", footy.cta.label)
+  const wordsToVideo = [scenes[0], scenes.find((x) => x.rows) ?? scenes[1], scenes.find((x) => x.kind === "quote") ?? scenes[2]]
   return (
     <>
       {/* 1. Hero: what it is, in one line, and the proof beside it */}
@@ -209,6 +217,26 @@ export default function HomePage() {
             </ol>
           </div>
           <ReviewCardMock />
+        </div>
+
+        {/* And the other way: words into video, paid for with AI credits */}
+        <div className="mt-14 grid grid-cols-1 items-center gap-8 rounded-lg border bg-card p-5 sm:p-8 lg:grid-cols-[1fr_1.5fr] lg:gap-12">
+          <div className="flex flex-col gap-4">
+            <p className="kicker">And the other way</p>
+            <h3 className="text-[28px] font-extrabold leading-[32px] tracking-[-0.025em]">Write it once. Get the video too.</h3>
+            <p className="text-[16px] leading-[25px] text-muted-foreground">
+              Any article becomes a video in your brand: a voiceover in your voice, charts and tables from your numbers, big type in your colours. Long-form for YouTube, a short
+              for the feed, or a clip for apps. Three templates come with every plan, more are a click away, and AI credits pay for the rendering.
+            </p>
+            <Link href="/studio/video" className="inline-flex w-fit items-center gap-1.5 text-[14px] font-semibold underline-offset-4 hover:underline">
+              See words to video <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 gap-2" aria-label="Three scenes from an Explainer video made from a Footy Fix article" role="img">
+            {wordsToVideo.map((sc, i) => (
+              <SceneFrame key={sc.id} scene={sc} index={i} template={explainer} brand={brandKit(footy)} ratio="9/16" />
+            ))}
+          </div>
         </div>
       </Section>
 

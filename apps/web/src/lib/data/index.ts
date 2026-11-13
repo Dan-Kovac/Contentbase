@@ -11,6 +11,9 @@ import {
   standaloneArticles,
   dailyStats,
   earnings,
+  videoTemplates,
+  creditAccount,
+  madeVideos,
   importJobs,
   shorts,
   videos,
@@ -47,6 +50,16 @@ export function getShort(id: string) {
 export function listImportJobs(channelId: string) {
   return importJobs.filter((j) => j.channelId === channelId)
 }
+export function listVideoTemplates() {
+  return videoTemplates
+}
+export function getCreditAccount() {
+  return creditAccount
+}
+export function listMadeVideos(channelId: string) {
+  return madeVideos.filter((v) => v.channelId === channelId)
+}
+
 /** The channel's share of sponsor revenue for the last 30 days (sample). */
 export function getEarnings(channelId: string) {
   return earnings.find((e) => e.channelId === channelId)

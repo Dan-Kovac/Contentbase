@@ -34,6 +34,10 @@ const FAQ = [
     a: "On Pro and above. Every channel starts on a homestand.com.au subdomain, and you can point your own domain at it whenever you're ready. We handle SSL.",
   },
   {
+    q: "What are AI credits?",
+    a: "Your plan turns every YouTube video into a draft pack. Credits pay for the heavier work: turning an article into a video, synthetic voiceover, dubbing and processing beyond your video hours. Each plan includes credits every month, top-ups roll over for 12 months, and a spend cap means no surprises.",
+  },
+  {
     q: "Do you take a cut of my ad revenue?",
     a: "Ads run in Homestand Native Formats across the network. On Pro and above you receive a share of net ad revenue, split by your channel's verified viewing.",
   },

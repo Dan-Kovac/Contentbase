@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { BarChart3, Inbox, LayoutDashboard, LayoutGrid, Library, Settings } from "lucide-react"
+import { BarChart3, Clapperboard, Coins, Inbox, LayoutDashboard, LayoutGrid, Library, Settings } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -23,6 +23,7 @@ export const STUDIO_NAV = [
   { href: "/studio", label: "Home", icon: LayoutDashboard },
   { href: "/studio/review", label: "Review", icon: Inbox, badge: true },
   { href: "/studio/library", label: "Library", icon: Library, also: ["/studio/articles", "/studio/shorts", "/studio/pages", "/studio/upload"] },
+  { href: "/studio/video", label: "Video", icon: Clapperboard, also: ["/studio/credits"] },
   { href: "/studio/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/studio/settings", label: "Settings", icon: Settings, also: ["/studio/imports"] },
 ]
@@ -83,11 +84,17 @@ export function StudioSidebar({ reviewCount = 0, publications = 1 }: { reviewCou
       </SidebarContent>
       <SidebarFooter className="group-data-[collapsible=icon]:hidden">
         <div className="rounded-lg border bg-card p-3">
-          <p className="text-[13px] font-semibold">Pro trial · 9 days left</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">18.5 of 40 video hours used</p>
+          <p className="text-[13px] font-semibold">Publisher · 2 of 3 publications</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">86.5 of 150 video hours used</p>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
-            <div className="h-full w-[46%] rounded-full bg-pitch" />
+            <div className="h-full w-[58%] rounded-full bg-pitch" />
           </div>
+          <Link href="/studio/credits" className="mt-3 flex items-center justify-between gap-2 border-t pt-2.5 text-xs outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring">
+            <span className="flex items-center gap-1.5 text-muted-foreground">
+              <Coins className="size-3.5" aria-hidden /> AI credits
+            </span>
+            <span className="font-semibold">1,240 left</span>
+          </Link>
         </div>
       </SidebarFooter>
       <SidebarRail />

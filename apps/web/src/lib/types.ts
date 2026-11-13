@@ -258,6 +258,57 @@ export interface Earnings {
   byViewer: { state: string; impressions: number; amount: number }[]
 }
 
+/** Words to video. A template is a motion style; the publication's brand kit and voice are applied to it. */
+export type VideoFormat = "long" | "short" | "inapp"
+
+export interface VideoTemplate {
+  id: string
+  name: string
+  tagline: string
+  /** How scenes are drawn. */
+  style: "explainer" | "report" | "countdown" | "datadesk" | "racecard" | "chalkboard"
+  /** Included with every plan, or bought once for the account. */
+  owned: boolean
+  /** One-off price in AUD inc. GST, for templates not yet owned. */
+  price?: number
+  by: string
+  formats: VideoFormat[]
+  bestFor: string
+}
+
+export interface CreditEntry {
+  id: string
+  at: string
+  description: string
+  /** Negative for usage, positive for allowances and top-ups. */
+  credits: number
+  publication?: string
+}
+
+/** The account's AI credits (sample). Shared by every publication on the account. */
+export interface CreditAccount {
+  balance: number
+  monthlyIncluded: number
+  usedThisMonth: number
+  /** Monthly spend cap in credits; usage stops and asks first beyond it. */
+  cap: number
+  renewsOn: string
+  ledger: CreditEntry[]
+}
+
+export interface MadeVideo {
+  id: string
+  channelId: string
+  title: string
+  templateId: string
+  format: VideoFormat
+  seconds: number
+  status: "ready" | "published"
+  credits: number
+  createdAt: string
+  sourceArticleId?: string
+}
+
 /** Homestand Native Formats: advertisers supply a brief; we render it in the channel's design. */
 export type NativeFormat = "chapter_sponsor" | "halftime" | "sponsored_story" | "sponsored_short" | "presented_by"
 

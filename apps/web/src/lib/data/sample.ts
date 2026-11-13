@@ -5,6 +5,9 @@ import type {
   CustomPage,
   Sponsor,
   Earnings,
+  VideoTemplate,
+  CreditAccount,
+  MadeVideo,
   StandaloneArticle,
   Article,
   Block,
@@ -30,7 +33,7 @@ export const channels: Channel[] = [
     accentHex: "#1c4fb8",
     cta: { label: "Join free", line: "New episodes every Tuesday, and members-only sessions.", action: "join" },
     mode: "age_verified",
-    plan: "pro",
+    plan: "publisher",
     nav: [
       { label: "Latest", href: "" },
       { label: "AFL", href: "s/afl" },
@@ -623,8 +626,11 @@ export const standaloneArticles: StandaloneArticle[] = [
     blocks: [
       { type: "paragraph", text: "Seven rounds in, the ladder tells you who has won. It doesn't tell you who has played whom." },
       { type: "heading", text: "Flattered by the draw" },
-      { type: "paragraph", text: "Four of the top six have played three or fewer games against last year's finalists. That changes from Round 8." },
+      { type: "paragraph", text: "Four of the top six have played three or fewer games against last year's finalists. That changes from Round 8, when Carlton face four of them in five weeks." },
+      { type: "list", items: ["Brisbane: 6 wins, 138%", "Collingwood: 6 wins, 131%", "Carlton: 5 wins, 104%", "Sydney: 5 wins, 112%"] },
       { type: "quote", text: "The run home is where premierships are actually decided.", cite: "Sam Doherty" },
+      { type: "heading", text: "Better than their record" },
+      { type: "paragraph", text: "Fremantle and the Bulldogs have lost three games by a combined 11 points. Both play four of their next five at home." },
       { type: "paragraph", text: "Brisbane and Collingwood look the real deal. Two others are about to find out." },
     ],
   },
@@ -640,6 +646,59 @@ export const standaloneArticles: StandaloneArticle[] = [
     readMinutes: 5,
     blocks: [{ type: "paragraph", text: "Start with the clearance numbers, because they don't lie for long." }],
   },
+  {
+    id: "a_carnival",
+    channelId: "ch_trackside",
+    slug: "spring-carnival-by-the-numbers",
+    status: "published",
+    headline: "The Spring Carnival by the numbers",
+    standfirst: "Four meetings, 40 races and one barrier that keeps winning. What the data says before Saturday.",
+    author: "Trackside",
+    section: "form",
+    hero: "/media/racing-jockey-red.jpg",
+    publishedAt: "9 November 2026",
+    readMinutes: 4,
+    blocks: [
+      { type: "paragraph", text: "The Carnival rewards horses that can settle. Across the last ten years, 62% of winners were in the first four at the 800." },
+      { type: "heading", text: "The barrier question" },
+      { type: "paragraph", text: "Barrier one has won four of the last ten Cox Plates. Barriers ten and wider have won one." },
+      { type: "list", items: ["Barriers 1 to 3: 6 wins", "Barriers 4 to 9: 3 wins", "Barriers 10 and wider: 1 win"] },
+      { type: "quote", text: "You can't give them a start here. The race is over at the 600.", cite: "A Moonee Valley trainer" },
+      { type: "heading", text: "Watch the weather" },
+      { type: "paragraph", text: "A Soft 6 or worse has changed the favourite in three of the last five years. Check the track on Friday." },
+    ],
+  },
+]
+
+/** Words to video: three templates come with every plan; more can be bought once for the account. */
+export const videoTemplates: VideoTemplate[] = [
+  { id: "vt_explainer", name: "Explainer", tagline: "Voiceover over charts, tables and big type, in your colours.", style: "explainer", owned: true, by: "Homestand", formats: ["long", "short", "inapp"], bestFor: "Analysis and why-it-matters pieces" },
+  { id: "vt_report", name: "Match report", tagline: "A scoreboard open, key moments as cards, a stat to finish.", style: "report", owned: true, by: "Homestand", formats: ["long", "short"], bestFor: "Results and round reviews" },
+  { id: "vt_countdown", name: "Countdown", tagline: "Big numerals, one point each, built for the feed.", style: "countdown", owned: true, by: "Homestand", formats: ["short", "inapp"], bestFor: "Lists, rankings and tips without the betting" },
+  { id: "vt_datadesk", name: "Data desk", tagline: "Animated ladders, line charts and tables with a newsroom feel.", style: "datadesk", owned: false, price: 149, by: "Homestand", formats: ["long", "short", "inapp"], bestFor: "Ladders, form and season numbers" },
+  { id: "vt_racecard", name: "Racecard", tagline: "Fields, barriers and form lines, set like a racebook.", style: "racecard", owned: false, price: 99, by: "Homestand", formats: ["long", "short"], bestFor: "Racing previews and reviews" },
+  { id: "vt_chalkboard", name: "Chalkboard", tagline: "Tactics drawn on a board: arrows, zones and set plays.", style: "chalkboard", owned: false, price: 79, by: "Studio Halfback", formats: ["long", "short"], bestFor: "Structures and set plays" },
+]
+
+export const creditAccount: CreditAccount = {
+  balance: 1240,
+  monthlyIncluded: 2000,
+  usedThisMonth: 1760,
+  cap: 4000,
+  renewsOn: "1 December 2026",
+  ledger: [
+    { id: "cr_9", at: "12 November 2026", description: "Short video: Round 7 in 60 seconds", credits: -45, publication: "Footy Fix" },
+    { id: "cr_8", at: "11 November 2026", description: "Long-form video: Cox Plate draw explainer, 6 min", credits: -180, publication: "Trackside" },
+    { id: "cr_7", at: "10 November 2026", description: "Top-up: 1,000 credits ($100 inc. GST)", credits: 1000 },
+    { id: "cr_6", at: "9 November 2026", description: "Dubbing: Round 7 in five minutes, Vietnamese", credits: -75, publication: "Footy Fix" },
+    { id: "cr_5", at: "6 November 2026", description: "Extra processing: 4 video hours over the plan", credits: -80, publication: "Footy Fix" },
+    { id: "cr_4", at: "1 November 2026", description: "Monthly allowance, Publisher plan", credits: 2000 },
+  ],
+}
+
+export const madeVideos: MadeVideo[] = [
+  { id: "mv_round7", channelId: "ch_footyfix", title: "Round 7 in 60 seconds", templateId: "vt_countdown", format: "short", seconds: 58, status: "published", credits: 45, createdAt: "12 November 2026", sourceArticleId: "a_ladder" },
+  { id: "mv_coxdraw", channelId: "ch_trackside", title: "Why the Cox Plate draw matters, explained", templateId: "vt_explainer", format: "long", seconds: 372, status: "ready", credits: 180, createdAt: "11 November 2026" },
 ]
 
 export const customPages: CustomPage[] = [

@@ -13,7 +13,7 @@ function Bars({ rows, note }: { rows: { label: React.ReactNode; amount: number; 
           <li key={i} className="grid gap-1.5">
             <span className="flex items-baseline justify-between gap-3 text-[14px]">
               <span className="min-w-0 truncate">{r.label}</span>
-              <span className="shrink-0 font-semibold tabular">{aud(r.amount)}</span>
+              <span className="shrink-0 font-semibold">{aud(r.amount)}</span>
             </span>
             <span className="h-2 overflow-hidden rounded-full bg-muted" aria-hidden>
               <span className="block h-full rounded-full bg-chart-1" style={{ width: `${(r.amount / max) * 100}%` }} />
