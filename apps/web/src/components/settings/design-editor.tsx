@@ -16,11 +16,10 @@ import { AccentField, accentState } from "./accent-field"
 import { TemplatePreview } from "./template-preview"
 
 const MODULE_INFO: Record<HomeModule, { label: string; description: string; ad?: boolean }> = {
-  lead: { label: "Lead story", description: "Your latest or pinned video, full width, with its headline." },
+  lead: { label: "Lead story", description: "Your latest or pinned video, full width, with its headline. Carries one “Presented by” credit.", ad: true },
   shorts: { label: "Shorts row", description: "Your YouTube Shorts and clips. Carries one sponsored short.", ad: true },
-  grid: { label: "Article grid", description: "Your newest videos and articles, newest first." },
-  sections: { label: "Section rows", description: "One row for each section, with a link to its page." },
-  sponsor: { label: "Sponsor band", description: "One “Presented by” credit across the module, never a box.", ad: true },
+  grid: { label: "Article grid", description: "Your newest videos and articles, newest first. Carries one sponsored story when there are no section rows.", ad: true },
+  sections: { label: "Section rows", description: "One row for each section. The first row carries one sponsored story, the size of the stories beside it.", ad: true },
 }
 
 const TEMPLATES: { id: Template; label: string; description: string }[] = [

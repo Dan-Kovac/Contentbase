@@ -10,7 +10,7 @@ import {
   SearchResultMock,
   AgeVerifiedPanel,
 } from "@/components/marketing/product-visuals"
-import { FormatStage, HalftimeExample, SponsoredShortExample, StatCardExample } from "@/components/marketing/native-formats"
+import { FormatStage, HalftimeExample, SponsoredShortExample, SponsoredStoryExample } from "@/components/marketing/native-formats"
 import { PricingTeaser } from "@/components/marketing/pricing-cards"
 import { cn } from "@/lib/utils"
 
@@ -203,7 +203,7 @@ export default function HomePage() {
             <HalftimeExample withCopy={false} />
           </FormatFigure>
           <FormatFigure className="lg:col-span-3" name="Stat card" where="In a row of key numbers, 18+ shown">
-            <StatCardExample editorial={false} />
+            <SponsoredStoryExample context={false} />
           </FormatFigure>
           <FormatFigure className="lg:col-span-3" name="Sponsored short" where="In the shorts row, one in eight at most">
             <div className="mx-auto w-full max-w-[200px]">

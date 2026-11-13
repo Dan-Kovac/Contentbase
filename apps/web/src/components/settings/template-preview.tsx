@@ -51,7 +51,6 @@ const SECTION_PHOTOS = ["/media/stadium-night-wide.jpg", "/media/broadcast-contr
 export const DEFAULT_MODULES: { id: HomeModule; enabled: boolean }[] = [
   { id: "lead", enabled: true },
   { id: "shorts", enabled: true },
-  { id: "sponsor", enabled: true },
   { id: "grid", enabled: true },
   { id: "sections", enabled: true },
 ]
@@ -182,13 +181,28 @@ function SponsorBand({ dark }: { dark: boolean }) {
   )
 }
 
+/** The one sponsored story: the same box as the story cards beside it. */
+function SponsoredStory() {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="relative flex flex-col justify-between overflow-hidden rounded-[6px] bg-[#111111] p-3 text-white" style={{ aspectRatio: "16/9" }}>
+        <span className="grid size-6 place-items-center rounded-[4px] bg-white text-[9px] font-bold text-[#111111]">KB</span>
+        <span className="text-[17px] font-extrabold leading-[1.05]">Kick Boots Co.</span>
+        <span className="absolute bottom-2 right-2 rounded-[2px] bg-black/70 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.8px]">Sponsored</span>
+      </div>
+      <span className="text-[11px] font-bold uppercase tracking-[1px] text-neutral-500">Sponsored · Kick Boots Co.</span>
+      <p className="text-[19px] leading-[1.12]" style={display}>
+        Grip for the wet ones.
+      </p>
+    </div>
+  )
+}
+
 function SponsoredShort() {
   return (
     <div className="flex flex-col gap-2">
       <div className="relative overflow-hidden rounded-[6px] bg-[#111111]" style={{ aspectRatio: "9/16" }}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- sample sponsor image */}
-        <img src="/media/stadium-day-pitch.jpg" alt="" className="absolute inset-0 size-full object-cover opacity-80" loading="lazy" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent from-40% to-[#111111]" />
+        <span className="absolute bottom-12 left-3 right-3 text-[14px] font-extrabold leading-[1.1] text-white">Grip for the wet ones.</span>
         <span className="absolute left-2 top-2 rounded-[2px] bg-black/70 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.8px] text-white">Sponsored</span>
         <span className="absolute bottom-3 left-3 rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-[#111111]">Shop the range</span>
       </div>
@@ -215,6 +229,7 @@ function Editorial({ modules, sectionLabels }: { modules: HomeModule[]; sectionL
                     {LEAD.standfirst}
                   </p>
                   <p className="text-[12px] text-neutral-500">{LEAD.byline}</p>
+                  <SponsorBand dark={false} />
                 </div>
               </article>
             )
@@ -225,7 +240,7 @@ function Editorial({ modules, sectionLabels }: { modules: HomeModule[]; sectionL
                   Latest stories
                 </h4>
                 <div className="grid grid-cols-3 gap-5">
-                  {STORIES.slice(0, 3).map((s) => (
+                  {STORIES.slice(0, 2).map((s) => (
                     <div key={s.title} className="flex flex-col gap-2">
                       <Photo src={s.photo} className="rounded-[6px]" />
                       <Kicker>{s.kicker}</Kicker>
@@ -234,6 +249,7 @@ function Editorial({ modules, sectionLabels }: { modules: HomeModule[]; sectionL
                       </p>
                     </div>
                   ))}
+                  <SponsoredStory />
                 </div>
               </section>
             )
@@ -258,8 +274,6 @@ function Editorial({ modules, sectionLabels }: { modules: HomeModule[]; sectionL
                 </div>
               </section>
             )
-          case "sponsor":
-            return <SponsorBand key="sponsor" dark={false} />
           case "sections":
             return (
               <div key="sections" className="grid grid-cols-2 gap-8">
@@ -333,6 +347,7 @@ function Broadcast({ modules, sectionLabels }: { modules: HomeModule[]; sectionL
                       </span>
                       <span className="text-[12px] text-white/70">{LEAD.byline}</span>
                     </span>
+                    <SponsorBand dark />
                   </div>
                 </Photo>
               </article>
@@ -363,12 +378,6 @@ function Broadcast({ modules, sectionLabels }: { modules: HomeModule[]; sectionL
                   ))}
                 </div>
               </section>
-            )
-          case "sponsor":
-            return (
-              <div key="sponsor" className="px-8">
-                <SponsorBand dark />
-              </div>
             )
           case "sections":
             return (

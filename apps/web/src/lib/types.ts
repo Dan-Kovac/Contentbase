@@ -59,7 +59,6 @@ export type HomeModule =
   | "shorts"
   | "grid"
   | "sections"
-  | "sponsor"
 
 export type ContentStatus =
   | "processing"
@@ -234,15 +233,18 @@ export interface AdDecision {
 }
 
 /** Homestand Native Formats: advertisers supply a brief; we render it in the channel's design. */
-export type NativeFormat = "chapter_sponsor" | "halftime" | "stat_card" | "sponsored_short" | "presented_by"
+export type NativeFormat = "chapter_sponsor" | "halftime" | "sponsored_story" | "sponsored_short" | "presented_by"
 
 export interface Sponsor {
   id: string
   name: string
   /** Brand colour used in the format (contrast-checked like channel accents). */
   colour: string
+  /** The one line the advertiser writes. */
   line: string
-  stat?: { value: string; label: string }
+  /** Optional supporting sentence, shown where a story card shows its standfirst. */
+  body?: string
+  /** Optional image or muted loop. Without one, the unit is type on the sponsor's colour. */
   image?: string
   cta: string
   url: string

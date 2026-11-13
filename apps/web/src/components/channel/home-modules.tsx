@@ -1,20 +1,21 @@
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 import { ShortCard } from "@/components/brand/media"
-import { SponsoredShortCard } from "@/components/brand/native-ads"
 import { StatusBadge } from "@/components/brand/status-badge"
 import { cn } from "@/lib/utils"
-import type { Channel, HomeModule, Short, Video } from "@/lib/types"
+import type { Channel, HomeModule, Short, Sponsor, Video } from "@/lib/types"
 import { getLiveBlog, type LiveBlog } from "./live-data"
 import {
   channelStories,
   leadStory,
   publicShorts,
   shortPath,
-  sponsorFor,
+  slotOptions,
   videoStory,
   type Story,
+  type Viewer,
 } from "./lib"
+import { SponsorSlot } from "./viewer"
 
 export { ModuleHeading } from "./story"
 
@@ -27,28 +28,26 @@ export interface HomeData {
   shorts: Short[]
   live?: LiveBlog
   mostWatched: Story[]
-  /** Enabled modules in the creator's order, with the sponsor break placed by the platform. */
+  /** Enabled modules in the creator's order. Sponsors have no module of their own. */
   modules: HomeModule[]
+  /**
+   * The home page carries three sponsor units at most: "Presented by" on the lead, one sponsored
+   * short in the shorts row and one sponsored story in a story grid (the first section row, or the
+   * Latest grid when there are no sections). Each one is decided per viewer state on the server.
+   */
+  sponsors: Record<"presented" | "short" | "story", Record<Viewer, Sponsor>>
+  /** Which module carries the sponsored story. */
+  storyIn: "sections" | "grid"
 }
 
-/**
- * The creator orders and toggles modules; the platform fixes ad positions. The sponsor
- * module is the one Half-time break, and it always sits between two content modules: never
- * first, never last and never straight after the lead story.
- */
 export function placeModules(channel: Channel): HomeModule[] {
-  const on = channel.modules.filter((m) => m.enabled).map((m) => m.id)
-  const content = on.filter((m) => m !== "sponsor")
-  if (!on.includes("sponsor") || content.length < 2) return content
-  let at = Math.max(1, on.indexOf("sponsor"))
-  if (content[at - 1] === "lead") at += 1
-  at = Math.min(at, content.length - 1)
-  return [...content.slice(0, at), "sponsor", ...content.slice(at)]
+  return channel.modules.filter((m) => m.enabled).map((m) => m.id)
 }
 
 export function homeData(channel: Channel): HomeData {
   const lead = leadStory(channel)
   const stories = channelStories(channel)
+  const modules = placeModules(channel)
   return {
     channel,
     lead,
@@ -57,23 +56,38 @@ export function homeData(channel: Channel): HomeData {
     shorts: publicShorts(channel),
     live: getLiveBlog(channel.slug),
     mostWatched: stories.filter((s) => s.views > 0).sort((a, b) => b.views - a.views).slice(0, 4),
-    modules: placeModules(channel),
+    modules,
+    sponsors: {
+      presented: slotOptions(channel, "presented"),
+      short: slotOptions(channel, "short"),
+      story: slotOptions(channel, "story"),
+    },
+    storyIn: modules.includes("sections") && channel.sections.some((s) => stories.filter((x) => x.section === s.slug).length >= 2) ? "sections" : "grid",
   }
 }
 
-/** Shorts with one sponsored card at the same size, after the third short (ADS-01). */
-export function ShortsList({ channel, shorts, className }: { channel: Channel; shorts: Short[]; className?: string }) {
-  const sponsor = sponsorFor("short")
+/** Shorts with one sponsored short after the third, exactly the size of the others (ADS-01). */
+export function ShortsList({
+  channel,
+  shorts,
+  sponsor,
+  className,
+}: {
+  channel: Channel
+  shorts: Short[]
+  sponsor?: Record<Viewer, Sponsor>
+  className?: string
+}) {
   const sponsorAt = Math.min(3, shorts.length)
   const items: ({ kind: "short"; short: Short } | { kind: "ad" })[] = shorts.map((short) => ({ kind: "short", short }))
-  items.splice(sponsorAt, 0, { kind: "ad" })
+  if (sponsor) items.splice(sponsorAt, 0, { kind: "ad" })
   return (
-    <div className={cn("-mx-4 overflow-x-auto px-4 pb-3 md:-mx-8 md:px-8 [scrollbar-width:thin]", className)}>
+    <div className={cn("-mx-4 overflow-x-auto px-4 pb-3 md:-mx-8 md:px-8 [scrollbar-width:thin]", className)} data-shorts-row>
       <ul className="flex w-max items-start gap-4">
         {items.map((item) =>
           item.kind === "ad" ? (
             <li key="sponsored" className="shrink-0">
-              <SponsoredShortCard sponsor={sponsor} />
+              {sponsor && <SponsorSlot format="short" options={sponsor} />}
             </li>
           ) : (
             <li key={item.short.id} className="shrink-0">

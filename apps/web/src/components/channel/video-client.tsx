@@ -1,15 +1,14 @@
 "use client"
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
-import { Search, ShieldCheck, ShieldOff } from "lucide-react"
-import { toast } from "sonner"
-import { ChapterSponsorCredit, HalftimeBreak, StatCard } from "@/components/brand/native-ads"
+import { Search } from "lucide-react"
+import { ChapterSponsorCredit, HalftimeBreak } from "@/components/brand/native-ads"
 import { Input } from "@/components/ui/input"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { formatDuration } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { Chapter, TranscriptLine } from "@/lib/types"
 import type { SlotPlan, Viewer } from "./lib"
+import { useViewer } from "./viewer"
 
 interface Ctx {
   time: number
@@ -49,7 +48,7 @@ export function VideoPageProvider({
   const [playing, setPlaying] = useState(false)
   const [started, setStarted] = useState(false)
   const [speed, setSpeed] = useState(1)
-  const [viewer, setViewer] = useState<Viewer>("logged_out")
+  const { viewer, setViewer } = useViewer()
 
   useEffect(() => {
     if (!playing) return
@@ -81,28 +80,9 @@ export function VideoPageProvider({
 
   const value = useMemo<Ctx>(
     () => ({ time: Math.floor(time), playing, started, speed, setSpeed, seek, toggle, viewer, setViewer, plan: plans[viewer], sponsoredChapter }),
-    [time, playing, started, speed, seek, toggle, viewer, plans, sponsoredChapter],
+    [time, playing, started, speed, seek, toggle, viewer, setViewer, plans, sponsoredChapter],
   )
   return <VideoCtx.Provider value={value}>{children}</VideoCtx.Provider>
-}
-
-/** The chapter sponsor credit under the player. */
-export function ChapterSponsorUnderPlayer({ chapters }: { chapters: Chapter[] }) {
-  const { plan, sponsoredChapter, seek } = useVideo()
-  const chapter = chapters[sponsoredChapter]
-  if (!chapter) return null
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-md border bg-card px-3 py-2.5">
-      <ChapterSponsorCredit key={plan.chapter.id} sponsor={plan.chapter} chapter={`Chapter ${sponsoredChapter + 1}: ${chapter.title}`} />
-      <button
-        type="button"
-        onClick={() => seek(chapter.start)}
-        className="rounded-sm font-mono text-[12px] font-medium text-muted-foreground underline-offset-2 outline-none hover:text-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ring tabular"
-      >
-        Jump to {formatDuration(chapter.start)}
-      </button>
-    </div>
-  )
 }
 
 export function ChapterList({ chapters, duration }: { chapters: Chapter[]; duration: number }) {
@@ -142,66 +122,10 @@ export function ChapterList({ chapters, duration }: { chapters: Chapter[]; durat
   )
 }
 
-const PREVIEW_LABELS: Record<Viewer, string> = {
-  logged_out: "Logged out",
-  signed_in: "Signed in",
-  verified: "Signed in, 18+ verified",
-  opted_out: "Verified, opted out of betting ads",
-}
-
-/** Prototype-only control so every ad state can be seen on one page. */
-export function PreviewAs() {
-  const { viewer, setViewer, plan } = useVideo()
-  return (
-    <div className="rounded-md border border-dashed border-input bg-muted/50 px-3 py-3 font-sans">
-      <div className="flex flex-col gap-2.5">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-          <span id="preview-as" className="text-[11px] font-bold uppercase tracking-[1px] text-muted-foreground">
-            Preview as
-          </span>
-          <ToggleGroup
-            type="single"
-            variant="outline"
-            size="sm"
-            value={viewer}
-            aria-labelledby="preview-as"
-            className="flex-wrap bg-background"
-            onValueChange={(v) => {
-              if (!v) return
-              setViewer(v as Viewer)
-              if (v === "opted_out") toast("You won't see betting ads on Homestand")
-            }}
-          >
-            {(Object.keys(PREVIEW_LABELS) as Viewer[]).map((k) => (
-              <ToggleGroupItem key={k} value={k} className="h-auto min-h-8 whitespace-normal py-1 text-[12px]">
-                {PREVIEW_LABELS[k]}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-        </div>
-        <p className="flex items-start gap-2 text-[12px] leading-[18px] text-muted-foreground" aria-live="polite">
-          {plan.restricted ? <ShieldCheck className="mt-px size-4 shrink-0 text-foreground" aria-hidden /> : <ShieldOff className="mt-px size-4 shrink-0" aria-hidden />}
-          <span>
-            <span className="font-semibold text-foreground">
-              Chapter: {plan.chapter.name} · Half-time: {plan.halftime.name} · Stat card: {plan.stat.name}.
-            </span>{" "}
-            {plan.note}
-          </span>
-        </p>
-      </div>
-    </div>
-  )
-}
-
-/** The Half-time break between article sections. Full container width, fixed height. */
+/** The Half-time break: an image block in the article column, so it is exactly the column's width. */
 export function HalftimeSlot() {
   const { plan } = useVideo()
   return <HalftimeBreak key={plan.halftime.id} sponsor={plan.halftime} />
-}
-
-export function StatSlot({ className }: { className?: string }) {
-  const { plan } = useVideo()
-  return <StatCard key={plan.stat.id} sponsor={plan.stat} className={className} />
 }
 
 function highlight(text: string, q: string) {

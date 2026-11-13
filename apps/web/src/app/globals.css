@@ -190,6 +190,7 @@
   --radius-md: var(--radius);
   --radius-lg: var(--radius-lg);
   --shadow-glow: var(--shadow-glow);
+  --shadow-popover: var(--shadow-popover);
 }
 
 /* Brand utilities: bg-pitch, bg-pitch-soft, bg-pitch-glow, text-pitch (dark grounds only). */

@@ -1,7 +1,8 @@
 import { Suspense } from "react"
 import { notFound } from "next/navigation"
 import { ChannelFooter, ChannelHeader } from "@/components/shell/channel-chrome"
-import { channelNav } from "@/components/channel/lib"
+import { channelNav, viewerNotes } from "@/components/channel/lib"
+import { DemoBar, ViewerProvider } from "@/components/channel/viewer"
 import { getChannel, listChannels } from "@/lib/data"
 import { channelStyle, contrastRatio } from "@/lib/format"
 import { cn } from "@/lib/utils"
@@ -30,11 +31,14 @@ async function ChannelFrame({
       data-template={channel.template}
       className={cn("flex min-h-svh flex-col bg-background text-foreground", dark && "dark [color-scheme:dark]")}
     >
-      <ChannelHeader channel={channel} nav={channelNav(channel)} />
-      <main id="main" className="flex-1">
-        {children}
-      </main>
-      <ChannelFooter channel={channel} nav={channelNav(channel)} />
+      <ViewerProvider>
+        <ChannelHeader channel={channel} nav={channelNav(channel)} />
+        <main id="main" className="flex-1">
+          {children}
+        </main>
+        <ChannelFooter channel={channel} nav={channelNav(channel)} />
+        <DemoBar notes={viewerNotes(channel)} />
+      </ViewerProvider>
     </div>
   )
 }

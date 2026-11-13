@@ -1,4 +1,4 @@
-import { Film, LayoutPanelTop, Newspaper, Smartphone, Trophy } from "lucide-react"
+import { Film, LayoutGrid, LayoutPanelTop, Newspaper, Smartphone } from "lucide-react"
 import { ShortCard, VideoThumb } from "@/components/brand/media"
 import {
   ChapterSponsorCredit,
@@ -6,8 +6,10 @@ import {
   HalftimeBreak,
   PresentedBy,
   SponsoredShortCard,
-  StatCard,
+  SponsoredStoryCard,
 } from "@/components/brand/native-ads"
+import { videoStory } from "@/components/channel/lib"
+import { StoryCard } from "@/components/channel/story"
 import { getChannel, getShort, getSponsor, getVideo } from "@/lib/data"
 import { channelStyle, formatDuration } from "@/lib/format"
 import type { NativeFormat } from "@/lib/types"
@@ -18,36 +20,36 @@ export const NATIVE_FORMATS: { id: NativeFormat; name: string; line: string; whe
   {
     id: "chapter_sponsor",
     name: "Chapter sponsor",
-    line: "A brand owns a moment of the video.",
-    where: "On the player timeline, in the chapter list and under the player while that chapter plays.",
+    line: "A brand owns a chapter of the video.",
+    where: "One chapter in the chapter list and one segment of the player timeline. The same shape as every other chapter.",
     Icon: Film,
   },
   {
     id: "halftime",
     name: "Half-time break",
-    line: "An editorial pause between article sections.",
-    where: "Between two sections of an article, after a natural break. Never between a headline and its first paragraph.",
+    line: "A pause between article sections, the size of a photo in the article.",
+    where: "Between two sections, the width of the article column. Never between a headline and its first paragraph.",
     Icon: Newspaper,
   },
   {
-    id: "stat_card",
-    name: "Stat card",
-    line: "A sponsor message set as a scoreboard tile.",
-    where: "In a row of key numbers, the same size as the editorial stat tiles beside it.",
-    Icon: Trophy,
+    id: "sponsored_story",
+    name: "Sponsored story",
+    line: "A story card among the stories.",
+    where: "One cell of a story grid on the channel home, the same size as the stories beside it.",
+    Icon: LayoutGrid,
   },
   {
     id: "sponsored_short",
     name: "Sponsored short",
-    line: "The same size as any other short.",
-    where: "In the shorts row on a channel home and in the shorts feed, at most one in every eight.",
+    line: "A short among the shorts.",
+    where: "In the shorts row and the shorts feed, exactly the size of every other short. At most one in every eight.",
     Icon: Smartphone,
   },
   {
     id: "presented_by",
     name: "Presented by",
-    line: "A sponsor credit on a lead story or section.",
-    where: "Under the lead story on a channel home, or across the top of a section, for the length of a flight.",
+    line: "A sponsor credit, set like a byline.",
+    where: "Under the lead story on a channel home, for the length of a flight. One line, never a box.",
     Icon: LayoutPanelTop,
   },
 ]
@@ -106,9 +108,9 @@ export function ChapterSponsorExample() {
 export function HalftimeExample({ withCopy = true }: { withCopy?: boolean }) {
   const sponsor = getSponsor("sp_ute")!
   return (
-    <div className="flex flex-col gap-5">
+    <div className="mx-auto flex max-w-[68ch] flex-col">
       {withCopy && <Lines n={3} />}
-      <HalftimeBreak sponsor={sponsor} />
+      <HalftimeBreak sponsor={sponsor} className="my-6" />
       {withCopy && (
         <div className="flex flex-col gap-3">
           <span className="h-3.5 w-2/5 rounded-full bg-foreground/80" aria-hidden />
@@ -119,21 +121,17 @@ export function HalftimeExample({ withCopy = true }: { withCopy?: boolean }) {
   )
 }
 
-export function StatCardExample({ editorial = true }: { editorial?: boolean }) {
-  const sponsor = getSponsor("sp_brew")!
+export function SponsoredStoryExample({ context = true }: { context?: boolean }) {
+  const ch = getChannel("footyfix")!
+  const sponsor = getSponsor("sp_boots")!
+  const a = videoStory(ch, getVideo("v_blues")!)
+  const b = videoStory(ch, getVideo("v_round7")!)
+  if (!context) return <SponsoredStoryCard sponsor={sponsor} size="sm" />
   return (
-    <div className={cn("grid gap-3", editorial && "sm:grid-cols-2")}>
-      {editorial && (
-        <div className="flex min-h-[188px] flex-col justify-between gap-4 rounded-lg border p-5" style={{ borderTop: "4px solid var(--chan)" }}>
-          <span className="text-[11px] font-bold uppercase tracking-[1px] text-muted-foreground">Key number</span>
-          <div>
-            <p className="text-[48px] font-extrabold leading-none tracking-[-1.5px]">14–6</p>
-            <p className="mt-1.5 text-[14px] leading-5 text-muted-foreground">Centre bounces lost by Carlton in Round 7</p>
-          </div>
-          <span className="text-[13px] text-muted-foreground">Footy Fix analysis</span>
-        </div>
-      )}
-      <StatCard sponsor={sponsor} />
+    <div className="grid gap-x-5 gap-y-8 sm:grid-cols-3">
+      <StoryCard story={a} size="sm" />
+      <SponsoredStoryCard sponsor={sponsor} size="sm" />
+      <StoryCard story={b} size="sm" />
     </div>
   )
 }
@@ -171,7 +169,7 @@ export function PresentedByExample() {
 export const FORMAT_EXAMPLE: Record<NativeFormat, () => React.ReactNode> = {
   chapter_sponsor: () => <ChapterSponsorExample />,
   halftime: () => <HalftimeExample />,
-  stat_card: () => <StatCardExample />,
+  sponsored_story: () => <SponsoredStoryExample />,
   sponsored_short: () => <SponsoredShortExample />,
   presented_by: () => <PresentedByExample />,
 }

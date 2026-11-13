@@ -127,7 +127,7 @@ export function ShortCard({
     <Link href={href} className={cn("group flex w-[168px] shrink-0 flex-col gap-2 outline-none focus-visible:ring-2 focus-visible:ring-ring", className)}>
       <VideoThumb tone={tone} src={src} durationSec={durationSec} ratio="9/16" />
       {sponsored && <span className="text-[11px] font-bold uppercase tracking-[1px] text-muted-foreground">Sponsored</span>}
-      <p className="line-clamp-2 text-[15px] font-semibold leading-5 text-foreground group-hover:underline">{title}</p>
+      <p className="line-clamp-2 min-h-10 text-[15px] font-semibold leading-5 text-foreground group-hover:underline">{title}</p>
     </Link>
   )
 }

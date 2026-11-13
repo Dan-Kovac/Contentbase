@@ -5,7 +5,7 @@ import { StatusBadge } from "@/components/brand/status-badge"
 import { getVideo } from "@/lib/data"
 import { formatDuration } from "@/lib/format"
 import { cn } from "@/lib/utils"
-import type { Block, Channel, Video } from "@/lib/types"
+import type { Block, Channel, Sponsor, Video } from "@/lib/types"
 import {
   BODY,
   DISPLAY,
@@ -20,6 +20,7 @@ import {
   type Related,
 } from "./lib"
 import { StoryCard } from "./story"
+import { SponsorSlot, type Viewer } from "./viewer"
 
 /**
  * Where the one in-article unit goes: before the first subheading that follows at least two
@@ -217,7 +218,7 @@ export function ExclusiveGate({ channel, video }: { channel: Channel; video: Vid
   )
 }
 
-export function RelatedItems({ channel, related }: { channel: Channel; related: Related }) {
+export function RelatedItems({ channel, related, sponsor }: { channel: Channel; related: Related; sponsor?: Record<Viewer, Sponsor> }) {
   const { stories, shorts } = related
   if (!stories.length && !shorts.length) return null
   return (
@@ -227,9 +228,9 @@ export function RelatedItems({ channel, related }: { channel: Channel; related: 
           Watch and read next
         </h2>
       </div>
-      <div className="grid gap-8 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
         {stories.length > 0 && (
-          <ul className={cn("grid gap-x-6 gap-y-10 sm:grid-cols-2", shorts.length ? "lg:col-span-8" : "lg:col-span-12 lg:grid-cols-4")}>
+          <ul className={cn("grid min-w-0 gap-x-6 gap-y-10 sm:grid-cols-2", shorts.length ? "lg:col-span-8" : "lg:col-span-12 lg:grid-cols-4")}>
             {stories.map((s) => (
               <li key={s.id}>
                 <StoryCard story={s} size="sm" ratio={s.kind === "video" ? "16/9" : "3/2"} />
@@ -238,7 +239,7 @@ export function RelatedItems({ channel, related }: { channel: Channel; related: 
           </ul>
         )}
         {shorts.length > 0 && (
-          <div className="lg:col-span-4">
+          <div className="min-w-0 lg:col-span-4">
             <h3 className="kicker mb-4 text-foreground">Shorts</h3>
             <ul className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 lg:mx-0 lg:px-0">
               {shorts.map((x) => (
@@ -246,6 +247,12 @@ export function RelatedItems({ channel, related }: { channel: Channel; related: 
                   <ShortCard href={shortPath(channel, x)} title={x.title} tone={x.posterTone} src={x.poster} durationSec={x.durationSec} className="w-[150px]" />
                 </li>
               ))}
+              {/* One sponsored short, the same size as the shorts beside it. */}
+              {sponsor && (
+                <li>
+                  <SponsorSlot format="short" options={sponsor} className="w-[150px]" />
+                </li>
+              )}
             </ul>
           </div>
         )}

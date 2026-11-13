@@ -21,7 +21,7 @@ const PRICING: Record<Campaign["pricing"], string> = { cpm: "CPM", flat: "Flat s
 const FORMAT: Record<NativeFormat, string> = {
   chapter_sponsor: "Chapter sponsor",
   halftime: "Half-time break",
-  stat_card: "Stat card",
+  sponsored_story: "Sponsored story",
   sponsored_short: "Sponsored short",
   presented_by: "Presented by",
 }

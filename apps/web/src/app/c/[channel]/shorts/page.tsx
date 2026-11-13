@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Suspense } from "react"
 import { notFound } from "next/navigation"
-import { SITE, publicShorts, shortSourceLabel, videoPath } from "@/components/channel/lib"
+import { SITE, publicShorts, shortSourceLabel, slotOptions, videoPath } from "@/components/channel/lib"
 import { ShortsFeed, ShortsFeedFromParams, type FeedShort } from "@/components/channel/shorts-feed"
 import { ChannelPageSkeleton } from "@/components/channel/skeleton"
 import { getChannel, getVideo } from "@/lib/data"
@@ -30,6 +30,7 @@ async function ShortsPageContent({ params }: { params: Promise<{ channel: string
       caption: s.caption,
       durationSec: s.durationSec,
       posterTone: s.posterTone,
+      poster: s.poster,
       source: s.source,
       sourceLabel: shortSourceLabel(s),
       parentHref: parent ? `${videoPath(channel, parent)}${s.startSec ? `?t=${s.startSec}` : ""}` : undefined,
@@ -39,10 +40,11 @@ async function ShortsPageContent({ params }: { params: Promise<{ channel: string
   })
 
   if (!shorts.length) notFound()
+  const sponsor = slotOptions(channel, "short")
 
   return (
-    <Suspense fallback={<ShortsFeed shorts={shorts} channelName={channel.name} />}>
-      <ShortsFeedFromParams shorts={shorts} channelName={channel.name} />
+    <Suspense fallback={<ShortsFeed shorts={shorts} channelName={channel.name} sponsor={sponsor} />}>
+      <ShortsFeedFromParams shorts={shorts} channelName={channel.name} sponsor={sponsor} />
     </Suspense>
   )
 }

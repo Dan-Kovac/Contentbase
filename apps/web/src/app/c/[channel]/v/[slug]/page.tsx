@@ -11,16 +11,14 @@ import {
   relatedFor,
   sectionLabel,
   sectionPath,
+  slotOptions,
   slotPlans,
   sponsorFor,
   sponsoredChapterIndex,
 } from "@/components/channel/lib"
 import {
   ChapterList,
-  ChapterSponsorUnderPlayer,
   HalftimeSlot,
-  PreviewAs,
-  StatSlot,
   Transcript,
   VideoPageProvider,
 } from "@/components/channel/video-client"
@@ -137,7 +135,6 @@ async function VideoPageContent({ params }: { params: Params }) {
                     source={video.source}
                     preroll={video.source === "upload" ? sponsorFor("presented") : undefined}
                   />
-                  <ChapterSponsorUnderPlayer chapters={video.chapters} />
                 </div>
                 <div className="lg:col-span-4">
                   <ChapterList chapters={video.chapters} duration={video.durationSec} />
@@ -148,31 +145,25 @@ async function VideoPageContent({ params }: { params: Params }) {
 
           <article id="article" className="mx-auto mt-12 max-w-[1280px] scroll-mt-24 px-4 md:mt-16 md:px-8">
             <div className={READING}>
-              <div className="mb-8">
-                <PreviewAs />
-              </div>
               <ArticleHeader channel={channel} video={video} />
               {before.map((b, i) => (
                 <BlockView key={i} block={b} channel={channel} />
               ))}
-            </div>
-            {after.length > 0 && (
-              <>
-                {/* Half-time: between sections, out of the reading column to the container width. */}
-                <div className="my-12 md:my-16">
+              {after.length > 0 && (
+                <>
+                  {/* Half-time: between two sections, inside the reading column like an image block. */}
                   <HalftimeSlot />
-                </div>
-                <div className={READING}>
                   {after.map((b, i) => (
                     <BlockView key={i} block={b} channel={channel} />
                   ))}
-                </div>
-              </>
-            )}
-            <div className={cn(BODY, "mx-auto mt-10 grid w-full max-w-[68ch] gap-5 text-[18px] md:text-[19px] sm:grid-cols-[1fr_minmax(0,240px)]")}>
-              {video.article.keyPoints.length ? <KeyPoints points={video.article.keyPoints} /> : <div className="hidden sm:block" />}
-              <StatSlot className="font-sans" />
+                </>
+              )}
             </div>
+            {video.article.keyPoints.length > 0 && (
+              <div className={cn(READING, "mt-10")}>
+                <KeyPoints points={video.article.keyPoints} />
+              </div>
+            )}
             <div className={cn(READING, "mt-10")}>
               <Transcript lines={video.transcript} />
             </div>
@@ -181,7 +172,7 @@ async function VideoPageContent({ params }: { params: Params }) {
       )}
 
       <div className="mx-auto mt-16 max-w-[1280px] px-4 md:mt-24 md:px-8">
-        <RelatedItems channel={channel} related={related} />
+        <RelatedItems channel={channel} related={related} sponsor={slotOptions(channel, "short", video.isLive)} />
       </div>
     </VideoPageProvider>
   )

@@ -4,11 +4,13 @@ import { useEffect, useEffectEvent, useRef, useState } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { ChevronDown, ChevronUp, MonitorPlay, Pause, Play, SquarePlay } from "lucide-react"
-import { AdSlot } from "@/components/brand/ad-slot"
+import { AgeTag, OptOut, SponsoredShortCard } from "@/components/brand/native-ads"
 import { VideoThumb } from "@/components/brand/media"
 import { Button } from "@/components/ui/button"
 import { compact, formatDuration } from "@/lib/format"
 import { cn } from "@/lib/utils"
+import type { Sponsor } from "@/lib/types"
+import { useViewer, type Viewer } from "./viewer"
 
 export interface FeedShort {
   id: string
@@ -16,6 +18,7 @@ export interface FeedShort {
   caption: string
   durationSec: number
   posterTone: string
+  poster?: string
   /** YouTube Shorts play in the vertical YouTube embed; clips cut from uploaded masters play in our player. */
   source: "youtube_short" | "clip"
   sourceLabel: string
@@ -36,7 +39,7 @@ export function buildFeed(shorts: FeedShort[]): FeedItem[] {
   return out
 }
 
-export function ShortsFeedFromParams(props: { shorts: FeedShort[]; channelName: string }) {
+export function ShortsFeedFromParams(props: { shorts: FeedShort[]; channelName: string; sponsor: Record<Viewer, Sponsor> }) {
   const params = useSearchParams()
   return <ShortsFeed {...props} initialId={params.get("s") ?? undefined} />
 }
@@ -45,11 +48,16 @@ export function ShortsFeed({
   shorts,
   channelName,
   initialId,
+  sponsor: sponsorOptions,
 }: {
   shorts: FeedShort[]
   channelName: string
   initialId?: string
+  /** The sponsored short for each viewer state, decided on the server. */
+  sponsor: Record<Viewer, Sponsor>
 }) {
+  const { viewer } = useViewer()
+  const sponsor = sponsorOptions[viewer]
   const feed = buildFeed(shorts)
   const start = Math.max(0, feed.findIndex((f) => f.kind === "short" && f.short.id === initialId))
   const [index, setIndex] = useState(start)
@@ -116,7 +124,7 @@ export function ShortsFeed({
         >
           {item.kind === "short" ? (
             <>
-              <VideoThumb tone={item.short.posterTone} ratio="9/16" className="h-full rounded-none" />
+              <VideoThumb tone={item.short.posterTone} src={item.short.poster} ratio="9/16" className="h-full rounded-none" />
               <button
                 type="button"
                 onClick={() => setPlaying((p) => !p)}
@@ -146,9 +154,8 @@ export function ShortsFeed({
               </div>
             </>
           ) : (
-            <div className="flex h-full flex-col items-center justify-center gap-3 bg-ad-frame p-4">
-              <AdSlot format="short-card" advertiser="Southern Cross Utes" />
-            </div>
+            // A sponsored short fills the same 9:16 frame as every short in the feed.
+            <SponsoredShortCard key={sponsor.id} sponsor={sponsor} variant="feed" />
           )}
         </div>
 
@@ -172,8 +179,12 @@ export function ShortsFeed({
             </>
           ) : (
             <>
-              <h1 className="text-[20px] font-bold leading-[26px]">Sponsored</h1>
-              <p className="mt-1 text-[15px] text-muted-foreground">Southern Cross Utes</p>
+              <h1 className="text-[20px] font-bold leading-[26px]">{sponsor.line}</h1>
+              <p className="mt-1 flex flex-wrap items-center gap-2 text-[13px] text-muted-foreground">
+                <span className="text-[11px] font-bold uppercase tracking-[1px]">Sponsored</span> · <span className="font-semibold text-foreground">{sponsor.name}</span>
+                <AgeTag category={sponsor.ageCategory} />
+                <OptOut category={sponsor.ageCategory} className="text-muted-foreground" />
+              </p>
             </>
           )}
         </div>
@@ -218,13 +229,18 @@ export function ShortsFeed({
                   >
                     <span className="w-10 shrink-0">
                       {f.kind === "short" ? (
-                        <span className="block aspect-[9/16] w-10 rounded-[3px]" style={{ background: f.short.posterTone }} />
+                        f.short.poster ? (
+                          // eslint-disable-next-line @next/next/no-img-element -- prototype media
+                          <img src={f.short.poster} alt="" className="block aspect-[9/16] w-10 rounded-[3px] object-cover" loading="lazy" />
+                        ) : (
+                          <span className="block aspect-[9/16] w-10 rounded-[3px]" style={{ background: f.short.posterTone }} />
+                        )
                       ) : (
-                        <span className="block aspect-[9/16] w-10 rounded-[3px] border bg-ad-frame" />
+                        <span className="block aspect-[9/16] w-10 rounded-[3px]" style={{ background: sponsor.colour }} />
                       )}
                     </span>
                     <span className="line-clamp-2 text-[14px] font-medium leading-[19px]">
-                      {f.kind === "short" ? f.short.title : "Sponsored"}
+                      {f.kind === "short" ? f.short.title : `Sponsored · ${sponsor.name}`}
                     </span>
                   </button>
                 </li>

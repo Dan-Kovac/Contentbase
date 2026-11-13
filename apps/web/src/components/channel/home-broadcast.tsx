@@ -1,13 +1,15 @@
+import { Fragment } from "react"
 import Link from "next/link"
 import { ArrowRight, Clock, Play, Radio } from "lucide-react"
-import { HalftimeBreak, PresentedBy } from "@/components/brand/native-ads"
 import { StatusBadge } from "@/components/brand/status-badge"
 import { formatDuration } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { Channel, Video } from "@/lib/types"
 import { LiveStrip, ShortsList, type HomeData } from "./home-modules"
 import type { LiveBlog } from "./live-data"
-import { BODY, DISPLAY, sectionLabel, sectionPath, sponsorFor, videoPath, type Story } from "./lib"
+import { BODY, DISPLAY, sectionLabel, sectionPath, videoPath, type Story } from "./lib"
+import { RAIL_CARD, RAIL_HEADLINE } from "./styles"
+import { SponsorSlot } from "./viewer"
 import { RailHeading, StoryImage } from "./story"
 
 const WRAP = "mx-auto w-full max-w-[1280px] px-4 md:px-8"
@@ -15,13 +17,6 @@ const WRAP = "mx-auto w-full max-w-[1280px] px-4 md:px-8"
 /** Broadcast: dark and video-led. A full-bleed photographic hero, then streaming-style rails. */
 export function BroadcastHome({ data }: { data: HomeData }) {
   const { channel, modules } = data
-  let presentedUsed = false
-  /** "Presented by" sits on one rail header: the first rail after the hero. */
-  const takePresented = () => {
-    if (presentedUsed) return false
-    presentedUsed = true
-    return true
-  }
   return (
     <div className="pb-8">
       {data.live && modules[0] !== "lead" && <LiveStrip channel={channel} live={data.live} tone="dark" />}
@@ -30,24 +25,18 @@ export function BroadcastHome({ data }: { data: HomeData }) {
         {modules.map((m) => {
           switch (m) {
             case "lead":
-              return data.lead ? <BroadcastHero key="lead" channel={channel} video={data.lead} live={data.live} /> : null
+              return data.lead ? <BroadcastHero key="lead" data={data} video={data.lead} /> : null
             case "grid":
-              return <LatestRail key="grid" data={data} presented={takePresented()} />
+              return <LatestRail key="grid" data={data} />
             case "sections":
-              return <SectionRails key="sections" data={data} presented={takePresented()} />
+              return <SectionRails key="sections" data={data} />
             case "shorts":
               return data.shorts.length ? (
                 <section key="shorts" aria-labelledby="shorts-title" className={WRAP}>
                   <RailHeading id="shorts-title" title="Shorts" href={`/c/${channel.slug}/shorts`} linkLabel="Watch all" />
-                  <ShortsList channel={channel} shorts={data.shorts} />
+                  <ShortsList channel={channel} shorts={data.shorts} sponsor={data.sponsors.short} />
                 </section>
               ) : null
-            case "sponsor":
-              return (
-                <div key="sponsor" className={WRAP}>
-                  <HalftimeBreak sponsor={sponsorFor("halftime")} />
-                </div>
-              )
           }
         })}
       </div>
@@ -55,7 +44,8 @@ export function BroadcastHome({ data }: { data: HomeData }) {
   )
 }
 
-function BroadcastHero({ channel, video, live }: { channel: Channel; video: Video; live?: LiveBlog }) {
+function BroadcastHero({ data, video }: { data: HomeData; video: Video }) {
+  const { channel, live } = data
   const href = videoPath(channel, video)
   return (
     <section aria-labelledby="lead-title" className="relative isolate overflow-hidden bg-black text-white">
@@ -115,7 +105,7 @@ function BroadcastHero({ channel, video, live }: { channel: Channel; video: Vide
               Read the article
             </Link>
           </div>
-          <PresentedBy sponsor={sponsorFor("presented")} tone="dark" className="mt-3 max-w-[560px]" />
+          <SponsorSlot format="presented" options={data.sponsors.presented} tone="dark" className="mt-3 max-w-[560px]" />
         </div>
       </div>
     </section>
@@ -125,12 +115,12 @@ function BroadcastHero({ channel, video, live }: { channel: Channel; video: Vide
 /** A streaming-style card: big poster, accent ring on hover, title under. */
 function RailCard({ story }: { story: Story }) {
   return (
-    <article className="group relative flex w-[78vw] max-w-[400px] shrink-0 snap-start flex-col gap-3 sm:w-[340px] lg:w-[400px]">
+    <article className={cn("group relative flex flex-col gap-3", RAIL_CARD)}>
       <div className="rounded-lg ring-2 ring-transparent ring-offset-2 ring-offset-background transition-shadow group-hover:ring-[var(--chan)] group-focus-within:ring-[var(--chan)]">
         <StoryImage story={story} ratio={story.kind === "video" ? "16/9" : "3/2"} />
       </div>
       <span className="text-[12px] font-bold uppercase tracking-[1.2px] text-[var(--chan-ink)]">{story.sectionLabel}</span>
-      <h3 className={cn(DISPLAY, "text-[24px] leading-[26px] md:text-[28px] md:leading-[30px]")}>
+      <h3 className={cn(DISPLAY, RAIL_HEADLINE)}>
         <Link href={story.href} className="outline-none after:absolute after:inset-0 group-hover:underline group-hover:underline-offset-4">
           {story.headline}
         </Link>
@@ -145,7 +135,7 @@ function RailCard({ story }: { story: Story }) {
 function LiveCard({ channel, live }: { channel: Channel; live: LiveBlog }) {
   const latest = live.updates[0]
   return (
-    <article className="group relative flex w-[78vw] max-w-[400px] shrink-0 snap-start flex-col gap-3 sm:w-[340px] lg:w-[400px]">
+    <article className={cn("group relative flex flex-col gap-3", RAIL_CARD)}>
       <div className="relative flex aspect-video flex-col justify-between overflow-hidden rounded-lg bg-[var(--chan)] p-4 text-[var(--chan-on)] ring-2 ring-transparent ring-offset-2 ring-offset-background group-hover:ring-[var(--chan)]">
         <span className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[1.5px]">
           <Radio className="size-4" aria-hidden /> Live now
@@ -154,7 +144,7 @@ function LiveCard({ channel, live }: { channel: Channel; live: LiveBlog }) {
         <span className="font-mono text-[13px] font-medium tabular">Updated {live.updatedAt}</span>
       </div>
       <span className="text-[12px] font-bold uppercase tracking-[1.2px] text-[var(--chan-ink)]">{live.event}</span>
-      <h3 className={cn(DISPLAY, "text-[24px] leading-[26px] md:text-[28px] md:leading-[30px]")}>
+      <h3 className={cn(DISPLAY, RAIL_HEADLINE)}>
         <Link href={`/c/${channel.slug}/live`} className="outline-none after:absolute after:inset-0 group-hover:underline group-hover:underline-offset-4">
           {live.title}
         </Link>
@@ -174,7 +164,7 @@ function Rail({ label, children }: { label: string; children: React.ReactNode })
   )
 }
 
-function LatestRail({ data, presented }: { data: HomeData; presented: boolean }) {
+function LatestRail({ data }: { data: HomeData }) {
   const { channel } = data
   const stories = data.stories
   if (!stories.length) return null
@@ -182,19 +172,25 @@ function LatestRail({ data, presented }: { data: HomeData; presented: boolean })
   return (
     <div className={cn(WRAP, "flex flex-col gap-14 md:gap-20")}>
       <section aria-labelledby="latest-title">
-        <RailHeading id="latest-title" title="Latest" href={`/c/${channel.slug}/search`} linkLabel="Browse">
-          {presented && <PresentedBy sponsor={sponsorFor("section")} />}
-        </RailHeading>
+        <RailHeading id="latest-title" title="Latest" href={`/c/${channel.slug}/search`} linkLabel="Browse" />
         <Rail label="Latest videos">
           {data.live && (
             <li className="flex">
               <LiveCard channel={channel} live={data.live} />
             </li>
           )}
-          {stories.map((s) => (
-            <li key={s.id} className="flex">
-              <RailCard story={s} />
-            </li>
+          {stories.map((s, i) => (
+            <Fragment key={s.id}>
+              {/* The page's one sponsored story: a rail card like the rest, third in the rail. */}
+              {data.storyIn === "grid" && i === Math.min(2, stories.length - 1) && (
+                <li className="flex">
+                  <SponsorSlot format="story" variant="rail" options={data.sponsors.story} />
+                </li>
+              )}
+              <li className="flex">
+                <RailCard story={s} />
+              </li>
+            </Fragment>
           ))}
         </Rail>
       </section>
@@ -224,24 +220,30 @@ function LatestRail({ data, presented }: { data: HomeData; presented: boolean })
   )
 }
 
-function SectionRails({ data, presented }: { data: HomeData; presented: boolean }) {
+function SectionRails({ data }: { data: HomeData }) {
   const { channel } = data
   const rows = channel.sections
     .map((s) => ({ ...s, items: data.stories.filter((x) => x.section === s.slug) }))
     .filter((r) => r.items.length > 0)
   if (!rows.length) return null
+  const sponsoredRow = rows.findIndex((r) => r.items.length >= 2)
   return (
     <div className={cn(WRAP, "flex flex-col gap-14")}>
       {rows.map((row, i) => (
         <section key={row.slug} aria-labelledby={`row-${row.slug}`}>
-          <RailHeading id={`row-${row.slug}`} title={row.label} href={sectionPath(channel, row.slug)}>
-            {presented && i === 0 && <PresentedBy sponsor={sponsorFor("section")} />}
-          </RailHeading>
+          <RailHeading id={`row-${row.slug}`} title={row.label} href={sectionPath(channel, row.slug)} />
           <Rail label={`${row.label} videos`}>
-            {row.items.map((s) => (
-              <li key={s.id} className="flex">
-                <RailCard story={s} />
-              </li>
+            {row.items.map((s, j) => (
+              <Fragment key={s.id}>
+                {data.storyIn === "sections" && i === sponsoredRow && j === 2 && (
+                  <li className="flex">
+                    <SponsorSlot format="story" variant="rail" options={data.sponsors.story} />
+                  </li>
+                )}
+                <li className="flex">
+                  <RailCard story={s} />
+                </li>
+              </Fragment>
             ))}
           </Rail>
         </section>

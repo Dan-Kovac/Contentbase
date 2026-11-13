@@ -1,9 +1,9 @@
 import { Suspense } from "react"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { AdSlot } from "@/components/brand/ad-slot"
+import { PresentedBy } from "@/components/brand/native-ads"
 import { StatusBadge } from "@/components/brand/status-badge"
-import { BODY, DISPLAY, SITE } from "@/components/channel/lib"
+import { BODY, DISPLAY, SITE, sponsorFor } from "@/components/channel/lib"
 import { getLiveBlog } from "@/components/channel/live-data"
 import { JsonLd } from "@/components/channel/video-page"
 import { ChannelPageSkeleton } from "@/components/channel/skeleton"
@@ -65,6 +65,8 @@ async function LivePageContent({ params }: { params: Promise<{ channel: string }
             <p className="text-[13px] text-muted-foreground">
               Last updated <time dateTime={blog.updatedIso}>{blog.updatedAt}, {blog.startedAt}</time> · Newest first
             </p>
+            {/* TLK-08: live coverage never carries age-restricted sponsors, whatever the viewer's locks. */}
+            <PresentedBy sponsor={sponsorFor("presented")} className="mt-2" />
           </header>
 
           <ol className="relative mt-2" aria-label="Live updates">
@@ -99,14 +101,6 @@ async function LivePageContent({ params }: { params: Promise<{ channel: string }
                 </li>
               ))}
             </ol>
-          </div>
-          {/*
-            TLK-08: this page is flagged is_live, so the ad decision service excludes wagering for
-            every slot here, whatever the viewer's locks. The slot below is always non-wagering.
-          */}
-          <div data-ad-policy="non-wagering" data-live-page="true" className="flex justify-center lg:justify-start">
-            <p className="sr-only">Betting ads are switched off on live coverage.</p>
-            <AdSlot format="mrec" wagering={false} advertiser="Southern Cross Utes" className="lg:mx-0" />
           </div>
         </aside>
       </div>

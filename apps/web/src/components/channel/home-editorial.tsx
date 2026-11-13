@@ -1,11 +1,12 @@
+import { Fragment } from "react"
 import Link from "next/link"
 import { Play } from "lucide-react"
-import { HalftimeBreak, PresentedBy } from "@/components/brand/native-ads"
 import { compact, formatDuration } from "@/lib/format"
 import { cn } from "@/lib/utils"
-import type { Channel, Video } from "@/lib/types"
+import type { Video } from "@/lib/types"
 import { LiveStrip, ShortsList, type HomeData } from "./home-modules"
-import { BODY, DISPLAY, sectionLabel, sectionPath, sponsorFor, videoPath } from "./lib"
+import { BODY, DISPLAY, sectionLabel, sectionPath, videoPath } from "./lib"
+import { SponsorSlot } from "./viewer"
 import { FeatureStory, ModuleHeading, StoryCard, StoryRow } from "./story"
 
 const WRAP = "mx-auto w-full max-w-[1280px] px-4 md:px-8"
@@ -21,20 +22,14 @@ export function EditorialHome({ data }: { data: HomeData }) {
         {modules.map((m) => {
           switch (m) {
             case "lead":
-              return data.lead ? <EditorialLead key="lead" channel={channel} video={data.lead} /> : null
+              return data.lead ? <EditorialLead key="lead" data={data} video={data.lead} /> : null
             case "shorts":
               return data.shorts.length ? (
                 <section key="shorts" aria-labelledby="shorts-title" className={WRAP}>
                   <ModuleHeading id="shorts-title" title="Shorts" href={`/c/${channel.slug}/shorts`} linkLabel="Watch all" />
-                  <ShortsList channel={channel} shorts={data.shorts} />
+                  <ShortsList channel={channel} shorts={data.shorts} sponsor={data.sponsors.short} />
                 </section>
               ) : null
-            case "sponsor":
-              return (
-                <div key="sponsor" className={WRAP}>
-                  <HalftimeBreak sponsor={sponsorFor("halftime")} />
-                </div>
-              )
             case "grid":
               return <EditorialGrid key="grid" data={data} />
             case "sections":
@@ -46,7 +41,8 @@ export function EditorialHome({ data }: { data: HomeData }) {
   )
 }
 
-function EditorialLead({ channel, video }: { channel: Channel; video: Video }) {
+function EditorialLead({ data, video }: { data: HomeData; video: Video }) {
+  const { channel } = data
   const href = videoPath(channel, video)
   return (
     <section aria-labelledby="lead-title" className={cn(WRAP, "pt-6 md:pt-12")}>
@@ -101,7 +97,7 @@ function EditorialLead({ channel, video }: { channel: Channel; video: Video }) {
               Read the article
             </Link>
           </div>
-          <PresentedBy sponsor={sponsorFor("presented")} className="mt-2" />
+          <SponsorSlot format="presented" options={data.sponsors.presented} className="mt-2" />
         </div>
       </div>
     </section>
@@ -121,8 +117,11 @@ function EditorialGrid({ data }: { data: HomeData }) {
           <FeatureStory story={feature} />
           {rest.length > 0 && (
             <div className="grid gap-x-8 gap-y-10 border-t pt-8 sm:grid-cols-2">
-              {rest.map((s) => (
-                <StoryCard key={s.id} story={s} standfirst ratio="3/2" />
+              {rest.map((s, i) => (
+                <Fragment key={s.id}>
+                  {data.storyIn === "grid" && i === 1 && <SponsorSlot format="story" options={data.sponsors.story} standfirst ratio="3/2" />}
+                  <StoryCard story={s} standfirst ratio="3/2" />
+                </Fragment>
               ))}
             </div>
           )}
@@ -165,22 +164,31 @@ function EditorialSections({ data }: { data: HomeData }) {
     .map((s) => ({ ...s, items: data.stories.filter((x) => x.section === s.slug) }))
     .filter((r) => r.items.length > 0)
   if (!rows.length) return null
+  const sponsoredRow = rows.findIndex((r) => r.items.length >= 2)
   return (
     <div className={cn(WRAP, "flex flex-col gap-16")}>
       {rows.map((row, i) => (
         <section key={row.slug} aria-labelledby={`row-${row.slug}`}>
-          <ModuleHeading id={`row-${row.slug}`} title={row.label} href={sectionPath(channel, row.slug)}>
-            {/* One section row carries a "Presented by" credit on its header. */}
-            {i === 0 && <PresentedBy sponsor={sponsorFor("section")} />}
-          </ModuleHeading>
-          <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-            {row.items.slice(0, 4).map((s) => (
-              <StoryCard key={s.id} story={s} size="sm" />
-            ))}
-          </div>
-          {row.items.length > 4 && (
+          <ModuleHeading id={`row-${row.slug}`} title={row.label} href={sectionPath(channel, row.slug)} />
+          {/* The first section row carries the page's one sponsored story, as one of its four cards. */}
+          {(() => {
+            const sponsored = data.storyIn === "sections" && i === sponsoredRow
+            const cards = row.items.slice(0, sponsored ? 3 : 4)
+            return (
+              <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+                {cards.map((s, j) => (
+                  <Fragment key={s.id}>
+                    {sponsored && j === 2 && <SponsorSlot format="story" options={data.sponsors.story} size="sm" />}
+                    <StoryCard story={s} size="sm" />
+                  </Fragment>
+                ))}
+                {sponsored && cards.length < 3 && <SponsorSlot format="story" options={data.sponsors.story} size="sm" />}
+              </div>
+            )
+          })()}
+          {row.items.length > (data.storyIn === "sections" && i === sponsoredRow ? 3 : 4) && (
             <div className="mt-8 flex flex-col gap-6">
-              {row.items.slice(4, 7).map((s) => (
+              {row.items.slice(data.storyIn === "sections" && i === sponsoredRow ? 3 : 4, 7).map((s) => (
                 <StoryRow key={s.id} story={s} className="border-t pt-6" />
               ))}
             </div>

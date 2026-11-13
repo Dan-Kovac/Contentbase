@@ -7,13 +7,11 @@ import {
   Check,
   Maximize,
   Minimize,
-  MonitorPlay,
   Pause,
   Play,
   RotateCcw,
   RotateCw,
   Settings,
-  SquarePlay,
   Volume2,
   VolumeX,
 } from "lucide-react"
@@ -344,17 +342,6 @@ export function VideoPlayer({
           </>
         )}
       </div>
-      <p className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
-        {source === "youtube" ? (
-          <>
-            <SquarePlay className="size-3.5" aria-hidden /> Plays in the YouTube player · Captions in English
-          </>
-        ) : (
-          <>
-            <MonitorPlay className="size-3.5" aria-hidden /> Plays in the Homestand player · Captions in English
-          </>
-        )}
-      </p>
     </div>
   )
 }
@@ -385,6 +372,7 @@ function Timeline({
     if (!r) return 0
     return Math.max(0, Math.min(1, (clientX - r.left) / r.width))
   }
+  const inSponsor = (x: number) => x >= sponsorFrom && x < sponsorTo
   const hoverChapter = hover === null ? undefined : [...chapters].reverse().find((c) => c.start <= hover * duration)
   return (
     <div
@@ -435,7 +423,8 @@ function Timeline({
           aria-hidden
         />
       </div>
-      {sponsor && (
+      {/* The credit shows only while the sponsored chapter plays or is hovered: one mention, not a banner. */}
+      {sponsor && (inSponsor(time / duration) || (hover !== null && inSponsor(hover))) && (
         <span
           className="pointer-events-none absolute -top-3.5 hidden -translate-x-0 whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.8px] text-white/80 md:block"
           style={{ left: `${sponsorFrom * 100}%` }}

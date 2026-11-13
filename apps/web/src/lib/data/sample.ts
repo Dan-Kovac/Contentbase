@@ -39,7 +39,6 @@ export const channels: Channel[] = [
     modules: [
       { id: "lead", enabled: true },
       { id: "shorts", enabled: true },
-      { id: "sponsor", enabled: true },
       { id: "grid", enabled: true },
       { id: "sections", enabled: true },
     ],
@@ -92,7 +91,6 @@ export const channels: Channel[] = [
     ],
     modules: [
       { id: "lead", enabled: true },
-      { id: "sponsor", enabled: true },
       { id: "grid", enabled: true },
       { id: "shorts", enabled: true },
       { id: "sections", enabled: false },
@@ -508,12 +506,12 @@ export const campaigns: Campaign[] = [
   { id: "cmp_ute", advertiser: "Southern Cross Utes", isWagering: false, format: "halftime", pricing: "cpm", status: "live", budget: 18000, spent: 7420.5, impressions: 742050, clicks: 3120, flight: "1 November – 30 November 2026", channels: ["Footy Fix", "Trackside"] },
   { id: "cmp_bookie", advertiser: "Harbour Bet (licensed)", isWagering: true, ageCategory: "wagering", format: "chapter_sponsor", pricing: "cpm", status: "live", budget: 25000, spent: 11980, impressions: 599000, clicks: 2210, flight: "1 November – 31 December 2026", channels: ["Footy Fix", "Trackside"] },
   { id: "cmp_boots", advertiser: "Kick Boots Co.", isWagering: false, format: "sponsored_short", pricing: "flat", status: "scheduled", budget: 6000, spent: 0, impressions: 0, clicks: 0, flight: "1 December – 14 December 2026", channels: ["Footy Fix"] },
-  { id: "cmp_tab", advertiser: "Riverbank Wagering", isWagering: true, ageCategory: "wagering", format: "stat_card", pricing: "cpc", status: "in_review", budget: 12000, spent: 0, impressions: 0, clicks: 0, flight: "15 November – 15 December 2026", channels: ["Trackside"] },
+  { id: "cmp_tab", advertiser: "Riverbank Wagering", isWagering: true, ageCategory: "wagering", format: "halftime", pricing: "cpc", status: "in_review", budget: 12000, spent: 0, impressions: 0, clicks: 0, flight: "15 November – 15 December 2026", channels: ["Trackside"] },
 ]
 
 export const creatives: Creative[] = [
   {
-    id: "cr_riv_1", campaignId: "cmp_tab", advertiser: "Riverbank Wagering", name: "Spring Carnival stat card", format: "stat_card", isWagering: true, status: "pending", submittedAt: "11 November 2026, 8:15 am",
+    id: "cr_riv_1", campaignId: "cmp_tab", advertiser: "Riverbank Wagering", name: "Spring Carnival half-time break", format: "halftime", isWagering: true, status: "pending", submittedAt: "11 November 2026, 8:15 am",
     checks: [
       { label: "No odds promoted", result: "fail" },
       { label: "No notable person", result: "pass" },
@@ -549,10 +547,10 @@ export const adDecisions: AdDecision[] = [
 ]
 
 export const sponsors: Sponsor[] = [
-  { id: "sp_ute", name: "Southern Cross Utes", colour: "#0f3d2e", line: "Built for the drive to every away game.", stat: { value: "3.5t", label: "towing, every model" }, image: "/media/stadium-night-wide.jpg", cta: "Book a test drive", url: "https://example.com/utes" },
-  { id: "sp_boots", name: "Kick Boots Co.", colour: "#111111", line: "Grip for the wet ones.", stat: { value: "14", label: "studs, moulded for Australian grounds" }, image: "/media/stadium-day-pitch.jpg", cta: "Shop the range", url: "https://example.com/boots" },
-  { id: "sp_harbour", name: "Harbour Bet", colour: "#0b2545", line: "Racing coverage, every meeting.", image: "/media/racing-motion.jpg", cta: "Learn more", url: "https://example.com/harbour", ageCategory: "wagering" },
-  { id: "sp_brew", name: "Riverside Brewing", colour: "#7a3e00", line: "Brewed in Abbotsford since 1998.", stat: { value: "4.6%", label: "Pale ale, best enjoyed after the siren" }, image: "/media/festival-crowd.jpg", cta: "Find a stockist", url: "https://example.com/brew", ageCategory: "alcohol" },
+  { id: "sp_ute", name: "Southern Cross Utes", colour: "#0f3d2e", line: "Built for the drive to every away game.", body: "3.5 tonnes of towing on every model, and a tray that fits the esky and the eskies.", cta: "Book a test drive", url: "https://example.com/utes" },
+  { id: "sp_boots", name: "Kick Boots Co.", colour: "#111111", line: "Grip for the wet ones.", body: "Fourteen studs, moulded for Australian grounds in July.", cta: "Shop the range", url: "https://example.com/boots" },
+  { id: "sp_harbour", name: "Harbour Bet", colour: "#0b2545", line: "Racing coverage, every meeting.", body: "Form, fields and results from every Australian meeting. 18+ only. Gamble responsibly.", cta: "Learn more", url: "https://example.com/harbour", ageCategory: "wagering" },
+  { id: "sp_brew", name: "Riverside Brewing", colour: "#7a3e00", line: "Brewed in Abbotsford since 1998.", body: "A 4.6% pale ale, best enjoyed after the siren. 18+ only.", cta: "Find a stockist", url: "https://example.com/brew", ageCategory: "alcohol" },
 ]
 
 export const standaloneArticles: StandaloneArticle[] = [

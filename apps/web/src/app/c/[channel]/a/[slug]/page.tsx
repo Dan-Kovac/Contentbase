@@ -3,8 +3,8 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ChevronRight } from "lucide-react"
-import { HalftimeBreak } from "@/components/brand/native-ads"
-import { BODY, SITE, isoDate, publicArticles, relatedFor, sectionLabel, sectionPath, sponsorFor } from "@/components/channel/lib"
+import { BODY, SITE, isoDate, publicArticles, relatedFor, sectionLabel, sectionPath, slotOptions } from "@/components/channel/lib"
+import { SponsorSlot } from "@/components/channel/viewer"
 import { ArticleHeaderView, BlockView, JsonLd, RelatedItems, splitAtBreak } from "@/components/channel/video-page"
 import { ChannelPageSkeleton } from "@/components/channel/skeleton"
 import { getChannel, listChannels } from "@/lib/data"
@@ -103,9 +103,9 @@ async function ArticlePageContent({ params }: { params: Params }) {
             />
           </div>
           {article.hero && (
-            <figure className="mx-auto mt-8 max-w-[1280px] md:mt-10">
+            <figure className="mx-auto mt-8 max-w-[920px] md:mt-10">
               {/* eslint-disable-next-line @next/next/no-img-element -- prototype media; next/image once media is on the CDN */}
-              <img src={article.hero} alt="" className="aspect-[16/9] w-full rounded-lg object-cover lg:aspect-[2/1]" fetchPriority="high" />
+              <img src={article.hero} alt="" className="aspect-[16/9] w-full rounded-lg object-cover" fetchPriority="high" />
             </figure>
           )}
           <div className={cn(READING, "mt-8 md:mt-12 [&>*:first-child]:mt-0")}>
@@ -114,22 +114,18 @@ async function ArticlePageContent({ params }: { params: Params }) {
             ))}
           </div>
           {after.length > 0 && (
-            <>
-              {/* Half-time: between sections, out of the reading column to the container width. Logged-out render, so never age-restricted. */}
-              <div className="my-12 md:my-16">
-                <HalftimeBreak sponsor={sponsorFor("halftime")} />
-              </div>
-              <div className={READING}>
-                {after.map((b, i) => (
-                  <BlockView key={i} block={b} channel={channel} />
-                ))}
-              </div>
-            </>
+            <div className={READING}>
+              {/* Half-time: between two sections, inside the reading column like an image block. */}
+              <SponsorSlot format="halftime" options={slotOptions(channel, "halftime")} />
+              {after.map((b, i) => (
+                <BlockView key={i} block={b} channel={channel} />
+              ))}
+            </div>
           )}
         </article>
       </div>
       <div className="mx-auto mt-16 max-w-[1280px] px-4 md:mt-24 md:px-8">
-        <RelatedItems channel={channel} related={related} />
+        <RelatedItems channel={channel} related={related} sponsor={slotOptions(channel, "short")} />
       </div>
     </div>
   )

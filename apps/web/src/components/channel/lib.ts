@@ -2,14 +2,7 @@
 import { getVideo, listArticles, listPages, listShorts, listSponsors, listVideos } from "@/lib/data"
 import type { AgeCategory, Block, Channel, CustomPage, Short, Sponsor, StandaloneArticle, Video } from "@/lib/types"
 
-/** Display face for the channel's pairing (weight and tracking come from the pairing too). */
-export const DISPLAY =
-  "font-[family-name:var(--chan-display)] [font-weight:var(--chan-weight)] tracking-[var(--chan-tracking)]"
-/** Reading face: Source Serif 4 for Grandstand and Minimal, Archivo for Broadcast. */
-export const BODY = "font-[family-name:var(--chan-body)]"
-/** Accent-underlined link that stays readable whatever the accent (pale accents fail as text). */
-export const ACCENT_LINK =
-  "underline decoration-[var(--chan)] decoration-2 underline-offset-4 hover:decoration-foreground"
+export { ACCENT_LINK, BODY, COLUMN, CONTAINER, DISPLAY, WIDE } from "./styles"
 
 export const SITE = "https://homestand.com.au"
 
@@ -236,10 +229,9 @@ export function allowedAgeCategories(viewer: Viewer, channel: Channel, isLive: b
 /** Slot plans: the age-restricted sponsors a slot prefers, and the non-restricted fill. */
 export const SLOT_PLANS = {
   chapter: { restricted: ["sp_harbour"], fill: "sp_ute" },
-  halftime: { restricted: ["sp_brew", "sp_harbour"], fill: "sp_ute" },
-  stat: { restricted: ["sp_brew"], fill: "sp_boots" },
+  halftime: { restricted: ["sp_harbour", "sp_brew"], fill: "sp_ute" },
+  story: { restricted: ["sp_brew", "sp_harbour"], fill: "sp_boots" },
   presented: { restricted: [], fill: "sp_ute" },
-  section: { restricted: [], fill: "sp_boots" },
   short: { restricted: [], fill: "sp_boots" },
 } as const satisfies Record<string, { restricted: readonly string[]; fill: string }>
 
@@ -258,19 +250,52 @@ export function sponsorFor(slot: SlotName, allowed: AgeCategory[] = []): Sponsor
   return fill
 }
 
+export const VIEWERS: Viewer[] = ["logged_out", "signed_in", "verified", "opted_out"]
+
+/**
+ * The sponsor a slot shows for every viewer state, decided on the server. The client only picks
+ * one of the four, so no ad decision is ever made in the browser (fail closed).
+ */
+export function slotOptions(channel: Channel, slot: SlotName, isLive = false): Record<Viewer, Sponsor> {
+  const out = {} as Record<Viewer, Sponsor>
+  for (const viewer of VIEWERS) out[viewer] = sponsorFor(slot, allowedAgeCategories(viewer, channel, isLive))
+  return out
+}
+
 /** The sponsors each native slot on a video or article page shows for one viewer state. */
 export interface SlotPlan {
   chapter: Sponsor
   halftime: Sponsor
-  stat: Sponsor
+  story: Sponsor
   /** Why: which checks passed and what the creator blocked. */
   note: string
   restricted: boolean
 }
 
-const VIEWERS: Viewer[] = ["logged_out", "signed_in", "verified", "opted_out"]
-
 const list = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}` : xs[0] ?? "")
+
+/** Plain-English reason for what a viewer sees, for the demo bar. */
+export function viewerNote(viewer: Viewer, channel: Channel, isLive = false): string {
+  if (viewer === "logged_out") return "Not signed in, so age-restricted sponsors never show. Everyday sponsors fill every slot."
+  if (viewer === "signed_in") return "Signed in but not confirmed 18+, so everyday sponsors only."
+  if (channel.mode !== "age_verified") return `${channel.name} runs in Standard mode, so no age-restricted ads.`
+  if (isLive) return "Live pages never carry age-restricted ads."
+  const allowed = allowedAgeCategories(viewer, channel, isLive)
+  const blocked = channel.blockedAgeCategories
+  return [
+    allowed.length ? `All three checks pass, so ${list(allowed)} sponsors can show.` : "No age-restricted category is eligible.",
+    blocked.length ? `${channel.name} blocks ${list(blocked)} ads.` : "",
+    viewer === "opted_out" ? "This viewer opted out of betting ads, so everyday sponsors fill those slots." : "",
+  ]
+    .filter(Boolean)
+    .join(" ")
+}
+
+export function viewerNotes(channel: Channel, isLive = false): Record<Viewer, string> {
+  const out = {} as Record<Viewer, string>
+  for (const viewer of VIEWERS) out[viewer] = viewerNote(viewer, channel, isLive)
+  return out
+}
 
 /** Decided on the server for every viewer state, so the client only switches between plans. */
 export function slotPlans(channel: Channel, isLive: boolean): Record<Viewer, SlotPlan> {
@@ -279,25 +304,9 @@ export function slotPlans(channel: Channel, isLive: boolean): Record<Viewer, Slo
     const allowed = allowedAgeCategories(viewer, channel, isLive)
     const chapter = sponsorFor("chapter", allowed)
     const halftime = sponsorFor("halftime", allowed)
-    const stat = sponsorFor("stat", allowed)
-    const restricted = [chapter, halftime, stat].some((s) => s.ageCategory)
-    let note: string
-    if (viewer === "logged_out") note = "Not signed in, so age-restricted sponsors never show. Non-restricted sponsors fill every slot."
-    else if (viewer === "signed_in") note = "Signed in but not 18+ verified, so non-restricted sponsors only."
-    else if (channel.mode !== "age_verified") note = `${channel.name} runs in Standard mode, so no age-restricted ads.`
-    else if (isLive) note = "Live pages never carry age-restricted ads."
-    else {
-      const blocked = channel.blockedAgeCategories
-      note = [
-        allowed.length ? `All checks pass for ${list(allowed)} ads.` : "No age-restricted category is eligible.",
-        blocked.length ? `${channel.name} blocks ${list(blocked)} ads.` : "",
-        viewer === "opted_out" ? "This viewer opted out of betting ads." : "",
-        restricted ? "" : "Non-restricted sponsors fill the slots.",
-      ]
-        .filter(Boolean)
-        .join(" ")
-    }
-    out[viewer] = { chapter, halftime, stat, note, restricted }
+    const story = sponsorFor("story", allowed)
+    const restricted = [chapter, halftime, story].some((s) => s.ageCategory)
+    out[viewer] = { chapter, halftime, story, note: viewerNote(viewer, channel, isLive), restricted }
   }
   return out
 }

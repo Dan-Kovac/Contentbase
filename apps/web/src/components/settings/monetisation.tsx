@@ -23,7 +23,7 @@ import {
   HalftimeBreak,
   PresentedBy,
   SponsoredShortCard,
-  StatCard,
+  SponsoredStoryCard,
 } from "@/components/brand/native-ads"
 import { cn } from "@/lib/utils"
 import type { AgeCategory, Channel, ChannelMode, Sponsor } from "@/lib/types"
@@ -130,7 +130,7 @@ export function Monetisation({ channel, sponsors }: { channel: Channel; sponsors
   }
   const chapter = pick("sp_ute", 0)
   const halftime = pick("sp_boots", 1)
-  const stat = pick("sp_brew", 0)
+  const story = pick("sp_brew", 0)
   const short = pick("sp_harbour", 1)
   const presented = pick("sp_ute", 0)
 
@@ -306,7 +306,7 @@ export function Monetisation({ channel, sponsors }: { channel: Channel; sponsors
         description="Homestand Native Formats. Advertisers send us a brief, and we set it in your channel's design. No banners, no third-party scripts and nothing that shifts the page. These are the only five formats, shown here with real sponsors."
       >
         <ol className="grid gap-4">
-          <FormatExample n={1} title="Chapter sponsor" where="A brand presents one chapter of a video: a credit under the player and a coloured segment on the timeline." note={exampleNote(chapter)}>
+          <FormatExample n={1} title="Chapter sponsor" where="A brand presents one chapter of a video: a credit in that chapter's row and a coloured segment on the timeline." note={exampleNote(chapter)}>
             <div className="grid max-w-[640px] gap-4">
               <div className="grid gap-2">
                 <div className="relative h-1.5 rounded-full bg-muted" aria-hidden>
@@ -329,20 +329,13 @@ export function Monetisation({ channel, sponsors }: { channel: Channel; sponsors
             </div>
           </FormatExample>
 
-          <FormatExample n={2} title="Half-time break" where="A pause between sections of a long article, set like a broadcast break. At most one per article." note={exampleNote(halftime)}>
-            <HalftimeBreak sponsor={halftime.sponsor} />
+          <FormatExample n={2} title="Half-time break" where="A pause between sections of an article, the width of the article column, like a photo. At most one per article." note={exampleNote(halftime)}>
+            <HalftimeBreak sponsor={halftime.sponsor} className="my-0 max-w-[560px]" />
           </FormatExample>
 
-          <FormatExample n={3} title="Stat card" where="A sponsor message set like a scoreboard tile, beside the key points of a video or in a stat row." note={exampleNote(stat)}>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="hidden min-h-[188px] flex-col justify-between rounded-lg border p-5 lg:flex" aria-hidden>
-                <p className="text-[11px] font-bold uppercase tracking-[1px] text-muted-foreground">Centre clearances</p>
-                <div>
-                  <p className="text-[48px] font-extrabold leading-none tracking-[-1.5px]">6–14</p>
-                  <p className="mt-1.5 text-[14px] leading-5 text-muted-foreground">Carlton v Collingwood, Round 7</p>
-                </div>
-              </div>
-              <StatCard sponsor={stat.sponsor} />
+          <FormatExample n={3} title="Sponsored story" where="One card in a story grid on your homepage, exactly the size of the stories beside it. One per page." note={exampleNote(story)}>
+            <div className="grid max-w-[640px] gap-4 sm:grid-cols-2">
+              <SponsoredStoryCard sponsor={story.sponsor} size="sm" />
             </div>
           </FormatExample>
 
@@ -354,7 +347,7 @@ export function Monetisation({ channel, sponsors }: { channel: Channel; sponsors
             </div>
           </FormatExample>
 
-          <FormatExample n={5} title="Presented by" where="A credit across the top of one homepage module or the lead story, the way a broadcast is brought to you by a sponsor." note={exampleNote(presented)}>
+          <FormatExample n={5} title="Presented by" where="A credit under your lead story, set like a byline: one line, never a box." note={exampleNote(presented)}>
             <div className="grid gap-3">
               <h4 className="text-xl font-bold tracking-[-0.01em]">Latest stories</h4>
               <PresentedBy sponsor={presented.sponsor} />

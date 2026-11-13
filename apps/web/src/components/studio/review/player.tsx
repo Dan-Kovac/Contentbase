@@ -39,7 +39,9 @@ export function VideoPlayer({
   onTime: React.Dispatch<React.SetStateAction<number>>
   className?: string
 }) {
-  const [playing, setPlaying] = useState(false)
+  const [wantsPlay, setPlaying] = useState(false)
+  // Stops at the end without a state update in an effect.
+  const playing = wantsPlay && time < durationSec
   const [muted, setMuted] = useState(false)
   const [captions, setCaptions] = useState(true)
 
@@ -48,10 +50,6 @@ export function VideoPlayer({
     const id = window.setInterval(() => onTime((t) => Math.min(durationSec, t + 0.5)), 500)
     return () => window.clearInterval(id)
   }, [playing, onTime, durationSec])
-
-  useEffect(() => {
-    if (playing && time >= durationSec) setPlaying(false)
-  }, [playing, time, durationSec])
 
   const pct = Math.min(100, (time / durationSec) * 100)
   const active = chapters.length ? chapterAt(chapters, time) : -1
@@ -130,7 +128,7 @@ export function VideoPlayer({
           />
         </div>
         <div className="mt-0.5 flex items-center gap-0.5">
-          <button type="button" className={ctrl} onClick={() => setPlaying((p) => !p)} aria-label={playing ? "Pause" : "Play"}>
+          <button type="button" className={ctrl} onClick={() => setPlaying(!playing)} aria-label={playing ? "Pause" : "Play"}>
             {playing ? <Pause className="size-4 fill-current" aria-hidden /> : <Play className="size-4 fill-current" aria-hidden />}
           </button>
           <button type="button" className={ctrl} onClick={() => onTime(Math.max(0, time - 10))} aria-label="Back 10 seconds">

@@ -24,7 +24,7 @@ import {
   HalftimeBreak,
   PresentedBy,
   SponsoredShortCard,
-  StatCard,
+  SponsoredStoryCard,
 } from "@/components/brand/native-ads"
 import { ADMIN_USER } from "./data"
 import { nowStamp } from "./clock"
@@ -48,7 +48,7 @@ const REJECT_PRESETS = [
 const FORMAT: Record<NativeFormat, string> = {
   chapter_sponsor: "Chapter sponsor",
   halftime: "Half-time break",
-  stat_card: "Stat card",
+  sponsored_story: "Sponsored story",
   sponsored_short: "Sponsored short",
   presented_by: "Presented by",
 }
@@ -58,8 +58,7 @@ const AGE: Record<AgeCategory, string> = { alcohol: "Alcohol", wagering: "Wageri
 const BRIEFS: Record<string, Partial<Sponsor> & { required?: string }> = {
   cr_riv_1: {
     colour: "#14532d",
-    line: "Every race, every track this Spring Carnival.",
-    stat: { value: "$3.50", label: "Feature race, Saturday" },
+    line: "$3.50 the favourite for Saturday's feature. Every race, every track.",
     image: "/media/racing-jockey-red.jpg",
     cta: "Learn more",
     url: "https://example.com/riverbank",
@@ -80,7 +79,6 @@ function sponsorFor(c: Creative, campaign: Campaign | undefined, sponsors: Spons
     name: base,
     colour: brief.colour ?? known?.colour ?? "#1f2937",
     line: brief.line ?? known?.line ?? c.name,
-    stat: brief.stat ?? known?.stat,
     image: brief.image ?? known?.image,
     cta: brief.cta ?? known?.cta ?? "Learn more",
     url: brief.url ?? known?.url ?? "#",
@@ -102,14 +100,6 @@ function CreativePreview({ c, sponsor }: { c: Creative; sponsor: Sponsor & { req
       <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-[13px] sm:grid-cols-[auto_1fr]">
         <dt className="text-muted-foreground">Line</dt>
         <dd>{sponsor.line}</dd>
-        {sponsor.stat && (
-          <>
-            <dt className="text-muted-foreground">Stat</dt>
-            <dd>
-              {sponsor.stat.value} · {sponsor.stat.label}
-            </dd>
-          </>
-        )}
         <dt className="text-muted-foreground">Button and link</dt>
         <dd className="break-all">
           {sponsor.cta} · <span className="font-mono">{sponsor.url}</span>
@@ -138,9 +128,10 @@ function FormatRender({ format, sponsor }: { format: NativeFormat; sponsor: Spon
         </div>
       )
     case "halftime":
-      return <HalftimeBreak sponsor={sponsor} />
-    case "stat_card":
-      return <StatCard sponsor={sponsor} className="max-w-[340px]" />
+      // The reading column's width, as on a channel's article.
+      return <HalftimeBreak sponsor={sponsor} className="my-0 max-w-[68ch]" />
+    case "sponsored_story":
+      return <SponsoredStoryCard sponsor={sponsor} size="sm" className="max-w-[300px]" />
     case "sponsored_short":
       return <SponsoredShortCard sponsor={sponsor} />
     case "presented_by":
