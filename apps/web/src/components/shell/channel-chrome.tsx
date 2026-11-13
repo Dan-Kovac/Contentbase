@@ -1,7 +1,8 @@
 import Link from "next/link"
-import { Search, UserRound } from "lucide-react"
+import { Search } from "lucide-react"
 import { Wordmark } from "@/components/brand/wordmark"
 import { ChannelNavLinks } from "@/components/channel/channel-nav"
+import { ChannelCtaBlock, HeaderActions } from "@/components/channel/channel-cta"
 import { cn } from "@/lib/utils"
 import type { Channel } from "@/lib/types"
 
@@ -48,15 +49,7 @@ export function ChannelHeader({ channel, nav = defaultNav(channel) }: { channel:
           <Link href={`/c/${channel.slug}/search`} aria-label="Search" className="grid size-9 place-items-center rounded-md outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring">
             <Search className="size-[18px]" aria-hidden />
           </Link>
-          <Link href="/account" aria-label="Your account" className="grid size-9 place-items-center rounded-md outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring">
-            <UserRound className="size-[18px]" aria-hidden />
-          </Link>
-          <Link
-            href="/account/signin"
-            className="ml-1 inline-flex h-8 items-center rounded-full bg-[var(--chan)] px-4 text-[13px] font-bold text-[var(--chan-on)] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-          >
-            Follow
-          </Link>
+          <HeaderActions channel={{ slug: channel.slug, name: channel.name, cta: channel.cta, template: channel.template }} />
         </div>
       </div>
       <ChannelNavLinks
@@ -76,6 +69,7 @@ export function ChannelFooter({ channel, nav = defaultNav(channel) }: { channel:
         <div className="flex max-w-[52ch] flex-col gap-3">
           <ChannelLogo channel={channel} />
           <p className="text-[14px] leading-[21px] text-muted-foreground">{channel.tagline}</p>
+          <ChannelCtaBlock channel={{ slug: channel.slug, name: channel.name, cta: channel.cta, template: channel.template }} tone="inline" className="mt-2" />
         </div>
         <nav aria-label="Footer">
           <ul className="flex flex-wrap gap-x-6 gap-y-2 text-[14px] font-medium">

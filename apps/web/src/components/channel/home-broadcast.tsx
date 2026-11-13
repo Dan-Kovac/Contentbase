@@ -10,6 +10,7 @@ import type { LiveBlog } from "./live-data"
 import { BODY, DISPLAY, sectionLabel, sectionPath, videoPath, type Story } from "./lib"
 import { RAIL_CARD, RAIL_HEADLINE } from "./styles"
 import { SponsorSlot } from "./viewer"
+import { ChannelCtaBlock } from "./channel-cta"
 import { RailHeading, StoryImage } from "./story"
 
 const WRAP = "mx-auto w-full max-w-[1280px] px-4 md:px-8"
@@ -39,6 +40,9 @@ export function BroadcastHome({ data }: { data: HomeData }) {
               ) : null
           }
         })}
+        <div className={WRAP}>
+          <ChannelCtaBlock channel={{ slug: channel.slug, name: channel.name, cta: channel.cta, template: channel.template }} className="max-w-[560px]" />
+        </div>
       </div>
     </div>
   )

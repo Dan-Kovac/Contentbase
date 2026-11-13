@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { PAIRINGS, channelStyle } from "@/lib/format"
 import { cn } from "@/lib/utils"
-import type { Channel, HomeModule, Pairing, Template } from "@/lib/types"
+import type { Channel, ChannelCta, HomeModule, Pairing, Template } from "@/lib/types"
 import { FixedNote, Panel, Section, Tag } from "./section"
 import { AccentField, accentState } from "./accent-field"
 import { TemplatePreview } from "./template-preview"
@@ -28,6 +28,9 @@ const TEMPLATES: { id: Template; label: string; description: string }[] = [
 ]
 
 const MAX_NAV = 8
+
+/** Button presets for the call to action. The creator can also write their own. */
+export const CTA_PRESETS = ["Join free", "Follow", "Subscribe", "Become a member"]
 
 type NavItem = { key: string; label: string; href: string }
 
@@ -91,6 +94,7 @@ export function DesignEditor({ channel }: { channel: Channel }) {
 
   // Homepage
   const [modules, setModules] = useState(channel.modules)
+  const [cta, setCta] = useState<ChannelCta>(channel.cta)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
 
   // Navigation
@@ -117,7 +121,7 @@ export function DesignEditor({ channel }: { channel: Channel }) {
 
   const style = useMemo(() => channelStyle(previewAccent, pairing), [previewAccent, pairing])
 
-  const current = { logoUrl, logoName, iconUrl, accent, pairing, template, modules, nav }
+  const current = { logoUrl, logoName, iconUrl, accent, pairing, template, modules, nav, cta }
   const snapshot = JSON.stringify({ ...current, logoName: null, accent: accentCheck.hex ?? accent, nav: nav.map(({ label, href }) => ({ label, href })) })
   const [saved, setSaved] = useState({ snapshot, state: current })
   const dirty = saved.snapshot !== snapshot
@@ -132,10 +136,16 @@ export function DesignEditor({ channel }: { channel: Channel }) {
     setTemplate(s.template)
     setModules(s.modules)
     setNav(s.nav)
+    setCta(s.cta)
     setUploadError(null)
   }
   const navError = nav.some((n) => !n.label.trim()) ? "Every navigation item needs a name." : null
-  const blocked = accentBlocked || !!navError
+  const ctaError = !cta.label.trim()
+    ? "Your button needs some text."
+    : cta.action === "link" && !/^https:\/\/\S+\.\S+/.test(cta.href ?? "")
+      ? "Add the full address for your button, starting with https://."
+      : null
+  const blocked = accentBlocked || !!navError || !!ctaError
 
   function moveModule(from: number, to: number) {
     setModules((list) => {
@@ -243,11 +253,86 @@ export function DesignEditor({ channel }: { channel: Channel }) {
           stacked
           id="accent"
           title="Accent colour"
-          description="Your own colour, as a hex. It appears on your logo tile, the active nav underline, the Follow button, kicker squares and links. We check its contrast as you type and pick black or white text for it."
+          description="Your own colour, as a hex. It appears on your logo tile, the active nav underline, your call-to-action button, kicker squares and links. We check its contrast as you type and pick black or white text for it."
         >
           <Panel>
             <div className="p-4 sm:p-5">
               <AccentField id="accent-hex" value={accent} onChange={setAccent} />
+            </div>
+          </Panel>
+        </Section>
+
+        {/* Call to action */}
+        <Section
+          stacked
+          id="cta"
+          title="Call to action"
+          description="The one thing you want visitors to do. It's the button in your header and footer, at the end of every article and on members-only videos. Sign in always sits beside it."
+        >
+          <Panel>
+            <div className="grid gap-5 p-4 sm:p-5">
+              <div className="grid gap-2">
+                <Label htmlFor="cta-label">Button</Label>
+                <div className="flex flex-wrap gap-1.5" role="group" aria-label="Button presets">
+                  {CTA_PRESETS.map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      aria-pressed={cta.label === p}
+                      onClick={() => setCta((c) => ({ ...c, label: p }))}
+                      className={cn(
+                        "h-8 rounded-full border px-3 text-[13px] font-semibold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring",
+                        cta.label === p ? "border-foreground bg-foreground text-background" : "border-input hover:bg-accent",
+                      )}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+                <Input id="cta-label" value={cta.label} maxLength={20} onChange={(e) => setCta((c) => ({ ...c, label: e.target.value }))} aria-invalid={!cta.label.trim()} className="max-w-[320px]" />
+                <p className="text-[13px] text-muted-foreground">Or write your own, up to 20 characters.</p>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="cta-line">Supporting line</Label>
+                <Input id="cta-line" value={cta.line} maxLength={60} onChange={(e) => setCta((c) => ({ ...c, line: e.target.value }))} />
+                <p className="text-[13px] text-muted-foreground">One sentence on what they get, up to 60 characters. Shown beside the button.</p>
+              </div>
+              <div className="grid gap-2">
+                <Label>Where it goes</Label>
+                <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Where the button goes">
+                  {(
+                    [
+                      { id: "join", title: "Join this channel", note: "A free account on your channel. You see who joins and they get your weekly digest." },
+                      { id: "link", title: "My own link", note: "Your newsletter, shop, Patreon or anything else." },
+                    ] as const
+                  ).map((o) => (
+                    <button
+                      key={o.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={cta.action === o.id}
+                      onClick={() => setCta((c) => ({ ...c, action: o.id }))}
+                      className={cn(
+                        "flex flex-col gap-1 rounded-lg border p-3 text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring",
+                        cta.action === o.id ? "border-foreground ring-1 ring-foreground" : "hover:bg-accent",
+                      )}
+                    >
+                      <span className="text-[14px] font-semibold">{o.title}</span>
+                      <span className="text-[13px] leading-[19px] text-muted-foreground">{o.note}</span>
+                    </button>
+                  ))}
+                </div>
+                {cta.action === "link" && (
+                  <Input
+                    aria-label="Button link"
+                    placeholder="https://"
+                    value={cta.href ?? ""}
+                    onChange={(e) => setCta((c) => ({ ...c, href: e.target.value }))}
+                    aria-invalid={!!ctaError}
+                    className="mt-1"
+                  />
+                )}
+              </div>
             </div>
           </Panel>
         </Section>
@@ -477,8 +562,8 @@ export function DesignEditor({ channel }: { channel: Channel }) {
             <p className={cn("min-w-0 text-[13px]", accentBlocked ? "text-destructive" : "text-muted-foreground")} aria-live="polite">
               {accentBlocked
                 ? "Fix the accent colour to save. It needs 3:1 on white and 4.5:1 with text on it."
-                : navError
-                  ? navError
+                : navError || ctaError
+                  ? navError || ctaError
                   : dirty
                     ? "You have unsaved changes. The preview shows them."
                     : "All changes saved."}
@@ -514,6 +599,7 @@ export function DesignEditor({ channel }: { channel: Channel }) {
               nav={nav.map((n) => n.label)}
               sectionLabels={channel.sections.map((s) => s.label)}
               domain={channel.customDomain ?? `${channel.slug}.homestand.com.au`}
+              ctaLabel={cta.label}
             />
           </div>
         </div>

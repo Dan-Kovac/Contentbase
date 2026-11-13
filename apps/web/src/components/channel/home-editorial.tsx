@@ -7,6 +7,7 @@ import type { Video } from "@/lib/types"
 import { LiveStrip, ShortsList, type HomeData } from "./home-modules"
 import { BODY, DISPLAY, sectionLabel, sectionPath, videoPath } from "./lib"
 import { SponsorSlot } from "./viewer"
+import { ChannelCtaBlock } from "./channel-cta"
 import { FeatureStory, ModuleHeading, StoryCard, StoryRow } from "./story"
 
 const WRAP = "mx-auto w-full max-w-[1280px] px-4 md:px-8"
@@ -151,6 +152,7 @@ function EditorialGrid({ data }: { data: HomeData }) {
               ))}
             </ol>
             <p className="mt-6 text-[13px] leading-[19px] text-muted-foreground">{channel.tagline}</p>
+            <ChannelCtaBlock channel={{ slug: channel.slug, name: channel.name, cta: channel.cta, template: channel.template }} className="mt-8" />
           </aside>
         )}
       </div>

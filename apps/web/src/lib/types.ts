@@ -22,6 +22,8 @@ export interface Channel {
   /** The creator's own accent colour (hex). Text on it is picked automatically for contrast. */
   accentHex: string
   logoText?: string
+  /** The channel's one call to action, named and pointed by the creator (CHN-02). */
+  cta: ChannelCta
   mode: ChannelMode
   plan: Plan
   nav: { label: string; href: string }[]
@@ -45,6 +47,16 @@ export interface Channel {
 }
 
 export type AgeCategory = "alcohol" | "wagering"
+
+export interface ChannelCta {
+  /** Button text, 20 characters at most. */
+  label: string
+  /** One supporting line, 60 characters at most. */
+  line: string
+  /** join: a free Homestand account for this channel. link: the creator's own URL. */
+  action: "join" | "link"
+  href?: string
+}
 
 export interface VoiceSource {
   id: string

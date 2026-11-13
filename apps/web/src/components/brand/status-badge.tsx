@@ -43,6 +43,7 @@ export function StatusBadge({
 }) {
   return (
     <span
+      data-tone={tone}
       className={cn(
         "inline-flex h-[22px] items-center gap-1.5 whitespace-nowrap rounded-[2px] border px-2 text-[11px] font-bold uppercase leading-none tracking-[0.8px]",
         STYLES[tone],

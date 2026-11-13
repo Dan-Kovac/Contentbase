@@ -169,6 +169,9 @@ export function DemoBar({ notes }: { notes: Record<Viewer, string> }) {
   }
 
   return (
+    <>
+    {/* Room at the end of the page so the bar never covers the footer. */}
+    <div aria-hidden className="h-32 sm:h-28" />
     <div
       role="region"
       aria-label="Demo: view this channel as"
@@ -229,5 +232,6 @@ export function DemoBar({ notes }: { notes: Record<Viewer, string> }) {
         {notes[viewer]}
       </p>
     </div>
+    </>
   )
 }

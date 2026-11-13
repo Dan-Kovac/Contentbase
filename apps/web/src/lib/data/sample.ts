@@ -27,6 +27,7 @@ export const channels: Channel[] = [
     template: "editorial",
     pairing: "minimal",
     accentHex: "#1c4fb8",
+    cta: { label: "Join free", line: "New episodes every Tuesday, and members-only sessions.", action: "join" },
     mode: "age_verified",
     plan: "pro",
     nav: [
@@ -80,6 +81,7 @@ export const channels: Channel[] = [
     template: "broadcast",
     pairing: "grandstand",
     accentHex: "#c9a227",
+    cta: { label: "Get the form guide", line: "Saturday's form in your inbox on Friday.", action: "join" },
     mode: "age_verified",
     plan: "publisher",
     nav: [
@@ -547,7 +549,7 @@ export const adDecisions: AdDecision[] = [
 ]
 
 export const sponsors: Sponsor[] = [
-  { id: "sp_ute", name: "Southern Cross Utes", colour: "#0f3d2e", line: "Built for the drive to every away game.", body: "3.5 tonnes of towing on every model, and a tray that fits the esky and the eskies.", cta: "Book a test drive", url: "https://example.com/utes" },
+  { id: "sp_ute", name: "Southern Cross Utes", colour: "#0f3d2e", line: "Built for the drive to every away game.", body: "3.5 tonnes of towing on every model, and room in the tray for the whole cheer squad.", cta: "Book a test drive", url: "https://example.com/utes" },
   { id: "sp_boots", name: "Kick Boots Co.", colour: "#111111", line: "Grip for the wet ones.", body: "Fourteen studs, moulded for Australian grounds in July.", cta: "Shop the range", url: "https://example.com/boots" },
   { id: "sp_harbour", name: "Harbour Bet", colour: "#0b2545", line: "Racing coverage, every meeting.", body: "Form, fields and results from every Australian meeting. 18+ only. Gamble responsibly.", cta: "Learn more", url: "https://example.com/harbour", ageCategory: "wagering" },
   { id: "sp_brew", name: "Riverside Brewing", colour: "#7a3e00", line: "Brewed in Abbotsford since 1998.", body: "A 4.6% pale ale, best enjoyed after the siren. 18+ only.", cta: "Find a stockist", url: "https://example.com/brew", ageCategory: "alcohol" },

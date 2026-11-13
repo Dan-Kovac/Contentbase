@@ -23,6 +23,7 @@ import {
   VideoPageProvider,
 } from "@/components/channel/video-client"
 import { VideoPlayer } from "@/components/channel/video-player"
+import { ChannelCtaBlock, MembersOnly } from "@/components/channel/channel-cta"
 import {
   ArticleHeader,
   BlockView,
@@ -76,6 +77,7 @@ async function VideoPageContent({ params }: { params: Params }) {
   const related = relatedFor(channel, video)
   const gated = video.exclusive
   const broadcast = channel.template === "broadcast"
+  const ctaChannel = { slug: channel.slug, name: channel.name, cta: channel.cta, template: channel.template }
 
   const breadcrumb = (
     <nav aria-label="Breadcrumb" className="mb-4 text-[13px] text-muted-foreground">
@@ -103,20 +105,7 @@ async function VideoPageContent({ params }: { params: Params }) {
     </nav>
   )
 
-  return (
-    <VideoPageProvider duration={video.durationSec} plans={slotPlans(channel, video.isLive)} sponsoredChapter={sponsoredChapterIndex(video.chapters)}>
-      <JsonLd data={videoJsonLd(channel, video)} />
-      {gated ? (
-        <div className="mx-auto max-w-[1280px] px-4 pt-5 md:px-8 md:pt-8">
-          {breadcrumb}
-          <div className="mx-auto flex max-w-[960px] flex-col gap-10">
-            <ExclusiveGate channel={channel} video={video} />
-            <div className="mx-auto w-full max-w-[68ch]">
-              <ArticleHeader channel={channel} video={video} />
-            </div>
-          </div>
-        </div>
-      ) : (
+  const content = (
         <>
           {/* The player stage. Broadcast sets it in a black theatre band; Editorial keeps it on the page. */}
           <div className={cn(broadcast && "border-b bg-black")}>
@@ -164,11 +153,36 @@ async function VideoPageContent({ params }: { params: Params }) {
                 <KeyPoints points={video.article.keyPoints} />
               </div>
             )}
-            <div className={cn(READING, "mt-10")}>
+            <div className={cn(READING, "mt-10 flex flex-col gap-10")}>
               <Transcript lines={video.transcript} />
+              <ChannelCtaBlock channel={ctaChannel} />
             </div>
           </article>
         </>
+  )
+
+  return (
+    <VideoPageProvider duration={video.durationSec} plans={slotPlans(channel, video.isLive)} sponsoredChapter={sponsoredChapterIndex(video.chapters)}>
+      <JsonLd data={videoJsonLd(channel, video)} />
+      {gated ? (
+        // Members-only: visitors see the gate; once they join, the full video page.
+        <MembersOnly
+          gate={
+            <div className="mx-auto max-w-[1280px] px-4 pt-5 md:px-8 md:pt-8">
+              {breadcrumb}
+              <div className="mx-auto flex max-w-[960px] flex-col gap-10">
+                <ExclusiveGate channel={channel} video={video} />
+                <div className="mx-auto w-full max-w-[68ch]">
+                  <ArticleHeader channel={channel} video={video} />
+                </div>
+              </div>
+            </div>
+          }
+        >
+          {content}
+        </MembersOnly>
+      ) : (
+        content
       )}
 
       <div className="mx-auto mt-16 max-w-[1280px] px-4 md:mt-24 md:px-8">

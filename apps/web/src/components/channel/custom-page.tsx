@@ -3,7 +3,7 @@ import { ArrowUpRight, Globe, SquarePlay } from "lucide-react"
 import { compact } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { Block, Channel } from "@/lib/types"
-import { FollowButton } from "./follow-button"
+import { ChannelCtaBlock } from "./channel-cta"
 import { BODY, DISPLAY, SITE, publicArticles, publicShorts, publicVideos } from "./lib"
 import { BlockView, JsonLd } from "./video-page"
 
@@ -88,9 +88,7 @@ export function CustomPageView({
               <BlockView key={i} block={b} channel={channel} />
             ))}
           </div>
-          <div className="mt-10">
-            <FollowButton channelName={channel.name} followers={channel.followers} />
-          </div>
+          <ChannelCtaBlock channel={{ slug: channel.slug, name: channel.name, cta: channel.cta, template: channel.template }} className="mt-10 max-w-[68ch]" />
         </div>
 
         <aside className="flex flex-col gap-8 lg:col-span-4 lg:col-start-9">

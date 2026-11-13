@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { storeViewer } from "@/components/channel/viewer"
 import { ArrowRight, CircleCheck, CircleX, ExternalLink, FileCheck, IdCard, Lock, ScanFace, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -23,6 +24,17 @@ const METHODS: { id: Method; title: string; note: string; time: string; Icon: ty
 /** Age assurance (TLK-02): why we ask, choose a method, provider handoff, then result. */
 export function VerifyAgeFlow() {
   const [step, setStep] = useState<Step>("choose")
+  // Where to go once confirmed: the page the viewer came from (?next=), else the demo channel.
+  const [next, setNext] = useState("/c/footyfix")
+  useEffect(() => {
+    const n = new URLSearchParams(window.location.search).get("next")
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reads the URL once after hydration
+    if (n && n.startsWith("/")) setNext(n)
+  }, [])
+  useEffect(() => {
+    // Prototype: the confirmed result is the viewer's state on every channel (TLK-02).
+    if (step === "success") storeViewer("verified")
+  }, [step])
   const [method, setMethod] = useState<Method>("digital-id")
   const [progress, setProgress] = useState(0)
   const chosen = METHODS.find((m) => m.id === method)!
@@ -102,10 +114,10 @@ export function VerifyAgeFlow() {
         </p>
         <div className="flex flex-col gap-2.5">
           <Button asChild size="lg" className="h-11">
-            <Link href="/account#ads">Back to ad preferences</Link>
+            <Link href={next}>Continue</Link>
           </Button>
           <Button asChild variant="ghost">
-            <Link href="/c/footyfix">Back to Footy Fix</Link>
+            <Link href="/account#ads">Ad preferences</Link>
           </Button>
         </div>
       </AccountSheet>

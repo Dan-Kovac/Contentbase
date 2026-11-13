@@ -5,6 +5,7 @@ import { notFound } from "next/navigation"
 import { ChevronRight } from "lucide-react"
 import { BODY, SITE, isoDate, publicArticles, relatedFor, sectionLabel, sectionPath, slotOptions } from "@/components/channel/lib"
 import { SponsorSlot } from "@/components/channel/viewer"
+import { ChannelCtaBlock } from "@/components/channel/channel-cta"
 import { ArticleHeaderView, BlockView, JsonLd, RelatedItems, splitAtBreak } from "@/components/channel/video-page"
 import { ChannelPageSkeleton } from "@/components/channel/skeleton"
 import { getChannel, listChannels } from "@/lib/data"
@@ -122,6 +123,9 @@ async function ArticlePageContent({ params }: { params: Params }) {
               ))}
             </div>
           )}
+          <div className={cn(READING, "mt-12")}>
+            <ChannelCtaBlock channel={{ slug: channel.slug, name: channel.name, cta: channel.cta, template: channel.template }} />
+          </div>
         </article>
       </div>
       <div className="mx-auto mt-16 max-w-[1280px] px-4 md:mt-24 md:px-8">

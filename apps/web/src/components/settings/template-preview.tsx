@@ -1,7 +1,7 @@
 "use client"
 
 import { useLayoutEffect, useRef, useState } from "react"
-import { Play, Search, UserRound } from "lucide-react"
+import { Play, Search } from "lucide-react"
 import { channelStyle } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { HomeModule, Pairing, Template } from "@/lib/types"
@@ -140,16 +140,16 @@ function initials(name: string) {
   return (parts.length > 1 ? parts[0][0] + parts[1][0] : (parts[0] ?? "H").slice(0, 2)).toUpperCase()
 }
 
-function Masthead({ name, logoUrl, nav, dark }: { name: string; logoUrl?: string | null; nav: string[]; dark: boolean }) {
+function Masthead({ name, logoUrl, nav, dark, ctaLabel }: { name: string; logoUrl?: string | null; nav: string[]; dark: boolean; ctaLabel: string }) {
   return (
     <header className={cn("border-b px-8", dark ? "border-white/10 bg-neutral-950" : "border-neutral-200 bg-white")}>
       <div className="flex h-16 items-center gap-4">
         <Logo name={name} logoUrl={logoUrl} dark={dark} />
         <span className={cn("ml-auto flex items-center gap-4", dark ? "text-white/70" : "text-neutral-500")}>
           <Search className="size-[18px]" aria-hidden />
-          <UserRound className="size-[18px]" aria-hidden />
+          <span className="text-[14px] font-medium">Sign in</span>
           <span className="rounded-full px-4 py-1.5 text-[13px] font-semibold" style={{ background: "var(--chan)", color: "var(--chan-on)" }}>
-            Follow
+            {ctaLabel || "Join free"}
           </span>
         </span>
       </div>
@@ -406,7 +406,10 @@ export function TemplatePreview({
   domain,
   maxHeight,
   className,
+  ctaLabel = "Join free",
 }: {
+  /** The channel's call-to-action button text. */
+  ctaLabel?: string
   template: Template
   accentHex: string
   pairing: Pairing
@@ -448,7 +451,7 @@ export function TemplatePreview({
       )}
       <ScaledFrame width={DESIGN_WIDTH} maxHeight={maxHeight}>
         <div style={channelStyle(accentHex, pairing)} className={cn("relative", dark ? "bg-neutral-950 text-white" : "bg-white text-neutral-950")}>
-          <Masthead name={title} logoUrl={logoUrl} nav={nav} dark={dark} />
+          <Masthead name={title} logoUrl={logoUrl} nav={nav} dark={dark} ctaLabel={ctaLabel} />
           {on.length === 0 ? (
             <p className={cn("py-24 text-center text-[15px]", dark ? "text-white/60" : "text-neutral-500")}>Turn on at least one module to fill your homepage.</p>
           ) : dark ? (

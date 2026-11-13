@@ -189,8 +189,9 @@ export function KeyPoints({ points }: { points: string[] }) {
   )
 }
 
-/** AUD-03: logged-out visitors get a tasteful teaser and one clear action. No ads. */
+/** AUD-03: logged-out visitors get a tasteful teaser and the channel's own call to action. No ads. */
 export function ExclusiveGate({ channel, video }: { channel: Channel; video: Video }) {
+  const next = encodeURIComponent(videoPath(channel, video))
   return (
     <section aria-labelledby="gate-title" className="relative overflow-hidden rounded-lg bg-brand-black text-brand-white">
       <div className="absolute inset-0 scale-105 blur-md" aria-hidden>
@@ -206,13 +207,18 @@ export function ExclusiveGate({ channel, video }: { channel: Channel; video: Vid
           {formatDuration(video.durationSec)} · {video.description}
         </p>
         <Link
-          href={`/account/signin?next=${encodeURIComponent(videoPath(channel, video))}`}
-          className="mt-2 inline-flex h-12 items-center gap-2 rounded-md bg-brand-white px-6 text-[16px] font-bold text-brand-black outline-none focus-visible:ring-2 focus-visible:ring-brand-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-black"
+          href={`/c/${channel.slug}/join?next=${next}`}
+          className="mt-2 inline-flex h-12 items-center gap-2 rounded-md bg-[var(--chan)] px-6 text-[16px] font-bold text-[var(--chan-on)] outline-none focus-visible:ring-2 focus-visible:ring-brand-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-black"
         >
           <Lock className="size-4" aria-hidden />
-          Sign in to watch
+          Join free to watch
         </Link>
-        <p className="text-[13px] text-brand-muted">Free. One account for every Homestand channel.</p>
+        <p className="text-[13px] text-brand-muted">
+          {channel.cta.line}{" "}
+          <Link href={`/c/${channel.slug}/join?next=${next}&mode=signin`} className="font-semibold text-brand-white underline-offset-4 hover:underline">
+            Sign in
+          </Link>
+        </p>
       </div>
     </section>
   )

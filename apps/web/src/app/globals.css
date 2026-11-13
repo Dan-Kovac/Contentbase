@@ -223,3 +223,10 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* On a client's channel the platform's Pitch gradient steps aside: the Exclusive badge takes the
+   channel's own accent, so a channel carries one brand. */
+[data-template] [data-tone="exclusive"] {
+  background: var(--chan);
+  color: var(--chan-on);
+}
