@@ -17,8 +17,10 @@ export function ChannelPreview({
   pairing,
   logoUrl,
   iconUrl,
+  ctaLabel,
   maxHeight = 760,
 }: {
+  ctaLabel?: string
   name: string
   subdomain: string
   template: Template
@@ -41,6 +43,7 @@ export function ChannelPreview({
           iconUrl={iconUrl}
           domain={`${subdomain || "yourchannel"}.homestand.com.au`}
           maxHeight={maxHeight}
+          ctaLabel={ctaLabel}
           className="border-white/10"
         />
       </div>

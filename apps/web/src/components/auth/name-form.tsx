@@ -2,19 +2,34 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowRight, CircleCheck, CircleX } from "lucide-react"
+import { AlertCircle, ArrowRight, Check, CircleCheck, CircleX } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
+import { AccentField, accentState } from "@/components/settings/accent-field"
+import { CTA_PRESETS } from "@/lib/cta"
+import { cn } from "@/lib/utils"
+import type { Template } from "@/lib/types"
+import { AuthHeading, AuthShell } from "./auth-shell"
+import { ChannelPreview } from "./channel-preview"
 import { toSubdomain, useSignupDraft } from "./signup-draft"
+import { SignupSteps } from "./signup-steps"
+
+const TEMPLATES: { id: Template; label: string; note: string }[] = [
+  { id: "editorial", label: "Editorial", note: "A white magazine: photo lead, story grid" },
+  { id: "broadcast", label: "Broadcast", note: "Dark and video-led, rails of videos" },
+]
 
 /** Subdomains already in use (sample). */
 const TAKEN = new Set(["footy", "afl", "nrl", "racing", "trackside", "homestand", "www", "studio", "admin", "footyfixed"])
 
 type Check = "idle" | "checking" | "available" | "taken" | "invalid"
 
-/** Step 3: channel name and subdomain, with a live availability check. */
+/**
+ * Step 3, Make it yours: name and address, template, colour and the channel's button, with the
+ * live preview as the left panel. Logo and type pairing wait for Design settings.
+ */
 export function NameForm() {
   const router = useRouter()
   const [draft, update] = useSignupDraft()
@@ -38,14 +53,44 @@ export function NameForm() {
   }, [sub])
 
   const suggestions = [`${sub}au`, `${sub}hq`, `the${sub}`].filter((s) => !TAKEN.has(s))
+  const accent = accentState(draft.accentHex)
+  const [tried, setTried] = useState(false)
+  const ready = check === "available" && !!draft.name.trim() && accent.ok && !!draft.ctaLabel.trim()
+
+  const preview = (
+    <ChannelPreview
+      name={draft.name}
+      subdomain={draft.subdomain}
+      template={draft.template}
+      accentHex={draft.accentHex}
+      pairing={draft.pairing}
+      logoUrl={draft.logoUrl}
+      iconUrl={draft.iconUrl}
+      ctaLabel={draft.ctaLabel}
+    />
+  )
 
   return (
+    <AuthShell
+      wide
+      top={<SignupSteps current={2} />}
+      aside={
+        <div className="flex flex-col gap-5">
+          <p className="text-[13px] font-semibold uppercase tracking-[1px] text-brand-muted">Live preview</p>
+          {preview}
+          <p className="text-[13px] leading-5 text-brand-muted">Your import has already started, and your real videos replace the sample photos as they arrive. Add a logo and choose fonts later in Design settings.</p>
+        </div>
+      }
+    >
+    <AuthHeading title="Make it yours" lede="Your name, your address, your look and the one thing you want visitors to do. Change any of it later." />
+    <div className="lg:hidden">{preview}</div>
     <form
       noValidate
       className="flex flex-col gap-8"
       onSubmit={(e) => {
         e.preventDefault()
-        if (check === "available" && draft.name.trim()) router.push("/signup/style")
+        setTried(true)
+        if (ready) router.push("/signup/importing")
       }}
     >
       <div className="flex flex-col gap-2">
@@ -123,10 +168,80 @@ export function NameForm() {
         </p>
       </div>
 
-      <Button type="submit" size="xl" className="w-full" disabled={check !== "available" || !draft.name.trim()}>
-        Continue
-        <ArrowRight aria-hidden />
-      </Button>
+      <fieldset className="flex flex-col gap-3">
+        <legend className="mb-3 text-[15px] font-semibold">Template</legend>
+        <div role="radiogroup" aria-label="Template" className="grid grid-cols-2 gap-2">
+          {TEMPLATES.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              role="radio"
+              aria-checked={draft.template === t.id}
+              // The type pairing follows the template here; it can be changed later in Design settings.
+              onClick={() => update({ template: t.id, pairing: t.id === "broadcast" ? "grandstand" : "minimal" })}
+              className={cn(
+                "flex flex-col gap-1 rounded-lg border p-3 text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring",
+                draft.template === t.id ? "border-foreground ring-1 ring-foreground" : "hover:bg-accent",
+              )}
+            >
+              <span className="flex items-center justify-between text-[14px] font-semibold">
+                {t.label}
+                {draft.template === t.id && <Check className="size-4" aria-hidden />}
+              </span>
+              <span className="text-[13px] leading-[18px] text-muted-foreground">{t.note}</span>
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset className="flex flex-col gap-3">
+        <legend className="mb-1 text-[15px] font-semibold">Your colour</legend>
+        <p className="mb-2 text-[13px] leading-5 text-muted-foreground">As a hex. It goes on your button, links and the nav underline. We check its contrast as you type.</p>
+        <AccentField id="signup-accent" value={draft.accentHex} onChange={(v) => update({ accentHex: v })} compact />
+      </fieldset>
+
+      <fieldset className="flex flex-col gap-3">
+        <legend className="mb-1 text-[15px] font-semibold">What should your button say?</legend>
+        <p className="mb-2 text-[13px] leading-5 text-muted-foreground">It sits in your header and at the end of every article. Visitors who press it join your channel for free.</p>
+        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Button presets">
+          {CTA_PRESETS.map((p) => (
+            <button
+              key={p}
+              type="button"
+              aria-pressed={draft.ctaLabel === p}
+              onClick={() => update({ ctaLabel: p })}
+              className={cn(
+                "h-9 rounded-full border px-3.5 text-[13px] font-semibold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring",
+                draft.ctaLabel === p ? "border-foreground bg-foreground text-background" : "border-input hover:bg-accent",
+              )}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+        <Input aria-label="Button text" value={draft.ctaLabel} maxLength={20} onChange={(e) => update({ ctaLabel: e.target.value })} className="h-10 max-w-[280px]" aria-invalid={!draft.ctaLabel.trim()} />
+      </fieldset>
+
+      <div className="grid gap-2">
+        {tried && !ready && (
+          <p role="alert" className="flex items-start gap-2 text-[13px] text-destructive">
+            <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
+            {!draft.name.trim()
+              ? "Give your channel a name."
+              : check !== "available"
+                ? "Choose an address that's available."
+                : !accent.ok
+                  ? "Fix your colour to continue. It needs 3:1 on white and 4.5:1 with text on it."
+                  : "Give your button some text."}
+          </p>
+        )}
+        <Button type="submit" size="xl" className="w-full" aria-disabled={!ready}>
+          Make it live
+          <ArrowRight aria-hidden />
+        </Button>
+        <p className="text-center text-[13px] text-muted-foreground">14-day Pro trial. No card needed. Choose a plan later in Billing.</p>
+      </div>
     </form>
+    </AuthShell>
   )
 }

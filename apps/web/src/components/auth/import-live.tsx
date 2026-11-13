@@ -56,11 +56,11 @@ export function ImportLive() {
 
   return (
     <AuthShell
-      top={<SignupSteps current={5} />}
+      top={<SignupSteps current={3} />}
       aside={
         <div className="flex flex-col gap-5">
           <p className="text-[13px] font-semibold uppercase tracking-[1px] text-brand-muted">{url}</p>
-          <ChannelPreview name={draft.name} subdomain={draft.subdomain} template={draft.template} accentHex={draft.accentHex} pairing={draft.pairing} logoUrl={draft.logoUrl} iconUrl={draft.iconUrl} />
+          <ChannelPreview name={draft.name} subdomain={draft.subdomain} template={draft.template} accentHex={draft.accentHex} pairing={draft.pairing} logoUrl={draft.logoUrl} iconUrl={draft.iconUrl} ctaLabel={draft.ctaLabel} />
         </div>
       }
     >
@@ -152,12 +152,17 @@ export function ImportLive() {
         </ol>
       </section>
 
-      <Button asChild variant="pop" size="xl" className="w-full">
-        <Link href="/studio">
-          Go to your studio
-          <ArrowRight aria-hidden />
-        </Link>
-      </Button>
+      <div className="flex flex-col gap-2">
+        <Button asChild variant="pop" size="xl" className="w-full">
+          <Link href="/studio/review/v_blues">
+            Review your first draft
+            <ArrowRight aria-hidden />
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" size="lg" className="w-full">
+          <Link href="/studio">Go to your studio</Link>
+        </Button>
+      </div>
     </AuthShell>
   )
 }

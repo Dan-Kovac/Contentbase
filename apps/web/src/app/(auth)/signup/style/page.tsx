@@ -1,8 +1,6 @@
-import type { Metadata } from "next"
-import { StyleStep } from "@/components/auth/style-step"
+import { redirect } from "next/navigation"
 
-export const metadata: Metadata = { title: "Choose your look" }
-
+/** Look moved into step 3 (Make it yours); logo and type pairing live in Design settings. */
 export default function SignupStylePage() {
-  return <StyleStep />
+  redirect("/signup/name")
 }

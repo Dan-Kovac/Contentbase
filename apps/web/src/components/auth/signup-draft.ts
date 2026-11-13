@@ -17,7 +17,10 @@ export interface SignupDraft {
   logoUrl: string | null
   iconUrl: string | null
   pairing: Pairing
+  /** Every new channel starts on a Pro trial; the plan is chosen later in Billing. */
   plan: Plan
+  /** The channel's call-to-action button. */
+  ctaLabel: string
 }
 
 export const DEFAULT_DRAFT: SignupDraft = {
@@ -32,6 +35,7 @@ export const DEFAULT_DRAFT: SignupDraft = {
   iconUrl: null,
   pairing: "minimal",
   plan: "pro",
+  ctaLabel: "Join free",
 }
 
 const KEY = "homestand.signup"

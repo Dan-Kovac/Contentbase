@@ -5,9 +5,7 @@ import { cn } from "@/lib/utils"
 export const SIGNUP_STEPS = [
   { label: "Connect", href: "/signup" },
   { label: "Channel", href: "/signup/channel" },
-  { label: "Name", href: "/signup/name" },
-  { label: "Look", href: "/signup/style" },
-  { label: "Plan", href: "/signup/plan" },
+  { label: "Make it yours", href: "/signup/name" },
   { label: "Live", href: "/signup/importing" },
 ] as const
 

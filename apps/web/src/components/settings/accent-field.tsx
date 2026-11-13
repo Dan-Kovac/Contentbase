@@ -95,7 +95,7 @@ export function AccentField({ id, value, onChange, compact = false }: { id: stri
         {hex && check && (
           <div className="flex items-center gap-2 pb-1" aria-hidden>
             <span className="rounded-full px-3 py-1 text-[12px] font-semibold" style={{ background: hex, color: check.on }}>
-              Follow
+              Join free
             </span>
             <span className="rounded-md border bg-white px-2.5 py-1 text-[12px] font-medium text-neutral-950 [color-scheme:light]">
               <span className="mr-1.5 inline-block size-[7px]" style={{ background: hex }} />

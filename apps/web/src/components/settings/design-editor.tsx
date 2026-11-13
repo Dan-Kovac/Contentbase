@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { PAIRINGS, channelStyle } from "@/lib/format"
+import { CTA_PRESETS } from "@/lib/cta"
 import { cn } from "@/lib/utils"
 import type { Channel, ChannelCta, HomeModule, Pairing, Template } from "@/lib/types"
 import { FixedNote, Panel, Section, Tag } from "./section"
@@ -29,8 +30,7 @@ const TEMPLATES: { id: Template; label: string; description: string }[] = [
 
 const MAX_NAV = 8
 
-/** Button presets for the call to action. The creator can also write their own. */
-export const CTA_PRESETS = ["Join free", "Follow", "Subscribe", "Become a member"]
+
 
 type NavItem = { key: string; label: string; href: string }
 
