@@ -1,0 +1,34 @@
+# Every pull request and push: typecheck, lint, build, then the design-rule checks against the built app.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm build
+      - name: Install Chromium for the checks
+        run: pnpm --filter web exec playwright install --with-deps chromium
+      - name: Design-rule checks (screens, same-shape sponsors, flows)
+        run: |
+          pnpm --filter web start -p 3111 &
+          npx --yes wait-on http://localhost:3111/demo --timeout 120000
+          BASE_URL=http://localhost:3111 pnpm check:demo

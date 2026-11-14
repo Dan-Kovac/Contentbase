@@ -33,6 +33,8 @@ pnpm typecheck && pnpm lint && pnpm build
 | [docs/screens.md](docs/screens.md) | The original screen inventory, mapped to requirement IDs |
 | [docs/research/integrations.md](docs/research/integrations.md) | What YouTube, TikTok and Instagram APIs allow, and what it changes |
 | [docs/build-plan.md](docs/build-plan.md) | Architecture, data model, pipelines, API surface, milestones |
+| [CLAUDE.md](CLAUDE.md) | The project brief for people and for Claude: the business, where the designs live, the MVP, hard rules and the build loop |
+| [docs/work-queue.md](docs/work-queue.md) | The build loop's queue: each work package's status, branch, pull request and what it needs |
 | [docs/implementation-plan.md](docs/implementation-plan.md) | Start here to build: the holes in the design, the pilot scope, data model additions and work packages |
 | [docs/demo-clarity-plan.md](docs/demo-clarity-plan.md) | The demo plan: same-shape ads, channel calls to action, landing page, simplified journey |
 | [docs/email.md](docs/email.md) | Newsletters: streams members choose, the builder, sending domains, deliverability and the Spam Act |
