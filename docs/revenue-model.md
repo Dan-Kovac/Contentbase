@@ -119,7 +119,13 @@ Article to video starts with three included templates: Explainer (voiceover, cha
 
 ## Risks to say out loud
 
-- **Ownership.** The PID warns that if a wagering company owns or controls the platform, regulators may treat the whole platform's content as wagering advertising. The licensing and data lines make this question bigger, not smaller. Settle it with lawyers before any wagering operator takes equity or in-house brands go live.
+- **Ownership.** Homestand is planned as a subdivision of the Sportsbet group with its own brand, not a Sportsbet product. The PID warns that if a wagering company owns or controls the platform, regulators may treat its content as wagering advertising, and that turns on ownership and control, not on the name. Settle it with lawyers before the in-house brands go live. The guardrails to put to them:
+  - A separate entity and brand, with no Sportsbet name, logo, links or offers anywhere in the product.
+  - Every licensed wagering advertiser can buy on the same terms, rival bookmakers included, through Homestand's own ad sales.
+  - Publishers' pay never depends on which ads ran (the pool), and nobody on the platform contracts with a wagering advertiser.
+  - Viewer data, including 18+ results and opt-outs, stays inside Homestand and is never shared with Sportsbet.
+  - Editorial independence in writing: Sportsbet doesn't direct what publications cover, and the compliance checks apply to in-house brands like everyone else.
+  - Outside publishers will ask about all of this, so the answers go in the publisher terms.
 - **Synthetic media.** Generated videos are drafts that a person approves. Synthetic voiceover is disclosed. Imagery is licensed. No AI-generated people, per the brand guidelines.
 - **Provider cost.** AI is priced at cost plus 20%, so a provider price rise passes through automatically. Keep the engine swappable all the same.
 - **Revenue concentration.** If advertising is a third of revenue, a regulatory change can move the whole business. Subscriptions and licensing are the hedge.

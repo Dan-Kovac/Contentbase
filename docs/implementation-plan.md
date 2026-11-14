@@ -16,6 +16,7 @@ These settle open questions below. Where a row in section 1 or 8 says otherwise,
 | **Imported subscribers get a welcome sign-in email** | An import creates a waiting reader account for each address. The first email is a sign-in link to see members-only content, with no password and a one-click unsubscribe (B3). |
 | **Payouts: the pool** | Half of net Native Format revenue goes into a monthly pool, split by verified minutes. Signed-in minutes count in full; logged-out minutes count a fifth. Pay never depends on which ads ran (B5). |
 | **Video engine** | Remotion on AWS Lambda, Azure Neural TTS (Australian voices), Pexels and Pixabay imagery, and Claude for the script. Generative video comes later (B7, [video-engine.md](video-engine.md)). |
+| **Structure: a Sportsbet subdivision, not a Sportsbet product** | Homestand is owned within the Sportsbet group but carries its own brand: no Sportsbet name, logo or links in the product. Branding alone doesn't settle the regulatory question below, so the guardrails in the [revenue model](revenue-model.md#risks-to-say-out-loud) apply from day one. |
 | **AI at provider cost plus 20%, on a ledger** | AI usage is a dollar balance shared by the account. Every line is the provider's price plus 20% (`MARGIN` in `lib/credits.ts`). Renders hold, then charge or release. The balance is the sum of the ledger (B9). |
 
 ## How to use this document
@@ -255,7 +256,7 @@ Keep these working in the demo environment behind `NEXT_PUBLIC_DEMO=1`, and leav
 | ~~One identity for creators and viewers (B2)~~ | Decided: one login, separate creator and reader records | WP-01 | Dan |
 | ~~Central accounts host for custom domains (B1)~~ | Decided: central sign-in, `accounts.homestand.au` | WP-05 | Dan |
 | ~~Payout model (B5)~~ | Decided: pool by verified minutes, signed-in counted in full and logged-out at a fifth. Counsel to confirm | WP-07 | Dan + counsel |
-| Whether a wagering operator owning the platform makes its publications wagering advertising | Get advice before the in-house brands go live | Launch of in-house brands | Counsel |
+| Whether a Sportsbet-owned subdivision makes its publications, or the whole platform, wagering advertising, and which guardrails make it defensible | Get advice before the in-house brands go live; brief counsel with the guardrails in the revenue model | Launch of in-house brands, and inviting outside publishers | Counsel |
 | YouTube player and chapter sponsors (A4) | Ask; fall back to uploads only | WP-09 | Counsel |
 | ~~Video engine (B7)~~ | Decided: Remotion, Azure TTS, Pexels and Pixabay ([video-engine.md](video-engine.md)) | WP-15 | Dan |
 | Text-to-speech and stock imagery providers | Choose in a one-week spike on price per finished minute | WP-16 | Dan |
