@@ -157,7 +157,7 @@ export default function DemoPage() {
               ))}
             </ul>
             <p className="mt-3 text-[13px] leading-5 text-muted-foreground">
-              Homestand is a Sportsbet subdivision with its own brand, not a Sportsbet product. Before launch, lawyers need to confirm that ownership doesn't make its publications wagering advertising, with guardrails: open to every licensed bookmaker, no Sportsbet branding, viewer data never shared, publishers' pay never tied to which ads ran.
+              Homestand is a Sportsbet subdivision with its own brand, not a Sportsbet product. Before launch, lawyers need to confirm that ownership doesn&apos;t make its publications wagering advertising, with guardrails: open to every licensed bookmaker, no Sportsbet branding, viewer data never shared, publishers' pay never tied to which ads ran.
             </p>
           </div>
         </section>
