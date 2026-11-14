@@ -84,6 +84,7 @@ function sponsorFor(c: Creative, campaign: Campaign | undefined, sponsors: Spons
     url: brief.url ?? known?.url ?? "#",
     ageCategory: campaign?.ageCategory ?? known?.ageCategory,
     required: brief.required,
+    channelIds: known?.channelIds ?? [],
   }
 }
 

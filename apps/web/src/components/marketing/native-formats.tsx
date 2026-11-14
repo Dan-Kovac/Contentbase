@@ -79,7 +79,7 @@ function Lines({ n = 3, className }: { n?: number; className?: string }) {
 
 export function ChapterSponsorExample() {
   const v = getVideo("v_coxplate")!
-  const sponsor = getSponsor("sp_harbour")!
+  const sponsor = getSponsor("sp_harbour_tr")!
   const sponsored = 1
   const from = v.chapters[sponsored].start / v.durationSec
   const to = v.chapters[sponsored + 1].start / v.durationSec

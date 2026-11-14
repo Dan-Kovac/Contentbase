@@ -46,7 +46,7 @@ Channel modes: **Standard** (no age-restricted ads) and **Age-verified** (triple
 
 ## Ads: Homestand Native Formats
 
-No banner placements, no standard IAB sizes, no AdSense. Advertisers fill a brief (name, one line, a colour, a link, optionally an image or muted loop) and Homestand renders it in the channel's own design. **The rule: a sponsor unit never has a size of its own. It takes the shape of the content beside it.**
+No banner placements and no standard IAB sizes. Until a slot is sold, a publication can fill it from its own Google AdSense account: story and half-time slots only, inside the same box, with Auto ads off and gambling and alcohol blocked (decided 14 November 2026, so every page earns from day one). Advertisers fill a brief (name, one line, a colour, a link, optionally an image or muted loop) and Homestand renders it in the channel's own design. **The rule: a sponsor unit never has a size of its own. It takes the shape of the content beside it.**
 
 | Format | Where it appears |
 | --- | --- |

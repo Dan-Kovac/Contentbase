@@ -4,6 +4,20 @@ Written 14 November 2026. This is the handover from the clickable prototype (`ap
 
 Read with the [build plan](build-plan.md), which keeps the architecture, stack, pipelines and milestones 0–8. This document adds what the build plan predates: multiple publications per account, words to video with AI credits, email, the same-shape sponsor rule and the channel calls to action. Where the two disagree, this document wins.
 
+## Decided on 14 November 2026
+
+These settle open questions below. Where a row in section 1 or 8 says otherwise, this list wins.
+
+| Decision | What it means |
+| --- | --- |
+| **Strip back to an MVP** for the showcase | The MVP is phases 1 and 2: Publish and Earn, plus several publications on one account. Words to video and email are designed, clickable and marked "Next" in the studio, and are built after the MVP. The showcase script is at `/demo`. |
+| **Google AdSense is back**, as fill | A publication can connect its own AdSense account. It fills only story and half-time slots that Homestand hasn't sold, inside the same box (responsive in-feed and in-article units, Auto ads off), with gambling and alcohol blocked in the AdSense account. Google pays the publisher directly. It never fills shorts, chapters, Presented by credits or live pages. |
+| **One central sign-in, separate records** | One login at the central accounts host. The person's creator record (publications, team, billing) and reader record (follows, newsletters, 18+ result, opt-outs) are separate tables, both keyed to that login, so moving between the studio and reading is a link, not another sign-in (B1, B2). |
+| **Imported subscribers get a welcome sign-in email** | An import creates a waiting reader account for each address. The first email is a sign-in link to see members-only content, with no password and a one-click unsubscribe (B3). |
+| **Payouts: the pool** | Half of net Native Format revenue goes into a monthly pool, split by verified minutes. Signed-in minutes count in full; logged-out minutes count a fifth. Pay never depends on which ads ran (B5). |
+| **Video engine** | Remotion on AWS Lambda, Azure Neural TTS (Australian voices), Pexels and Pixabay imagery, and Claude for the script. Generative video comes later (B7, [video-engine.md](video-engine.md)). |
+| **AI at provider cost plus 20%, on a ledger** | AI usage is a dollar balance shared by the account. Every line is the provider's price plus 20% (`MARGIN` in `lib/credits.ts`). Renders hold, then charge or release. The balance is the sum of the ledger (B9). |
+
 ## How to use this document
 
 1. Settle the decisions in [section 8](#8-decisions-needed) that block your work package. Most are one line.
@@ -31,15 +45,15 @@ These are fine in a demo and wrong in production. Each has a work package.
 
 | # | Gap | Recommendation |
 | --- | --- | --- |
-| B1 | **One sign-in across custom domains.** Cookies are per domain. A viewer signed in on `footyfix.com.au` isn't signed in on `trackside.homestand.au`, yet the promise is one account everywhere | A central `accounts.homestand.au` with a redirect handshake that sets a first-party session on each channel host. Age assurance and opt-out stay on the central account (WP-05) |
-| B2 | **Creators and viewers are separate tables** (`users`, `viewers`), so a creator who watches is two people | One Supabase auth identity. `memberships` makes someone a creator; a `viewer_profiles` row makes them a viewer. Drop `users` as a separate table |
-| B3 | **Imported subscribers aren't members**, but newsletters are "signed-in members only" | An import creates unclaimed viewer accounts (email only) subscribed to the streams they consented to. The first email carries a claim link. Imports without recorded consent get a confirmation email first (double opt-in) and nothing else until they confirm |
+| B1 | **Decided.** **One sign-in across custom domains.** Cookies are per domain. A viewer signed in on `footyfix.com.au` isn't signed in on `trackside.homestand.au`, yet the promise is one account everywhere | A central `accounts.homestand.au` with a redirect handshake that sets a first-party session on each channel host. Age assurance and opt-out stay on the central account (WP-05) |
+| B2 | **Decided.** **Creators and viewers are separate tables** (`users`, `viewers`), so a creator who watches is two people | Keep both tables, both keyed to the one Supabase auth identity. The studio's account menu links to the reader account, and the reader account links back to the studio when the person runs publications |
+| B3 | **Decided.** **Imported subscribers aren't members**, but newsletters are "signed-in members only" | An import creates unclaimed viewer accounts (email only) subscribed to the streams they consented to. The first email carries a claim link. Imports without recorded consent get a confirmation email first (double opt-in) and nothing else until they confirm |
 | B4 | **Follow digests and newsletters overlap** (`follows.digest` vs email streams) | Following a channel subscribes to its default stream. Drop `follows.digest` |
-| B5 | **Two payout models.** PID BIL-03 pools ad revenue by verified minutes; the studio shows earnings per sponsor | Keep the pool: it's simpler to explain, and it keeps creators away from wagering deals (a hard rule). The studio shows the pool share plus which formats ran, not money per sponsor |
+| B5 | **Decided.** **Two payout models.** PID BIL-03 pools ad revenue by verified minutes; the studio shows earnings per sponsor | Keep the pool: it's simpler to explain, and it keeps creators away from wagering deals (a hard rule). The studio shows the pool share plus which formats ran, not money per sponsor |
 | B6 | **Team roles.** Publisher promises team roles; the build plan has owners only. In-house brands (Sportsbet) need people limited to some publications | MVP: org-level owner and editor. Next: per-publication access (`memberships.channel_ids[]`) |
-| B7 | **The video engine.** "Higgsfield" is generative video. Vox-style explainers are voiceover, charts, tables and licensed imagery, which is programmatic | Remotion (rendered on Lambda) for templates, charts and tables; a text-to-speech provider for voice; licensed stock imagery. Generative clips (Higgsfield or similar) are an optional scene type behind the same interface. Remotion needs a company licence |
+| B7 | **Decided.** **The video engine.** "Higgsfield" is generative video. Vox-style explainers are voiceover, charts, tables and licensed imagery, which is programmatic | Remotion (rendered on Lambda) for templates, charts and tables; a text-to-speech provider for voice; licensed stock imagery. Generative clips (Higgsfield or similar) are an optional scene type behind the same interface. Remotion needs a company licence |
 | B8 | **Where generated videos go.** Publishing to YouTube needs the `youtube.upload` scope, which means another round of Google verification | MVP: generated videos live on the channel (Mux) and can be downloaded. Push to YouTube comes later |
-| B9 | **Credits have no ledger.** There are no holds, refunds on failed renders, expiry or per-publication caps | An append-only ledger: hold on start, capture on success, release on failure. The balance is a sum, not a stored number |
+| B9 | **Decided.** **Credits have no ledger.** There are no holds, refunds on failed renders, expiry or per-publication caps | An append-only ledger: hold on start, capture on success, release on failure. The balance is a sum, not a stored number |
 | B10 | **Template marketplace.** It needs submissions, review, licensing and payouts to designers | MVP: three included templates plus first-party paid ones. The marketplace waits for Stripe Connect |
 | B11 | **Data housing and triple-lock licensing have no product.** They're revenue lines with no screens | Sales-led. Don't build until a design partner signs. Evidence export (ADM-03) is the seed of both |
 | B12 | **Synthetic media disclosure.** The design says synthetic voice is disclosed, but no screen shows it | A "Voiced with AI" label under the player and in the video's structured data, set automatically on generated videos |
@@ -47,27 +61,27 @@ These are fine in a demo and wrong in production. Each has a work package.
 
 ### C. Documents that contradict each other
 
-The brief (13 November) decided no AdSense, and two channel modes (Standard and Age-verified). Older documents still say otherwise. Fix them in WP-00 so nobody builds the old version.
+The brief decided two channel modes (Standard and Age-verified). On 14 November, AdSense came back as fill for unsold slots, and the brief now says so. Older documents still say otherwise in places. Fix them in WP-00 so nobody builds the old version.
 
 | Document | Says | Change to |
 | --- | --- | --- |
-| `pid.md` lines 17, 107, 243 (ADS-08), 342, 372, 458, 562 | AdSense in slots, in the stack, on Publisher and as a pilot criterion | Remove. Native Formats only (brief) |
+| `pid.md` lines 17, 107, 243 (ADS-08), 342, 372, 458, 562 | AdSense in slots, in the stack, on Publisher and as a pilot criterion | Keep, narrowed: the publication's own AdSense fills unsold story and half-time slots only, gambling and alcohol blocked |
 | `pid.md` lines 181 (CHN-06), 225 (TLK-07), 228 (TLK-10), 292 | Racing-only mode, and AdSense in the lock-off block | Two modes; racing-only is parked pending legal advice |
 | `pid.md` line 254 (BIL-03) | Pool payout | Keep, and add that the studio shows pool share (B5) |
-| `screens.md` D17 | AdSense on/off, Racing-only | Match the brief |
-| `build-plan.md` | `channels.adsense_enabled`, AdSense in the diagram, "AdSense in slots" in milestone 7, `users` and `viewers` | Match the brief and B2; add the tables in [section 4](#4-data-model-additions) |
+| `screens.md` D17 | AdSense on/off, Racing-only | Keep AdSense (as fill); drop Racing-only |
+| `build-plan.md` | `channels.adsense_enabled`, "AdSense in slots" in milestone 7 | Replace with `channels.adsense` (publisher ID, fill on or off, categories confirmed); add the tables in [section 4](#4-data-model-additions) |
 
-## 2. Scope: what the pilot needs
+## 2. Scope: the MVP
 
-The pilot (3 May 2027) proves three things: creators publish weekly with less work, verified viewers sign up, and advertisers pay for evidence. Everything else either supports that or waits.
+The MVP proves three things: our in-house brands (and any publisher) grow on their own publications with less work, verified viewers sign up, and advertisers pay for evidence. Everything else waits.
 
-| In the pilot | Narrowed for the pilot | After the pilot |
+| In the MVP | Narrowed | After the MVP |
 | --- | --- | --- |
 | YouTube-first sign-up, import and draft packs | Multiple publications: switcher and the All publications view, org-level roles only | Per-publication roles |
-| Review, publish, channel pages, SEO | Email: three streams per publication, the block builder, CSV import, a shared sending domain plus custom domains | Pasted HTML templates, A/B subjects, dedicated IPs |
-| Viewer accounts, age assurance, triple lock, evidence | Words to video: a beta for pilot channels with a starter credit grant. Explainer template only, long-form and shorts | Match report and Countdown, paid templates, marketplace, push to YouTube |
-| Native Formats, creative review, same-shape rule | Credits: grant, hold, capture, release and a cap; top-ups through Stripe Checkout | Rollover rules, enterprise invoicing |
-| Stripe plans and trial | Members-only content (free membership) | Paid memberships, data housing, licensing |
+| Review, publish, channel pages, SEO | Members-only content (free membership) | Paid memberships |
+| One central sign-in; viewer accounts, age assurance, triple lock, evidence | AdSense as fill for unsold story and half-time slots | Homestand-run Ad Manager for publications without AdSense |
+| Native Formats, creative review, same-shape rule, the creator pool | Analytics and earnings per publication | Data housing, triple-lock licensing |
+| Stripe plans and trial | | Words to video and AI usage (WP-14 to WP-16); email (WP-11 to WP-13); site migration |
 
 ## 3. Phases
 
@@ -77,10 +91,10 @@ Four phases, each one usable on its own. They map onto the build plan's mileston
 | --- | --- | --- | --- | --- |
 | 1. **Publish** | Sign up with YouTube, get a channel, review and publish draft packs, run several publications | 0–6 | WP-00 to WP-04, WP-08 to WP-10 | 2 Apr 2027 |
 | 2. **Earn** | Viewers join, confirm 18+ and opt out; Native Formats serve with evidence; members-only content | 7 | WP-05 to WP-07 | 23 Apr 2027 |
-| 3. **Grow** | Members choose newsletters; the publisher builds and sends them from their own domain; imports with consent | 7b (new, alongside 7) | WP-11 to WP-13 | 23 Apr 2027 |
-| 4. **Create** | Turn an article into a video using brand kit, voice and a template, paid for with credits | 8 plus 9 (new) | WP-14 to WP-16 | Beta 30 Apr, general 4 Jun 2027 |
+| 3. **Grow** (after the MVP) | Members choose newsletters; the publisher builds and sends them from their own domain; imports get a welcome sign-in email | 9 (new) | WP-11 to WP-13 | June 2027 |
+| 4. **Create** (after the MVP) | Turn an article into a video using brand kit, voice and a template, at provider cost plus 20% | 10 (new) | WP-14 to WP-16 | July 2027 |
 
-Milestone 8 (billing, analytics, admin and hardening) runs across phases 3 and 4 as before.
+Milestone 8 (billing, analytics, admin and hardening) finishes the MVP. Phases 3 and 4 follow the pilot start.
 
 ## 4. Data model additions
 
@@ -88,10 +102,10 @@ These add to the build plan's tables. All carry `org_id` and the same RLS policy
 
 | Table | Key columns | Notes |
 | --- | --- | --- |
-| `viewer_profiles` | user_id (auth uid), display_name, created_at | Replaces `viewers` (B2). Global, not tenant-scoped |
+| `viewers` | user_id (auth uid), email, display_name, claimed_at, created_at | The reader record, separate from the creator record (`users`), both keyed to the one login (B2). `claimed_at` is empty for imported addresses until they sign in |
 | `memberships` | org_id, user_id, role (owner, editor), channel_ids[] (null means all) | Adds `channel_ids` for per-publication access later (B6) |
 | `brand_kits` | channel_id, colours jsonb, fonts, logo_ref, voice_id, tone, banned_words[] | Shared by channel design, video templates and email |
-| `credit_ledger` | id, org_id, channel_id, kind (grant, topup, hold, capture, release, refund, expire), amount, ref_type, ref_id, expires_at, at | Append-only (INSERT and SELECT only). Balance = sum |
+| `credit_ledger` | id, org_id, channel_id, kind (allowance, topup, hold, charge, release), provider, provider_cost, amount, ref_type, ref_id, at | AUD. Append-only (INSERT and SELECT only). `amount` = provider cost × 1.2 for charges. Balance = sum |
 | `credit_caps` | channel_id, monthly_cap, alert_pct, alerted_at | Checked before every hold |
 | `video_templates` | id, owner (homestand, org), name, formats[], price_cents, spec jsonb, version, status | `spec` is the Remotion composition id plus slots |
 | `template_licences` | org_id, template_id, source (included, purchase), stripe_ref | One purchase covers every brand on the account |
@@ -103,6 +117,7 @@ These add to the build plan's tables. All carry `org_id` and the same RLS policy
 | `email_suppressions` | email_hash, channel_id (null means global), reason (unsubscribe, bounce, complaint), at | Checked before every send |
 | `sending_domains` | channel_id, domain, provider_domain_id, dns_records jsonb, status, verified_at | Shared `mail.homestand.au` until verified |
 | `subscriber_imports` | id, channel_id, file_ref, consent_basis, counts jsonb, status | The file is deleted after processing |
+| `channels` | adds adsense jsonb (publisher_id, fill_unsold, categories_confirmed_at) | AdSense fill. We publish the publisher's ads.txt on the channel's host |
 | `entitlements` | none, it's code | `lib/plans.ts` maps a plan to its limits; every server action calls `entitlements(org)` |
 
 ## 5. Provider interfaces
@@ -128,7 +143,7 @@ Each work package is about one pull request, with tests. "Faked today" names wha
 **WP-00 Clean-up before code (1 day)**
 - Fix the documents in [section 1C](#c-documents-that-contradict-each-other).
 - Add `lib/plans.ts` with every plan's limits, and point pricing, billing and the switcher at it.
-- Done when: no document mentions AdSense or Racing-only as current, and the plan limits exist in one file.
+- Done when: no document mentions Racing-only as current, AdSense is described only as fill for unsold story and half-time slots, and the plan limits exist in one file.
 
 **WP-01 Foundations** (build plan milestone 1)
 - Supabase in Sydney, migrations for the build plan's tables plus [section 4](#4-data-model-additions), RLS on every tenant table, staging and production, and CI running typecheck, lint, unit tests and `check:demo` against a preview.
@@ -174,7 +189,8 @@ Each work package is about one pull request, with tests. "Faked today" names wha
 **WP-07 Ad decisions and evidence** (milestone 7)
 - Faked today: `slotOptions()`, `SponsorSlot`'s client-side pick, `/admin/evidence` sample rows.
 - Build: `packages/ads` `decide()` runs on the server per slot, fails closed, and writes evidence in the same transaction before returning. `SponsorSlot` keeps its props (`kind`, the neighbour's shape) but receives one creative. Opt-out posts to `/api/ads/optout` and re-renders the slot.
-- Done when: a logged-out payload never contains a wagering creative; every wagering impression has an evidence row; `check:demo` flows pass on real sessions.
+- AdSense: when no sold creative wins a story or half-time slot and the channel has AdSense on, return an AdSense unit sized to the slot (responsive in-feed or in-article, Auto ads off). Serve `ads.txt` per channel host. Record the publisher's confirmation that gambling and alcohol are blocked, and show AdSense nowhere else.
+- Done when: a logged-out payload never contains a wagering creative; every wagering impression has an evidence row; AdSense appears only in unsold story and half-time slots; `check:demo` flows pass on real sessions.
 
 ### Phase 3: Grow
 
@@ -196,10 +212,10 @@ Each work package is about one pull request, with tests. "Faked today" names wha
 
 ### Phase 4: Create
 
-**WP-14 Credits**
-- Screens: `/studio/credits`, `credits-panel.tsx`, billing.
-- Faked today: `CreditAccount` sample data and `TOP_UPS`.
-- Build: `credit_ledger` and `credit_caps`; top-ups through Stripe Checkout; the plan's monthly grant via Inngest cron; an 80% alert email.
+**WP-14 AI usage**
+- Screens: `/studio/credits` (AI usage), `credits-panel.tsx`, billing.
+- Faked today: `CreditAccount` sample data and `TOP_UPS`. The rate card in `lib/credits.ts` is real (provider cost plus `MARGIN`).
+- Build: `credit_ledger` and `credit_caps`; each provider adapter reports its actual cost per job, and the charge is that cost plus 20%; top-ups through Stripe Checkout; the plan's monthly allowance via Inngest cron; an 80% alert email.
 - Done when: a failed render releases its hold, a cap blocks the next job with a clear message, and the balance always equals the ledger sum.
 
 **WP-15 Brand kit and templates**
@@ -222,6 +238,7 @@ Keep these working in the demo environment behind `NEXT_PUBLIC_DEMO=1`, and leav
 | `components/channel/viewer.tsx`: `DemoBar`, `?as=`, localStorage in `ViewerProvider` | Viewer state | `Session` (WP-05) |
 | `components/channel/lib.ts`: `slotOptions`, the `Record<Viewer, Sponsor>` maps | Ad decisions | `AdDecision` (WP-07) |
 | `components/channel/channel-cta.tsx`: `MembersOnly` | Gating | Server check (WP-06) |
+| `components/brand/native-ads.tsx`: `AdSenseBox` | The AdSense unit | The real AdSense tag in a fixed-size container (WP-07) |
 | `app/demo`, `app/screens` | The demo guide and screen index | Demo environment only |
 | `components/account/check-email.tsx`, `verify-age-flow.tsx` | Magic link and age assurance | Supabase Auth, `AgeAssurance` |
 | `components/auth/*` (provider button, import live, name form, email link) | Sign-up and import | WP-02 |
@@ -235,14 +252,15 @@ Keep these working in the demo environment behind `NEXT_PUBLIC_DEMO=1`, and leav
 
 | Decision | Recommendation | Blocks | Owner |
 | --- | --- | --- | --- |
-| One identity for creators and viewers (B2) | Yes | WP-01 | Dan |
-| Central accounts host for custom domains (B1) | `accounts.homestand.au` | WP-05 | Dan |
-| Payout model (B5) | Pool by verified minutes | WP-07, studio earnings copy | Dan + counsel |
+| ~~One identity for creators and viewers (B2)~~ | Decided: one login, separate creator and reader records | WP-01 | Dan |
+| ~~Central accounts host for custom domains (B1)~~ | Decided: central sign-in, `accounts.homestand.au` | WP-05 | Dan |
+| ~~Payout model (B5)~~ | Decided: pool by verified minutes, signed-in counted in full and logged-out at a fifth. Counsel to confirm | WP-07 | Dan + counsel |
+| Whether a wagering operator owning the platform makes its publications wagering advertising | Get advice before the in-house brands go live | Launch of in-house brands | Counsel |
 | YouTube player and chapter sponsors (A4) | Ask; fall back to uploads only | WP-09 | Counsel |
-| Video engine (B7) | Remotion plus TTS; generative optional | WP-15 | Dan |
+| ~~Video engine (B7)~~ | Decided: Remotion, Azure TTS, Pexels and Pixabay ([video-engine.md](video-engine.md)) | WP-15 | Dan |
 | Text-to-speech and stock imagery providers | Choose in a one-week spike on price per finished minute | WP-16 | Dan |
 | Imported contacts without proof of consent (B3) | Confirmation email first | WP-13 | Dan + counsel |
-| Credit price per finished minute | Confirm after the spike measures real cost | WP-14, pricing page | Dan |
+| ~~AI pricing~~ | Decided: provider cost plus 20%. Confirm provider rates with a test render | WP-14, pricing page | Dan |
 | Wagering ownership question (revenue model risks) | Settle before any operator equity or in-house brand launch | Sportsbet deal | Counsel |
 | Age-assurance provider, evidence retention, wagering CPC, density caps | As in the build plan | WP-05, WP-07 | Dan + counsel |
 

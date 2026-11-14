@@ -24,7 +24,7 @@ export const PLANS: PlanInfo[] = [
       "10 video hours processed a month",
       "Article drafts and shorts from every video",
       "Editorial and Broadcast templates",
-      "100 AI credits a month for words to video",
+      "$5 of AI usage a month for words to video",
       "Newsletters to 1,000 subscribers",
     ],
     cta: "Start free trial",
@@ -41,7 +41,7 @@ export const PLANS: PlanInfo[] = [
       "40 video hours processed a month",
       "Age-verified advertising",
       "Ad revenue share",
-      "500 AI credits a month",
+      "$20 of AI usage a month",
       "Newsletters to 10,000 subscribers",
       "Priority processing",
     ],
@@ -57,7 +57,7 @@ export const PLANS: PlanInfo[] = [
     includes: [
       "Everything in Pro",
       "3 publications under one account",
-      "2,000 AI credits a month",
+      "$60 of AI usage a month",
       "Newsletters to 50,000 subscribers",
       "Team roles for editors and producers",
       "150 video hours processed a month",
@@ -73,7 +73,7 @@ export const PLANS: PlanInfo[] = [
     for: "Large publishers, networks and internal brands",
     includes: [
       "Unlimited publications",
-      "AI credits at volume pricing",
+      "AI usage at provider cost plus 20%",
       "White-glove migration",
       "Service level agreement",
       "Dedicated support",
@@ -120,9 +120,9 @@ export const COMPARISON: { group: string; rows: { label: string; values: [string
   {
     group: "Words to video",
     rows: [
-      { label: "AI credits a month", values: ["100", "500", "2,000", "Custom"] },
+      { label: "AI usage included a month", values: ["$5", "$20", "$60", "Custom"] },
       { label: "Video templates included", values: ["3", "3", "3", "All"] },
-      { label: "Top up credits any time", values: [true, true, true, true] },
+      { label: "AI usage at provider cost plus 20%", values: [true, true, true, true] },
       { label: "Spend caps per publication", values: [false, false, true, true] },
     ],
   },

@@ -2,7 +2,7 @@
 
 /**
  * Words to video. Pick an article (or paste text), a template and a format. The script is drafted
- * scene by scene in the publication's brand kit and voice; edit any line, see the credit cost, then
+ * scene by scene in the publication's brand kit and voice; edit any line, see the cost, then
  * generate. The result is a draft that waits for review, like everything else on Homestand.
  */
 import { useEffect, useMemo, useState } from "react"
@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { FORMAT_INFO, renderCost } from "@/lib/credits"
+import { FORMAT_INFO, MARGIN, money, renderEstimate } from "@/lib/credits"
 import { cn } from "@/lib/utils"
 import type { Block, VideoFormat, VideoTemplate } from "@/lib/types"
 import { SceneFrame, type BrandKit } from "./scene-frame"
@@ -81,7 +81,8 @@ export function VideoComposer({
   }, [source, pasted, format, cta, edits, articles])
 
   const seconds = totalSeconds(scenes)
-  const cost = renderCost(format, seconds, voice)
+  const estimate = renderEstimate(format, seconds, voice)
+  const cost = estimate.price
   const short = format === "short"
   const ratio = FORMAT_INFO[format].ratio
   const current = scenes[Math.min(selected, scenes.length - 1)]
@@ -134,7 +135,7 @@ export function VideoComposer({
                 <CircleCheck className="size-5 text-pop-ink" aria-hidden /> Your draft video is ready to review
               </p>
               <p className="text-[14px] leading-[21px] text-muted-foreground">
-                {clock(seconds)} · {scenes.length} scenes · {cost} credits used, {balance.toLocaleString("en-AU")} left. Nothing goes live until you publish.
+                {clock(seconds)} · {scenes.length} scenes · {money(cost)} charged, {money(balance)} left. Nothing goes live until you publish.
                 {voice && " The video is labelled as using a synthetic voice."}
               </p>
               <div className="flex flex-col gap-2">
@@ -345,12 +346,15 @@ export function VideoComposer({
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-background/95 px-4 py-3 shadow-popover backdrop-blur">
           <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-muted-foreground">
             <span className="flex items-center gap-1.5 font-semibold text-foreground">
-              <Coins className="size-4" aria-hidden /> {cost} credits
+              <Coins className="size-4" aria-hidden /> {money(cost)}
+            </span>
+            <span title={estimate.lines.map((l) => `${l.label} (${l.detail}): $${l.cost.toFixed(3)}`).join("\n")}>
+              Provider cost ${estimate.cost.toFixed(2)} + {Math.round(MARGIN * 100)}%
             </span>
             <span>
               {FORMAT_INFO[format].label} · {clock(seconds)} {voice ? "· with voiceover" : "· no voiceover"}
             </span>
-            <span>{canAfford ? `${(balance - cost).toLocaleString("en-AU")} left after this` : "Not enough credits"}</span>
+            <span>{canAfford ? `${money(balance - cost)} left after this` : "Not enough AI balance"}</span>
             {!canAfford && (
               <Link href="/studio/credits" className="font-semibold text-foreground underline-offset-4 hover:underline">
                 Top up

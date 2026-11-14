@@ -10,7 +10,7 @@ import { getEarnings, listChannels, listVideos } from "@/lib/data"
 import { compact } from "@/lib/format"
 import { currentPublication } from "@/lib/publication"
 import { pubScale, studioDays, sum, toPack } from "@/components/studio/lib"
-import { previewLead } from "@/components/channel/lib"
+import { previewContent } from "@/components/channel/lib"
 import { cn } from "@/lib/utils"
 
 export const metadata = { title: "All publications" }
@@ -77,7 +77,7 @@ export default async function PublicationsPage() {
           {pubs.map(({ c, views, verified, earnings, ready, flagged, domain }) => (
             <li key={c.id} className={cn("flex min-w-0 flex-col overflow-hidden rounded-lg border bg-card", c.id === current.id && "ring-1 ring-foreground")}>
               <div className="relative border-b bg-muted/40 p-3" aria-hidden>
-                <TemplatePreview template={c.template} accentHex={c.accentHex} pairing={c.pairing} name={c.name} nav={c.nav.map((n) => n.label)} ctaLabel={c.cta.label} lead={previewLead(c)} maxHeight={300} />
+                <TemplatePreview template={c.template} accentHex={c.accentHex} pairing={c.pairing} name={c.name} nav={c.nav.map((n) => n.label)} ctaLabel={c.cta.label} content={previewContent(c)} maxHeight={300} />
               </div>
               <div className="flex flex-1 flex-col gap-4 p-5">
                 <div className="flex items-start gap-3">

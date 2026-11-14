@@ -60,9 +60,23 @@ export function SubscriberImport({ streams, channelName }: { streams: { id: stri
           ))}
         </dl>
         <p className="text-[13px] leading-5 text-muted-foreground">
-          Each one is now a {channelName} member. Their first email explains why they&apos;re hearing from you and has a one-click unsubscribe; they sign in with a link from any
-          email.
+          Each one is now a {channelName} member with an account waiting. They get one welcome email: a sign-in link to see members-only content, no password, and a one-click
+          unsubscribe.
         </p>
+        <figure className="overflow-hidden rounded-md border bg-background text-[14px]" aria-label="The welcome email">
+          <figcaption className="border-b bg-muted/40 px-4 py-2 text-[12px] text-muted-foreground">
+            <span className="font-semibold text-foreground">Welcome email</span> · from {channelName}, sent from your own domain
+          </figcaption>
+          <div className="flex flex-col gap-3 p-4">
+            <p className="font-semibold">Subject: Your {channelName} account is ready</p>
+            <p className="leading-[21px] text-muted-foreground">
+              You signed up for {channelName}&apos;s newsletter, and it now lives on our own site. Your account is already set up: tap below to sign in and watch the members-only videos.
+              No password needed.
+            </p>
+            <span className="w-fit rounded-md bg-foreground px-3.5 py-2 text-[13px] font-semibold text-background">Sign in to {channelName}</span>
+            <p className="text-[12px] text-muted-foreground">Not for you? Unsubscribe in one click.</p>
+          </div>
+        </figure>
         <Button variant="outline" className="w-fit" onClick={() => { setPhase("pick"); setFile(null); setConsent(false) }}>
           Import another file
         </Button>
@@ -75,7 +89,7 @@ export function SubscriberImport({ streams, channelName }: { streams: { id: stri
       {!file ? (
         <button
           type="button"
-          onClick={() => setFile("footyfix-substack-export.csv")}
+          onClick={() => setFile(`${channelName.toLowerCase().replace(/[^a-z0-9]+/g, "")}-substack-export.csv`)}
           className="flex flex-col items-center gap-2 rounded-lg border border-dashed p-8 text-center outline-none hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring"
         >
           <Upload className="size-6" aria-hidden />

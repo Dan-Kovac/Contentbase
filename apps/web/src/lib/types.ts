@@ -32,6 +32,11 @@ export interface Channel {
   adCategoryBlocks: string[]
   /** Age-restricted categories the creator has blocked (only meaningful in age_verified mode). */
   blockedAgeCategories: AgeCategory[]
+  /**
+   * Google AdSense, connected with the publisher's own account. It only fills story and half-time
+   * slots that Homestand hasn't sold, inside the same box, with gambling and alcohol blocked.
+   */
+  adsense?: AdSenseSettings
   followers: number
   youtube?: {
     handle: string
@@ -245,17 +250,29 @@ export interface AdDecision {
 }
 
 /** A channel's share of sponsor revenue for a period (sample data until billing is wired in). */
+/**
+ * A publication's ad earnings. Half of net Native Format revenue goes into a monthly creator pool,
+ * split by verified minutes: minutes from signed-in viewers count in full, logged-out minutes count
+ * a fifth. Pay never depends on which ads ran, so no one has a reason to favour an advertiser.
+ */
 export interface Earnings {
   channelId: string
   period: string
-  /** The creator's share, AUD inc. GST. */
+  /** The publication's pool share, AUD inc. GST. */
   total: number
-  /** Of the total, what came from age-restricted sponsors behind the triple lock. */
-  ageVerified: number
   previousTotal: number
-  byFormat: { format: NativeFormat; amount: number }[]
-  bySponsor: { name: string; amount: number; ageCategory?: AgeCategory }[]
-  byViewer: { state: string; impressions: number; amount: number }[]
+  /** Watch and reading minutes this period. */
+  minutes: { signedIn: number; loggedOut: number }
+  pool: {
+    /** The creator pool across every publication this period. */
+    size: number
+    /** AUD per 1,000 weighted minutes. */
+    ratePer1000: number
+    /** Share of the pool paid by age-verified sponsors, who only buy behind the triple lock. */
+    ageVerifiedShare: number
+  }
+  /** AdSense earnings, paid by Google straight to the publisher's own account. */
+  adsense: number
 }
 
 /**
@@ -341,24 +358,31 @@ export interface VideoTemplate {
   bestFor: string
 }
 
-export interface CreditEntry {
+/**
+ * One line of the AI usage ledger. Append-only: a render places a hold, then the hold is either
+ * charged (on success) or released (on failure). The balance is the sum of the ledger.
+ */
+export interface LedgerEntry {
   id: string
   at: string
+  kind: "allowance" | "topup" | "hold" | "charge" | "release"
   description: string
-  /** Negative for usage, positive for allowances and top-ups. */
-  credits: number
+  /** What the provider charged us, for usage lines (AUD). */
+  cost?: number
+  /** Signed change to the balance (AUD): usage is negative. */
+  amount: number
   publication?: string
 }
 
-/** The account's AI credits (sample). Shared by every publication on the account. */
+/** The account's AI usage balance in AUD (sample). Shared by every publication on the account. */
 export interface CreditAccount {
   balance: number
   monthlyIncluded: number
   usedThisMonth: number
-  /** Monthly spend cap in credits; usage stops and asks first beyond it. */
+  /** Monthly spend cap in AUD; usage stops and asks first beyond it. */
   cap: number
   renewsOn: string
-  ledger: CreditEntry[]
+  ledger: LedgerEntry[]
 }
 
 export interface MadeVideo {
@@ -369,7 +393,8 @@ export interface MadeVideo {
   format: VideoFormat
   seconds: number
   status: "ready" | "published"
-  credits: number
+  /** What the render was charged (AUD). */
+  charged: number
   createdAt: string
   sourceArticleId?: string
 }
@@ -377,7 +402,21 @@ export interface MadeVideo {
 /** Homestand Native Formats: advertisers supply a brief; we render it in the channel's design. */
 export type NativeFormat = "chapter_sponsor" | "halftime" | "sponsored_story" | "sponsored_short" | "presented_by"
 
+export type AdSenseSlot = "story" | "halftime"
+
+export interface AdSenseSettings {
+  publisherId: string
+  /** Fill unsold slots. Off means unsold slots show the channel's own call to action. */
+  fillUnsold: boolean
+  /** Slots Homestand hasn't sold this week (sample data; in a real build the ad server knows). */
+  unsoldSlots: AdSenseSlot[]
+  /** The publisher confirmed these categories are blocked in their AdSense account. */
+  blockedCategoriesConfirmed: boolean
+}
+
 export interface Sponsor {
+  /** Set when the slot is filled by an ad network instead of a sold sponsor. */
+  network?: "adsense"
   id: string
   name: string
   /** Brand colour used in the format (contrast-checked like channel accents). */
@@ -391,6 +430,10 @@ export interface Sponsor {
   cta: string
   url: string
   ageCategory?: AgeCategory
+  /** The publications this creative is written for. Sponsors write one creative per publication, so a racing line never lands on a football site. */
+  channelIds: string[]
+  /** For everyday sponsors: which fill they are in the slot plans. */
+  fill?: "primary" | "secondary"
 }
 
 /** Standalone article written in the studio (not generated from a video). */

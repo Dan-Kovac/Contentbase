@@ -38,8 +38,8 @@ const FAQ = [
     a: "Yes, without a separate tool. Each publication has its own newsletters that members choose on your site. Build an email from blocks in your brand or paste your own HTML, import your existing list with consent, and send from your own domain. Each plan includes subscribers and up to four emails per subscriber a month; beyond that, sends come out of AI credits.",
   },
   {
-    q: "What are AI credits?",
-    a: "Your plan turns every YouTube video into a draft pack. Credits pay for the heavier work: turning an article into a video, synthetic voiceover, dubbing and processing beyond your video hours. Each plan includes credits every month, top-ups roll over for 12 months, and a spend cap means no surprises.",
+    q: "How is AI usage charged?",
+    a: "Your plan turns every YouTube video into a draft pack. AI work beyond that, like turning an article into a video, synthetic voiceover, dubbing and processing beyond your video hours, is charged at exactly what the provider charges us plus 20%. A short costs about 15 cents. Each plan includes some every month, top-ups never expire, and a monthly cap means no surprises.",
   },
   {
     q: "Do you take a cut of my ad revenue?",

@@ -1,6 +1,6 @@
 "use client"
 
-import { useLayoutEffect, useRef, useState } from "react"
+import { createContext, useContext, useLayoutEffect, useRef, useState } from "react"
 import { Play, Search } from "lucide-react"
 import { channelStyle } from "@/lib/format"
 import { cn } from "@/lib/utils"
@@ -49,6 +49,33 @@ const SHORTS = [
 ]
 
 const SECTION_PHOTOS = ["/media/stadium-night-wide.jpg", "/media/broadcast-control-room.jpg", "/media/stadium-crowd-red.jpg", "/media/mcg-night.jpg"]
+
+export type PreviewStory = (typeof STORIES)[number]
+export type PreviewShort = (typeof SHORTS)[number]
+type PreviewSponsor = { name: string; initials: string; colour: string; line: string; cta: string }
+
+/** What the miniature homepage shows: a publication's own stories, shorts and sponsors, or the sample. */
+export type PreviewContent = {
+  lead: PreviewLead
+  stories: PreviewStory[]
+  shorts: PreviewShort[]
+  sectionPhotos: string[]
+  /** The Presented by credit. */
+  band: PreviewSponsor
+  /** The sponsored story and sponsored short. */
+  gear: PreviewSponsor
+}
+
+const SAMPLE: PreviewContent = {
+  lead: LEAD,
+  stories: STORIES,
+  shorts: SHORTS,
+  sectionPhotos: SECTION_PHOTOS,
+  band: { name: "Southern Cross Utes", initials: "SC", colour: "#0f3d2e", line: "Built for the drive to every away game.", cta: "Book a test drive" },
+  gear: { name: "Kick Boots Co.", initials: "KB", colour: "#111111", line: "Grip for the wet ones.", cta: "Shop the range" },
+}
+
+const ContentContext = createContext<PreviewContent>(SAMPLE)
 
 export const DEFAULT_MODULES: { id: HomeModule; enabled: boolean }[] = [
   { id: "lead", enabled: true },
@@ -171,49 +198,53 @@ function Masthead({ name, logoUrl, nav, dark, ctaLabel }: { name: string; logoUr
 }
 
 function SponsorBand({ dark, compact = false }: { dark: boolean; compact?: boolean }) {
+  const { band } = useContext(ContentContext)
   return (
-    <div className={cn("flex items-center justify-between gap-4 border-t-2 pt-2.5 text-[13px]", dark ? "text-white/70" : "text-neutral-500")} style={{ borderColor: "#0f3d2e" }}>
+    <div className={cn("flex items-center justify-between gap-4 border-t-2 pt-2.5 text-[13px]", dark ? "text-white/70" : "text-neutral-500")} style={{ borderColor: band.colour }}>
       <span className="flex items-center gap-2">
         <span className="text-[11px] font-bold uppercase tracking-[1px]">Presented by</span>
-        <span className="grid size-[18px] place-items-center rounded-[4px] bg-[#0f3d2e] text-[8px] font-bold text-white">SC</span>
-        <span className={cn("font-semibold", dark ? "text-white" : "text-neutral-950")}>Southern Cross Utes</span>
+        <span className="grid size-[18px] place-items-center rounded-[4px] text-[8px] font-bold text-white" style={{ background: band.colour }}>{band.initials}</span>
+        <span className={cn("font-semibold", dark ? "text-white" : "text-neutral-950")}>{band.name}</span>
       </span>
-      {!compact && <span>Built for the drive to every away game.</span>}
+      {!compact && <span>{band.line}</span>}
     </div>
   )
 }
 
 /** The one sponsored story: the same box as the story cards beside it. */
 function SponsoredStory() {
+  const { gear } = useContext(ContentContext)
   return (
     <div className="flex flex-col gap-2">
-      <div className="relative flex flex-col justify-between overflow-hidden rounded-[6px] bg-[#111111] p-3 text-white" style={{ aspectRatio: "16/9" }}>
-        <span className="grid size-6 place-items-center rounded-[4px] bg-white text-[9px] font-bold text-[#111111]">KB</span>
-        <span className="text-[17px] font-extrabold leading-[1.05]">Kick Boots Co.</span>
+      <div className="relative flex flex-col justify-between overflow-hidden rounded-[6px] p-3 text-white" style={{ aspectRatio: "16/9", background: gear.colour }}>
+        <span className="grid size-6 place-items-center rounded-[4px] bg-white text-[9px] font-bold" style={{ color: gear.colour }}>{gear.initials}</span>
+        <span className="text-[17px] font-extrabold leading-[1.05]">{gear.name}</span>
         <span className="absolute bottom-2 right-2 rounded-[2px] bg-black/70 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.8px]">Sponsored</span>
       </div>
-      <span className="text-[11px] font-bold uppercase tracking-[1px] text-neutral-500">Sponsored · Kick Boots Co.</span>
+      <span className="text-[11px] font-bold uppercase tracking-[1px] text-neutral-500">Sponsored · {gear.name}</span>
       <p className="text-[19px] leading-[1.12]" style={display}>
-        Grip for the wet ones.
+        {gear.line}
       </p>
     </div>
   )
 }
 
 function SponsoredShort() {
+  const { gear } = useContext(ContentContext)
   return (
     <div className="flex flex-col gap-2">
-      <div className="relative overflow-hidden rounded-[6px] bg-[#111111]" style={{ aspectRatio: "9/16" }}>
-        <span className="absolute bottom-12 left-3 right-3 text-[14px] font-extrabold leading-[1.1] text-white">Grip for the wet ones.</span>
+      <div className="relative overflow-hidden rounded-[6px]" style={{ aspectRatio: "9/16", background: gear.colour }}>
+        <span className="absolute bottom-12 left-3 right-3 text-[14px] font-extrabold leading-[1.1] text-white">{gear.line}</span>
         <span className="absolute left-2 top-2 rounded-[2px] bg-black/70 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.8px] text-white">Sponsored</span>
-        <span className="absolute bottom-3 left-3 rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-[#111111]">Shop the range</span>
+        <span className="absolute bottom-3 left-3 rounded-full bg-white px-2.5 py-1 text-[10px] font-bold" style={{ color: gear.colour }}>{gear.cta}</span>
       </div>
-      <p className="text-[13px] font-semibold leading-[17px]">Grip for the wet ones.</p>
+      <p className="text-[13px] font-semibold leading-[17px]">{gear.line}</p>
     </div>
   )
 }
 
-function Editorial({ modules, sectionLabels, lead: LEAD }: { modules: HomeModule[]; sectionLabels: string[]; lead: PreviewLead }) {
+function Editorial({ modules, sectionLabels }: { modules: HomeModule[]; sectionLabels: string[] }) {
+  const { lead: LEAD, stories: STORIES, shorts: SHORTS } = useContext(ContentContext)
   return (
     <div className="grid gap-10 px-8 py-8">
       {modules.map((m) => {
@@ -303,7 +334,7 @@ function Editorial({ modules, sectionLabels, lead: LEAD }: { modules: HomeModule
   )
 }
 
-function Rail({ title, items, start = 0 }: { title: string; items: typeof STORIES; start?: number }) {
+function Rail({ title, items, start = 0 }: { title: string; items: PreviewStory[]; start?: number }) {
   return (
     <section className="grid gap-3">
       <div className="flex items-center justify-between px-8">
@@ -326,7 +357,8 @@ function Rail({ title, items, start = 0 }: { title: string; items: typeof STORIE
   )
 }
 
-function Broadcast({ modules, sectionLabels, lead: LEAD }: { modules: HomeModule[]; sectionLabels: string[]; lead: PreviewLead }) {
+function Broadcast({ modules, sectionLabels }: { modules: HomeModule[]; sectionLabels: string[] }) {
+  const { lead: LEAD, stories: STORIES, shorts: SHORTS, sectionPhotos: SECTION_PHOTOS } = useContext(ContentContext)
   return (
     <div className={cn("grid gap-9 pb-9", modules[0] !== "lead" && "pt-8")}>
       {modules.map((m) => {
@@ -410,9 +442,12 @@ export function TemplatePreview({
   className,
   ctaLabel = "Join free",
   lead,
+  content,
 }: {
   /** The channel's own lead story, when there is one. Otherwise a sample. */
   lead?: Partial<PreviewLead>
+  /** The publication's own stories, shorts and sponsors. Otherwise the sample. */
+  content?: PreviewContent
   /** The channel's call-to-action button text. */
   ctaLabel?: string
   template: Template
@@ -460,9 +495,13 @@ export function TemplatePreview({
           {on.length === 0 ? (
             <p className={cn("py-24 text-center text-[15px]", dark ? "text-white/60" : "text-neutral-500")}>Turn on at least one module to fill your homepage.</p>
           ) : dark ? (
-            <Broadcast modules={on} sectionLabels={sectionLabels} lead={{ ...LEAD, ...lead }} />
+            <ContentContext value={{ ...(content ?? SAMPLE), lead: { ...(content?.lead ?? LEAD), ...lead } }}>
+              <Broadcast modules={on} sectionLabels={sectionLabels} />
+            </ContentContext>
           ) : (
-            <Editorial modules={on} sectionLabels={sectionLabels} lead={{ ...LEAD, ...lead }} />
+            <ContentContext value={{ ...(content ?? SAMPLE), lead: { ...(content?.lead ?? LEAD), ...lead } }}>
+              <Editorial modules={on} sectionLabels={sectionLabels} />
+            </ContentContext>
           )}
           {!maxHeight && (
             <footer className={cn("flex justify-between border-t px-8 py-5 text-[12px]", dark ? "border-white/10 text-white/50" : "border-neutral-200 text-neutral-500")}>

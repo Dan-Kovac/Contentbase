@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ExternalLink, Plus } from "lucide-react"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { AccountMenu } from "@/components/shell/account-menu"
 import { StudioSidebar } from "@/components/shell/studio-sidebar"
 import { PublicationSwitcher, type PublicationSummary } from "@/components/shell/publication-switcher"
 import { StudioSectionTabs } from "@/components/shell/section-tabs"
@@ -46,9 +46,7 @@ async function StudioFrame({ children }: { children: React.ReactNode }) {
                 <Plus /> Upload
               </Link>
             </Button>
-            <Avatar className="size-8">
-              <AvatarFallback className="bg-brand-black text-[12px] font-bold text-brand-white">SD</AvatarFallback>
-            </Avatar>
+            <AccountMenu name="Sam Doherty" initials="SD" />
           </div>
         </header>
         <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 py-8 md:px-8">

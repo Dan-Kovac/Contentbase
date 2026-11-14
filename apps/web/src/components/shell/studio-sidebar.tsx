@@ -19,14 +19,21 @@ import {
 } from "@/components/ui/sidebar"
 import { Monogram, Wordmark } from "@/components/brand/wordmark"
 
-export const STUDIO_NAV = [
+type NavItem = { href: string; label: string; icon: typeof Inbox; badge?: boolean; also?: string[] }
+
+/** The MVP: publish from YouTube, review, see what it earns, set the triple lock. */
+export const STUDIO_NAV: NavItem[] = [
   { href: "/studio", label: "Home", icon: LayoutDashboard },
   { href: "/studio/review", label: "Review", icon: Inbox, badge: true },
   { href: "/studio/library", label: "Library", icon: Library, also: ["/studio/articles", "/studio/shorts", "/studio/pages", "/studio/upload"] },
-  { href: "/studio/video", label: "Video", icon: Clapperboard, also: ["/studio/credits"] },
-  { href: "/studio/email", label: "Email", icon: Mail },
   { href: "/studio/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/studio/settings", label: "Settings", icon: Settings, also: ["/studio/imports"] },
+]
+
+/** Designed and clickable, built after the MVP. */
+export const STUDIO_NEXT: NavItem[] = [
+  { href: "/studio/video", label: "Words to video", icon: Clapperboard, also: ["/studio/credits"] },
+  { href: "/studio/email", label: "Email", icon: Mail },
 ]
 
 function isActive(pathname: string, item: { href: string; also?: string[] }) {
@@ -67,6 +74,24 @@ export function StudioSidebar({ reviewCount = 0, publications = 1 }: { reviewCou
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
+          <SidebarGroupLabel>Coming next</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {STUDIO_NEXT.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton asChild isActive={isActive(pathname, item)} tooltip={`${item.label} (next)`}>
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                  <SidebarMenuBadge className="rounded-sm border px-1 text-[10px] font-semibold text-muted-foreground">Next</SidebarMenuBadge>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
           <SidebarGroupLabel>Your account</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -92,9 +117,9 @@ export function StudioSidebar({ reviewCount = 0, publications = 1 }: { reviewCou
           </div>
           <Link href="/studio/credits" className="mt-3 flex items-center justify-between gap-2 border-t pt-2.5 text-xs outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring">
             <span className="flex items-center gap-1.5 text-muted-foreground">
-              <Coins className="size-3.5" aria-hidden /> AI credits
+              <Coins className="size-3.5" aria-hidden /> AI balance
             </span>
-            <span className="font-semibold">1,240 left</span>
+            <span className="font-semibold">$71.20</span>
           </Link>
         </div>
       </SidebarFooter>

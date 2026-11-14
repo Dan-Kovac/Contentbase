@@ -122,7 +122,7 @@ async function VideoPageContent({ params }: { params: Params }) {
                     chapters={video.chapters}
                     transcript={video.transcript}
                     source={video.source}
-                    preroll={video.source === "upload" ? sponsorFor("presented") : undefined}
+                    preroll={video.source === "upload" ? sponsorFor(channel.id, "presented") : undefined}
                   />
                 </div>
                 <div className="lg:col-span-4">

@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils"
 import type { Channel, ChannelCta, HomeModule, Pairing, Template } from "@/lib/types"
 import { FixedNote, Panel, Section, Tag } from "./section"
 import { AccentField, accentState } from "./accent-field"
-import { TemplatePreview } from "./template-preview"
+import { TemplatePreview, type PreviewContent } from "./template-preview"
 
 const MODULE_INFO: Record<HomeModule, { label: string; description: string; ad?: boolean }> = {
   lead: { label: "Lead story", description: "Your latest or pinned video, full width, with its headline. Carries one “Presented by” credit.", ad: true },
@@ -81,7 +81,7 @@ function fileError(f: File) {
   return null
 }
 
-export function DesignEditor({ channel }: { channel: Channel }) {
+export function DesignEditor({ channel, preview }: { channel: Channel; preview: PreviewContent }) {
   // Brand
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [logoName, setLogoName] = useState<string | null>(null)
@@ -360,7 +360,7 @@ export function DesignEditor({ channel }: { channel: Channel }) {
                     {selected && <Check className="size-4" aria-hidden />}
                   </span>
                   <span className="text-[22px] leading-[1.05] [text-wrap:balance]" style={{ fontFamily: p.display, fontWeight: p.weight, letterSpacing: p.tracking }}>
-                    Cripps wins it, nobody gets it out
+                    {preview.lead.headline}
                   </span>
                   <span className="text-[13px] leading-5 text-muted-foreground" style={{ fontFamily: p.body }}>
                     {p.description}
@@ -403,6 +403,7 @@ export function DesignEditor({ channel }: { channel: Channel }) {
                       logoUrl={logoUrl}
                       nav={nav.map((n) => n.label)}
                       sectionLabels={channel.sections.map((s) => s.label)}
+                      content={preview}
                       maxHeight={520}
                       className="rounded-md"
                     />
@@ -600,6 +601,7 @@ export function DesignEditor({ channel }: { channel: Channel }) {
               sectionLabels={channel.sections.map((s) => s.label)}
               domain={channel.customDomain ?? `${channel.slug}.homestand.com.au`}
               ctaLabel={cta.label}
+              content={preview}
             />
           </div>
         </div>

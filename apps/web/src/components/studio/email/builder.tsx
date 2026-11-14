@@ -82,7 +82,7 @@ export function EmailBuilder({
       { id: blockId(), type: "button", label: `More on ${brand.name}`, href: `https://${brand.domain.replace(/^send\./, "")}` },
     ])
     setMode("blocks")
-    toast.success("Drafted from this week's stories", { description: "5 AI credits. Edit anything before you send." })
+    toast.success("Drafted from this week's stories", { description: "3 cents of AI usage. Edit anything before you send." })
   }
 
   // Pre-send checks: what inboxes and the Spam Act care about.

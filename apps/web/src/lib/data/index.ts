@@ -98,8 +98,9 @@ export function allVideos() {
 export function allShorts() {
   return shorts
 }
-export function listSponsors() {
-  return sponsors
+/** Sponsors with creative written for a publication, or every creative (admin) when no publication is given. */
+export function listSponsors(channelId?: string) {
+  return channelId ? sponsors.filter((s) => s.channelIds.includes(channelId)) : sponsors
 }
 export function getSponsor(id: string) {
   return sponsors.find((s) => s.id === id)

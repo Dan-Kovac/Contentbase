@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { Ban, History, Lock, ShieldCheck, ShieldOff } from "lucide-react"
+import { Ban, Check, History, Lock, ShieldCheck, ShieldOff } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import {
@@ -48,7 +49,7 @@ const MODE_LABEL: Record<ChannelMode, string> = { standard: "Standard", age_veri
 
 const AGE_CATEGORIES: { id: AgeCategory; label: string; description: string; optOut: string }[] = [
   { id: "alcohol", label: "Alcohol", description: "Breweries, wineries, spirits and bottle shops.", optOut: "Don't show me alcohol ads" },
-  { id: "wagering", label: "Wagering", description: "Bookmakers and racing wagering services.", optOut: "Don't show me betting ads" },
+  { id: "wagering", label: "Wagering", description: "Bookmakers and wagering services.", optOut: "Don't show me betting ads" },
 ]
 
 const OTHER_CATEGORIES = [
@@ -94,7 +95,13 @@ function FormatExample({
   )
 }
 
-export function Monetisation({ channel, sponsors }: { channel: Channel; sponsors: Sponsor[] }) {
+/** Real items from the publication, so the format examples look like its own pages. */
+export type FormatExamples = {
+  chapters: { start: string; title: string }[]
+  shorts: { title: string; src?: string; durationSec: number }[]
+}
+
+export function Monetisation({ channel, sponsors, examples }: { channel: Channel; sponsors: Sponsor[]; examples: FormatExamples }) {
   const [mode, setMode] = useState<ChannelMode>(channel.mode)
   const [draftMode, setDraftMode] = useState<ChannelMode>(channel.mode)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -123,16 +130,17 @@ export function Monetisation({ channel, sponsors }: { channel: Channel; sponsors
   // Examples follow the channel's own settings: a blocked category is swapped for an unrestricted sponsor.
   const allowed = (s: Sponsor) => !s.ageCategory || (verified && !ageBlocks.includes(s.ageCategory))
   const unrestricted = sponsors.filter((s) => !s.ageCategory)
-  function pick(id: string, fallback: number) {
-    const preferred = sponsors.find((s) => s.id === id) ?? sponsors[0]
+  function pick(match: (s: Sponsor) => boolean, fallback: number) {
+    const preferred = sponsors.find(match) ?? sponsors[0]
     if (allowed(preferred)) return { sponsor: preferred, swapped: null }
     return { sponsor: unrestricted[fallback % unrestricted.length] ?? preferred, swapped: preferred.ageCategory ?? null }
   }
-  const chapter = pick("sp_ute", 0)
-  const halftime = pick("sp_boots", 1)
-  const story = pick("sp_brew", 0)
-  const short = pick("sp_harbour", 1)
-  const presented = pick("sp_ute", 0)
+  const chapter = pick((s) => s.fill === "primary", 0)
+  const halftime = pick((s) => s.fill === "secondary", 1)
+  const story = pick((s) => s.ageCategory === "alcohol", 0)
+  const short = pick((s) => s.ageCategory === "wagering", 1)
+  const presented = pick((s) => s.fill === "primary", 0)
+  const [c0, c1, c2] = examples.chapters
 
   function exampleNote({ sponsor, swapped }: { sponsor: Sponsor; swapped: AgeCategory | null }) {
     if (sponsor.ageCategory)
@@ -303,7 +311,7 @@ export function Monetisation({ channel, sponsors }: { channel: Channel; sponsors
         stacked
         id="formats"
         title="How ads appear on your channel"
-        description="Homestand Native Formats. Advertisers send us a brief, and we set it in your channel's design. No banners, no third-party scripts and nothing that shifts the page. These are the only five formats, shown here with real sponsors."
+        description="Homestand Native Formats. Advertisers send us a brief, and we set it in your channel's design. Until a slot is sold, your own Google AdSense can fill it (below). No banners, no third-party scripts and nothing that shifts the page. These are the only five formats, shown here with real sponsors."
       >
         <ol className="grid gap-4">
           <FormatExample n={1} title="Chapter sponsor" where="A brand presents one chapter of a video: a credit in that chapter's row and a coloured segment on the timeline." note={exampleNote(chapter)}>
@@ -315,17 +323,19 @@ export function Monetisation({ channel, sponsors }: { channel: Channel; sponsors
                 </div>
                 <ol className="grid gap-1 text-[13px]" aria-label="Sample chapters">
                   <li className="flex gap-3 text-muted-foreground">
-                    <span className="font-mono tabular">0:00</span> Cold open
+                    <span className="font-mono tabular">{c0.start}</span> {c0.title}
                   </li>
                   <li className="flex gap-3 font-medium">
-                    <span className="font-mono tabular text-muted-foreground">5:48</span> Centre-bounce breakdown
+                    <span className="font-mono tabular text-muted-foreground">{c1.start}</span> {c1.title}
                   </li>
-                  <li className="flex gap-3 text-muted-foreground">
-                    <span className="font-mono tabular">10:02</span> The fix at Coburg
-                  </li>
+                  {c2 && (
+                    <li className="flex gap-3 text-muted-foreground">
+                      <span className="font-mono tabular">{c2.start}</span> {c2.title}
+                    </li>
+                  )}
                 </ol>
               </div>
-              <ChapterSponsorCredit sponsor={chapter.sponsor} chapter="Centre-bounce breakdown" />
+              <ChapterSponsorCredit sponsor={chapter.sponsor} chapter={c1.title} />
             </div>
           </FormatExample>
 
@@ -341,9 +351,9 @@ export function Monetisation({ channel, sponsors }: { channel: Channel; sponsors
 
           <FormatExample n={4} title="Sponsored short" where="A vertical card the same size as your shorts, in the shorts row and feed. At most one in every eight shorts." note={exampleNote(short)}>
             <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
-              <ShortCard href="#formats" title="Cripps from the boundary" src="/media/mcg-night.jpg" durationSec={38} />
+              <ShortCard href="#formats" title={examples.shorts[0].title} src={examples.shorts[0].src} durationSec={examples.shorts[0].durationSec} />
               <SponsoredShortCard sponsor={short.sponsor} />
-              <ShortCard href="#formats" title="The smother of the round" src="/media/stadium-night-wide.jpg" durationSec={24} />
+              <ShortCard href="#formats" title={examples.shorts[1].title} src={examples.shorts[1].src} durationSec={examples.shorts[1].durationSec} />
             </div>
           </FormatExample>
 
@@ -356,13 +366,15 @@ export function Monetisation({ channel, sponsors }: { channel: Channel; sponsors
         </ol>
       </Section>
 
+      <AdSensePanel channel={channel} />
+
       <Section id="rules" title="Fixed by Homestand" description="These rules apply to every channel and every advertiser.">
         <FixedNote
           title="Ad rules"
           items={[
             "Every ad is labelled “Sponsored” or “Presented by”, and age-restricted ads carry an 18+ mark and an opt-out link",
             "At most 1 ad per 600 words of article, and 3 ads on any page in total",
-            "No pop-ups, interstitials, sticky overlays, auto-playing sound or banner networks",
+            "No pop-ups, interstitials, sticky overlays or auto-playing sound. Google AdSense only fills unsold story and half-time slots, at their size, with Auto ads off",
             "Ads are never placed between a headline and its first paragraph, and an Exclusive gate carries none",
             "You never contract with advertisers directly. Homestand sells, reviews and places every ad.",
           ]}
@@ -373,13 +385,16 @@ export function Monetisation({ channel, sponsors }: { channel: Channel; sponsors
         <Panel>
           <div className="grid gap-3 p-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-sm font-semibold">Pooled ad revenue share</p>
-              <Tag>Next</Tag>
+              <p className="text-sm font-semibold">The ad pool</p>
             </div>
             <p className="text-[13px] leading-5 text-muted-foreground">
-              Each month a share of net ad revenue is split between channels by verified watch minutes and article reads. Your pay doesn&apos;t depend on which ads ran on your channel, so there is never a reason to favour one advertiser.
+              Each month half of what advertisers pay for Native Formats goes into a pool, split between publications by verified minutes: time spent watching and reading. Minutes from
+              signed-in viewers count in full; logged-out minutes count a fifth.
             </p>
-            <p className="text-[13px] leading-5 text-muted-foreground">Payouts start in the next phase. Your verified minutes are already being counted.</p>
+            <p className="text-[13px] leading-5 text-muted-foreground">
+              Your pay doesn&apos;t depend on which ads ran on your channel, so there is never a reason to favour an advertiser, including a betting one. AdSense is separate: Google pays
+              you directly.
+            </p>
           </div>
         </Panel>
       </Section>
@@ -404,5 +419,59 @@ export function Monetisation({ channel, sponsors }: { channel: Channel; sponsors
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+const SLOT_NAME = { story: "Sponsored story", halftime: "Half-time break" } as const
+
+/** Google AdSense: ads from day one, before Homestand has sold every slot. */
+function AdSensePanel({ channel }: { channel: Channel }) {
+  const initial = channel.adsense
+  const [publisherId, setPublisherId] = useState(initial?.publisherId ?? "")
+  const [fill, setFill] = useState(initial?.fillUnsold ?? false)
+  const [confirmed, setConfirmed] = useState(initial?.blockedCategoriesConfirmed ?? false)
+  const valid = /^pub-\d{16}$/.test(publisherId.trim())
+  const unsold = initial?.unsoldSlots ?? []
+  const live = fill && valid && confirmed
+  return (
+    <Section
+      id="adsense"
+      title="Google AdSense"
+      description="Ads from day one. Your own AdSense account fills story and half-time slots Homestand hasn't sold, inside the same box, so the page keeps its shape. Google pays you directly."
+    >
+      <Panel>
+        <SettingRow htmlFor="adsense-id" label="AdSense publisher ID" description="From AdSense, Account, Settings. We publish your ads.txt on your channel's domain.">
+          <Input
+            id="adsense-id"
+            value={publisherId}
+            onChange={(e) => setPublisherId(e.target.value)}
+            placeholder="pub-0000000000000000"
+            className="w-[220px] font-mono"
+            aria-invalid={publisherId !== "" && !valid}
+          />
+        </SettingRow>
+        <SettingRow
+          htmlFor="adsense-confirm"
+          label="Gambling and alcohol are blocked in my AdSense account"
+          description="AdSense can't check the triple lock, so both categories must be blocked in AdSense (Blocking controls, Sensitive categories). In-house brands should also block competitors' domains."
+        >
+          <Switch id="adsense-confirm" checked={confirmed} onCheckedChange={setConfirmed} />
+        </SettingRow>
+        <SettingRow htmlFor="adsense-fill" label="Fill unsold slots with AdSense" description={live ? (unsold.length ? `Unsold this week: ${unsold.map((s) => SLOT_NAME[s]).join(" and ")}.` : "Everything is sold this week, so AdSense isn't showing.") : "Needs a publisher ID and the categories blocked first."}>
+          <Switch id="adsense-fill" checked={fill} disabled={!valid || !confirmed} onCheckedChange={setFill} />
+        </SettingRow>
+        <PanelFooter note="Sold Native Formats always come first. AdSense never fills shorts, chapters, Presented by credits or live pages.">
+          <span className="flex items-center gap-1.5 text-[13px] font-medium">
+            {live ? (
+              <>
+                <Check className="size-4" aria-hidden /> AdSense is filling unsold slots
+              </>
+            ) : (
+              <span className="text-muted-foreground">AdSense is off</span>
+            )}
+          </span>
+        </PanelFooter>
+      </Panel>
+    </Section>
   )
 }

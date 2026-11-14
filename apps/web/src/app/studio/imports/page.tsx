@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { StatusBadge } from "@/components/brand/status-badge"
 import { SourceMark, SOURCE_LABEL } from "@/components/imports/source-meta"
-import { listChannels, listImportJobs } from "@/lib/data"
+import { listImportJobs } from "@/lib/data"
 import { currentPublication } from "@/lib/publication"
 import { number } from "@/lib/format"
 import type { ImportJob } from "@/lib/types"
@@ -20,9 +20,9 @@ function JobStatus({ job }: { job: ImportJob }) {
 
 export default async function ImportsPage() {
   const demo = (await currentPublication())
-  const jobs = listChannels().flatMap((c) => listImportJobs(c.id).map((j) => ({ job: j, channel: c })))
-  // Own channel first, the running sync at the top.
-  jobs.sort((a, b) => Number(b.channel.id === demo.id) - Number(a.channel.id === demo.id) || Number(b.job.status === "running") - Number(a.job.status === "running"))
+  // This publication's imports only, the running sync at the top.
+  const jobs = listImportJobs(demo.id).map((j) => ({ job: j }))
+  jobs.sort((a, b) => Number(b.job.status === "running") - Number(a.job.status === "running"))
 
   return (
     <div className="mx-auto max-w-[1040px]">
@@ -52,10 +52,9 @@ export default async function ImportsPage() {
       </div>
 
       <ul className="grid gap-3" aria-label="Import history">
-        {jobs.map(({ job, channel }) => {
+        {jobs.map(({ job }) => {
           const done = job.imported + job.skipped + job.failed
           const pct = Math.round((done / job.total) * 100)
-          const isExample = channel.id !== demo.id
           return (
             <li key={job.id} className="rounded-lg border bg-card">
               <div className="grid gap-4 p-4 sm:p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
@@ -67,7 +66,6 @@ export default async function ImportsPage() {
                         {job.label}
                       </Link>
                       <JobStatus job={job} />
-                      {isExample && <StatusBadge tone="neutral">Example · {channel.name}</StatusBadge>}
                     </p>
                     <p className="mt-0.5 text-[13px] text-muted-foreground">
                       {SOURCE_LABEL[job.source]} · Started {job.startedAt}

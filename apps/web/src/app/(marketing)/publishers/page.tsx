@@ -172,23 +172,30 @@ export default function PublishersPage() {
           {earn && (
             <figure className="flex flex-col gap-4 rounded-lg border bg-card p-6">
               <figcaption className="flex flex-wrap items-baseline justify-between gap-2 text-[13px] text-muted-foreground">
-                <span className="font-semibold text-foreground">Footy Fix, sponsor revenue share</span>
+                <span className="font-semibold text-foreground">Footy Fix, share of the ad pool</span>
                 <span>{earn.period}</span>
               </figcaption>
               <p className="text-[48px] font-extrabold leading-none tracking-[-0.03em]">{aud(earn.total)}</p>
               <p className="text-[14px] text-muted-foreground">
-                Up {Math.round(((earn.total - earn.previousTotal) / earn.previousTotal) * 100)}% on the month before. {aud(earn.ageVerified)} of it from age-verified sponsors, shown only behind the triple lock.
+                Up {Math.round(((earn.total - earn.previousTotal) / earn.previousTotal) * 100)}% on the month before. Age-verified sponsors fund {Math.round(earn.pool.ageVerifiedShare * 100)}% of the pool, and they only buy behind the triple lock. Your share follows your signed-in minutes.
               </p>
               <ul className="flex flex-col divide-y border-t text-[14px]">
-                {earn.byViewer.map((v) => (
+                {[
+                  { state: "Signed-in minutes, counted in full", minutes: earn.minutes.signedIn, amount: Math.round((earn.minutes.signedIn / 1000) * earn.pool.ratePer1000) },
+                  { state: "Logged-out minutes, counted at a fifth", minutes: earn.minutes.loggedOut, amount: earn.total - Math.round((earn.minutes.signedIn / 1000) * earn.pool.ratePer1000) },
+                ].map((v) => (
                   <li key={v.state} className="flex items-center justify-between gap-3 py-2.5">
                     <span>{v.state}</span>
                     <span className="flex items-baseline gap-4 tabular">
-                      <span className="text-muted-foreground">{compact(v.impressions)} impressions</span>
+                      <span className="text-muted-foreground">{compact(v.minutes)}</span>
                       <span className="w-16 text-right font-semibold">{aud(v.amount)}</span>
                     </span>
                   </li>
                 ))}
+                <li className="flex items-center justify-between gap-3 py-2.5">
+                  <span>Google AdSense, paid to you directly</span>
+                  <span className="w-16 text-right font-semibold tabular">{aud(earn.adsense)}</span>
+                </li>
               </ul>
               <p className="text-[12px] text-muted-foreground">Sample pilot data, AUD inc. GST. Not a forecast. Not legal advice.</p>
             </figure>

@@ -1,13 +1,13 @@
 # Homestand revenue model
 
-Written 13 November 2026. How Homestand gets past subscriptions to a business doing $45–50 million a year. Every figure is an illustrative assumption in AUD, not a forecast. The prices sit alongside the PID's (which are themselves starting hypotheses) and need testing in the pilot.
+Written 13 November 2026, updated 14 November for AdSense, the creator pool and AI at cost plus 20%. How Homestand gets past subscriptions to a business doing $45–50 million a year. Every figure is an illustrative assumption in AUD, not a forecast. The prices sit alongside the PID's (which are themselves starting hypotheses) and need testing in the pilot.
 
 ## The short version
 
 Subscriptions alone don't get there. The PID's own maths puts 3,000 Australian channels at about $3.6 million a year. The business gets big by charging for what publishers do on the platform, not just for access to it:
 
 1. **Advertising**, sold by Homestand in Native Formats, with the platform keeping a share. This is the biggest line and the least certain.
-2. **AI credits**: metered usage for the expensive work (article to video, dubbing, voice, extra processing), bought on top of the plan.
+2. **AI usage**: the expensive work (article to video, dubbing, voice, extra processing), charged at the provider's price plus 20%. It's a thin margin by design; its job is to keep publishers creating on the platform.
 3. **The triple lock as a product**: licence the compliance engine and evidence packs to sites and apps that aren't on Homestand.
 4. **Data housing**: each publication's first-party audience vault (accounts, consent, follows, evidence), charged by retention, exports and integrations. Never sold.
 5. **Templates, memberships and services**, which are smaller but attach to the same accounts.
@@ -16,17 +16,18 @@ Subscriptions alone don't get there. The PID's own maths puts 3,000 Australian c
 | --- | --- | --- |
 | Subscriptions | Platform fee per publication (Starter to Enterprise) | $10.2M |
 | Advertising | Platform share of Native Format sales | $15.0M |
-| AI credits | Metered, prepaid credits on top of the plan | $6.0M |
+| AI usage | Provider cost plus 20%, prepaid balance | $1.2M billed, $0.2M gross profit |
 | Triple lock licensing | Annual licence plus per-decision fee | $4.8M |
 | Data housing and insights | Retention tiers, warehouse sync, aggregate advertiser reports | $4.0M |
 | Services | Migrations, managed branded video | $3.0M |
 | Memberships | Take rate on fan memberships and paid content | $2.0M |
 | Video templates | Template sales and a cut of third-party templates | $1.5M |
 | Hosting overage | Video hours, storage and bandwidth beyond the plan | $1.5M |
-| Email | Sends beyond the plan (credits), dedicated sending IPs | $1.0M |
-| **Total** | | **about $49M** |
+| Email | Sends beyond the plan (cost plus 20%), dedicated sending IPs | $0.5M |
+| Programmatic fill (later) | Homestand-run Google Ad Manager for publications without their own AdSense, as a revenue share | $1.0M |
+| **Total** | | **about $45M** |
 
-The assumptions behind each row are below. The sum depends on three things being true at once: the verified audience is large enough for premium CPMs, publishers use AI credits every week, and the platform grows beyond Australian sport (other countries, other sports, clubs and racing bodies). Australia alone, on these assumptions, lands nearer $15–20 million.
+The assumptions behind each row are below. The sum depends on three things being true at once: the verified audience is large enough for premium CPMs, publishers create on the platform every week, and the platform grows beyond Australian sport (other countries, other sports, clubs and racing bodies). Australia alone, on these assumptions, lands nearer $15–20 million.
 
 ## 1. Subscriptions: the platform fee
 
@@ -39,34 +40,37 @@ Unchanged from the PID: Starter $29, Pro $99 and Publisher $299 a month, with En
 | Enterprise and networks (in-house brands, media groups, clubs) | 40 | $10,000 | $4.8M |
 | **Total** | | | **$10.2M** |
 
-Multi-brand owners are the best customers: they pay per publication, use the most credits and buy the most services. The publication switcher and the All publications view are what they buy.
+Multi-brand owners are the best customers: they pay per publication, use the most AI and buy the most services. The publication switcher and the All publications view are what they buy.
 
 ## 2. Advertising: the platform's share
 
-Homestand sells the five Native Formats network-wide. The PID proposes a creator pool of a fixed share of net ad revenue (for example 50%). The rest is the platform's.
+Homestand sells the five Native Formats network-wide. Half of net Native Format revenue goes into a monthly **creator pool**, split between publications by verified minutes: minutes from signed-in viewers count in full, logged-out minutes count a fifth. The rest is the platform's.
+
+- Pay never depends on which ads ran, so no publisher has a reason to favour an advertiser, betting ones included. That matters to regulators, and it keeps creators out of wagering deals (a hard rule).
+- Weighting signed-in minutes makes sign-ups the lever, which is also what makes the premium CPM possible.
+- **AdSense from day one.** Until Homestand has sold enough, a publication can connect its own AdSense account to fill unsold story and half-time slots, in the same box, with gambling and alcohol blocked. Google pays the publisher directly, so Homestand earns nothing from it in the MVP; it makes every page earn while sales ramp. Later, Homestand can run Google Ad Manager for publications without their own account and take a share (the programmatic line).
 
 - Assumption: 1.2 billion sponsor impressions a year across the network at a blended $25 CPM is about $30M of ad sales. A 50% platform share is **$15M**.
 - What justifies a premium CPM is a signed-in audience, confirmed adults for age-restricted categories, formats people watch, and evidence for every impression.
 - The lever is the verified sign-up rate. The PID's target is 3% of visitors and the sample pilot shows 2.7%. Members-only content, the channel's own call to action and one account across every channel all push it up.
 
-## 3. AI credits: metered usage
+## 3. AI usage: provider cost plus 20%
 
-The platform fee covers the core loop (YouTube video to draft pack, within the plan's video hours). Credits pay for the work that costs real compute and grows with the publisher.
+The platform fee covers the core loop (YouTube video to draft pack, within the plan's video hours). AI work beyond that is charged at exactly what the provider charges Homestand, plus 20%, on a dollar balance the whole account shares. The rate card and engine choice are in [video-engine.md](video-engine.md).
 
-| Work | Sample price in credits |
-| --- | --- |
-| Article to short video (up to 60 s, 9:16) | 40 |
-| Article to long-form video, per finished minute (16:9) | 25 |
-| Synthetic voiceover, per minute | 5 |
-| Translation and dubbing, per minute | 15 |
-| Extra video-to-article processing beyond the plan, per video hour | 20 |
-| Thumbnail and title set | 5 |
+| Work | Provider cost (AUD) | Customer pays |
+| --- | --- | --- |
+| Finished minute of video (script, voice, render) | about $0.11 | about $0.13 |
+| A 45-second short | about $0.12 | about $0.15 |
+| Translation and dubbing, per minute | $0.05 | $0.06 |
+| Video to article beyond the plan, per video hour | $0.50 | $0.60 |
+| 100 emails beyond the plan | $0.06 | $0.07 |
 
-- One credit retails at about $0.10. Plans include a monthly allowance: Starter 100, Pro 500, Publisher 2,000, Enterprise custom.
-- Top-ups: 1,000 credits for $100, 5,000 for $450, 20,000 for $1,600. Unused top-ups roll over for 12 months.
-- Every publication gets a monthly spend cap and an alert at 80%, so there are no surprise bills.
-- Assumption: 30% of paying accounts top up at an average of $150 a month, plus enterprise at $5,000 a month. That's **$6M** a year at roughly 60–70% gross margin after the video engine and model costs.
-- The margin comes from Homestand's own layer over the video engine: brand kit, voice, templates, compliance pre-check and the review gate. Customers pay for the result, not raw generation.
+- Plans include a monthly allowance: Starter $5, Pro $20, Publisher $60, Enterprise custom. Top-ups never expire and cost the same per dollar at every size.
+- **It runs on an append-only ledger.** A render places a hold for its estimate, a success charges it, and a failure releases it. The balance is always the sum of the ledger, and each line shows the provider cost and the 20%.
+- Every account has a monthly cap and an alert at 80%.
+- Assumption: 6,600 accounts spending an average of $15 a month is **$1.2M** billed and about **$0.2M** of gross profit. The fixed costs of the engine (licences, storage, the team) come out of the platform fee.
+- AI usage isn't a profit line. It keeps publishers making video, newsletters and articles on the platform, and that is what keeps them paying the platform fee and earning from the pool.
 
 ## 4. The triple lock, licensed
 
@@ -100,16 +104,16 @@ Article to video starts with three included templates: Explainer (voiceover, cha
 ## 7. Memberships, services and hosting
 
 - **Memberships and paid content:** a take rate of about 8% on fan memberships and paywalled series. Assumption: $25M of membership sales gives **$2M**.
-- **Services:** white-glove migrations, plus a managed branded-video studio where brands commission template videos and Homestand charges a margin over credits. Assumption: **$3M**.
-- **Hosting overage:** video hours, storage and bandwidth beyond the plan, metered like credits. Assumption: **$1.5M**.
-- **Email:** each plan includes subscribers and sends; beyond that, sends draw on credits (1 per 100 emails), and Enterprise can add dedicated sending IPs. The bigger value is retention: newsletters are why members come back, and members are the verified audience. Assumption: **$1M**. See [email.md](email.md).
+- **Services:** white-glove migrations, plus a managed branded-video studio where brands commission template videos and Homestand charges a margin over the AI cost. Assumption: **$3M**.
+- **Hosting overage:** video hours, storage and bandwidth beyond the plan, metered like AI usage. Assumption: **$1.5M**.
+- **Email:** each plan includes subscribers and sends; beyond that, sends are charged at cost plus 20%, and Enterprise can add dedicated sending IPs. The bigger value is retention: newsletters are why members come back, and members are the verified audience. Assumption: **$0.5M**. See [email.md](email.md).
 
 ## What has to be true
 
 | Assumption | Why it matters | How the pilot tests it |
 | --- | --- | --- |
 | Verified sign-up rate reaches 3% or more | It sets the premium CPM and the advertising line | Members-only content and channel calls to action, measured weekly |
-| A third of accounts buy credits | It sets the second-biggest variable line | Offer article to video to pilot channels with a starter credit grant |
+| Publishers create on the platform weekly | It keeps them paying and growing their verified minutes | Offer article to video to pilot channels with a starter balance |
 | Advertisers pay a premium for evidence | It sets CPMs and the licensing line | Sell two flights with evidence packs before launch |
 | Growth beyond Australian sport | Australia alone is about $15–20M on these numbers | Enterprise and racing-body pilots; New Zealand and the UK next |
 
@@ -117,9 +121,9 @@ Article to video starts with three included templates: Explainer (voiceover, cha
 
 - **Ownership.** The PID warns that if a wagering company owns or controls the platform, regulators may treat the whole platform's content as wagering advertising. The licensing and data lines make this question bigger, not smaller. Settle it with lawyers before any wagering operator takes equity or in-house brands go live.
 - **Synthetic media.** Generated videos are drafts that a person approves. Synthetic voiceover is disclosed. Imagery is licensed. No AI-generated people, per the brand guidelines.
-- **Provider cost.** Credit prices assume the video engine's per-minute cost stays within a range. Check it before publishing prices, and keep the engine swappable.
-- **Revenue concentration.** If advertising is a third of revenue, a regulatory change can move the whole business. Credits, licensing and subscriptions are the hedge.
+- **Provider cost.** AI is priced at cost plus 20%, so a provider price rise passes through automatically. Keep the engine swappable all the same.
+- **Revenue concentration.** If advertising is a third of revenue, a regulatory change can move the whole business. Subscriptions and licensing are the hedge.
 
 ## Comparable businesses (from the PID)
 
-beehiiv (software plus an ad network) was around US$30M ARR in 2025, guiding US$50–55M for 2026. Substack takes 10% of paid subscriptions, about US$45M annualised. Neither has metered AI or a compliance product; both of those are Homestand's to own.
+beehiiv (software plus an ad network) was around US$30M ARR in 2025, guiding US$50–55M for 2026. Substack takes 10% of paid subscriptions, about US$45M annualised. Neither has a compliance product; that is Homestand's to own.

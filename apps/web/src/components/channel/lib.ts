@@ -1,5 +1,5 @@
 // Channel-page helpers. Local to the channel screens so shared lib files stay untouched.
-import { getVideo, listArticles, listPages, listShorts, listSponsors, listVideos } from "@/lib/data"
+import { getChannelById, getVideo, listArticles, listPages, listShorts, listSponsors, listVideos } from "@/lib/data"
 import type { AgeCategory, Block, Channel, CustomPage, Short, Sponsor, StandaloneArticle, Video } from "@/lib/types"
 
 export { ACCENT_LINK, BODY, COLUMN, CONTAINER, DISPLAY, WIDE } from "./styles"
@@ -227,27 +227,36 @@ export function allowedAgeCategories(viewer: Viewer, channel: Channel, isLive: b
   return cats.filter((c) => !channel.blockedAgeCategories.includes(c) && !(viewer === "opted_out" && c === "wagering"))
 }
 
-/** Slot plans: the age-restricted sponsors a slot prefers, and the non-restricted fill. */
+/** An unsold story or half-time slot, filled by the publisher's own AdSense account. */
+export const ADSENSE: Sponsor = { id: "adsense", network: "adsense", channelIds: [], name: "Google AdSense", colour: "#e8eaed", line: "", cta: "", url: "#" }
+
+/** Slot plans: the age-restricted categories a slot prefers, in order, and which everyday sponsor fills it. */
 export const SLOT_PLANS = {
-  chapter: { restricted: ["sp_harbour"], fill: "sp_ute" },
-  halftime: { restricted: ["sp_harbour", "sp_brew"], fill: "sp_ute" },
-  story: { restricted: ["sp_brew", "sp_harbour"], fill: "sp_boots" },
-  presented: { restricted: [], fill: "sp_ute" },
-  short: { restricted: [], fill: "sp_boots" },
-} as const satisfies Record<string, { restricted: readonly string[]; fill: string }>
+  chapter: { restricted: ["wagering"], fill: "primary" },
+  halftime: { restricted: ["wagering", "alcohol"], fill: "primary" },
+  story: { restricted: ["alcohol", "wagering"], fill: "secondary" },
+  presented: { restricted: [], fill: "primary" },
+  short: { restricted: [], fill: "secondary" },
+} as const satisfies Record<string, { restricted: readonly AgeCategory[]; fill: "primary" | "secondary" }>
 
 export type SlotName = keyof typeof SLOT_PLANS
 
-/** Pick the sponsor for a slot. Anything that isn't explicitly allowed falls back to a non-restricted sponsor. */
-export function sponsorFor(slot: SlotName, allowed: AgeCategory[] = []): Sponsor {
-  const all = listSponsors()
+/**
+ * Pick the sponsor for a slot on one publication, from creative written for that publication.
+ * Anything that isn't explicitly allowed falls back to an everyday sponsor.
+ */
+export function sponsorFor(channelId: string, slot: SlotName, allowed: AgeCategory[] = []): Sponsor {
+  const all = listSponsors(channelId)
   const plan = SLOT_PLANS[slot]
-  for (const id of plan.restricted as readonly string[]) {
-    const s = all.find((x) => x.id === id)
-    if (s?.ageCategory && allowed.includes(s.ageCategory)) return s
+  for (const cat of plan.restricted as readonly AgeCategory[]) {
+    const s = all.find((x) => x.ageCategory === cat)
+    if (s && allowed.includes(cat)) return s
   }
-  const fill = all.find((x) => x.id === plan.fill && !x.ageCategory) ?? all.find((x) => !x.ageCategory)
-  if (!fill) throw new Error("No non-restricted sponsor to fill the slot")
+  // Nobody bought this slot: AdSense fills it when the publisher has switched that on.
+  const adsense = getChannelById(channelId)?.adsense
+  if (adsense?.fillUnsold && (adsense.unsoldSlots as string[]).includes(slot)) return ADSENSE
+  const fill = all.find((x) => x.fill === plan.fill && !x.ageCategory) ?? all.find((x) => !x.ageCategory)
+  if (!fill) throw new Error(`No everyday sponsor to fill the ${slot} slot on ${channelId}`)
   return fill
 }
 
@@ -259,7 +268,7 @@ export const VIEWERS: Viewer[] = ["logged_out", "signed_in", "verified", "opted_
  */
 export function slotOptions(channel: Channel, slot: SlotName, isLive = false): Record<Viewer, Sponsor> {
   const out = {} as Record<Viewer, Sponsor>
-  for (const viewer of VIEWERS) out[viewer] = sponsorFor(slot, allowedAgeCategories(viewer, channel, isLive))
+  for (const viewer of VIEWERS) out[viewer] = sponsorFor(channel.id, slot, allowedAgeCategories(viewer, channel, isLive))
   return out
 }
 
@@ -277,8 +286,9 @@ const list = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} a
 
 /** Plain-English reason for what a viewer sees, for the demo bar. */
 export function viewerNote(viewer: Viewer, channel: Channel, isLive = false): string {
-  if (viewer === "logged_out") return "Not signed in, so age-restricted sponsors never show. Everyday sponsors fill every slot."
-  if (viewer === "signed_in") return "Signed in but not confirmed 18+, so everyday sponsors only."
+  const unsold = channel.adsense?.fillUnsold && channel.adsense.unsoldSlots.length ? " Unsold slots are filled by Google AdSense, with gambling and alcohol ads blocked." : ""
+  if (viewer === "logged_out") return "Not signed in, so age-restricted sponsors never show. Everyday sponsors fill every slot." + unsold
+  if (viewer === "signed_in") return "Signed in but not confirmed 18+, so everyday sponsors only." + unsold
   if (channel.mode !== "age_verified") return `${channel.name} runs in Standard mode, so no age-restricted ads.`
   if (isLive) return "Live pages never carry age-restricted ads."
   const allowed = allowedAgeCategories(viewer, channel, isLive)
@@ -303,9 +313,9 @@ export function slotPlans(channel: Channel, isLive: boolean): Record<Viewer, Slo
   const out = {} as Record<Viewer, SlotPlan>
   for (const viewer of VIEWERS) {
     const allowed = allowedAgeCategories(viewer, channel, isLive)
-    const chapter = sponsorFor("chapter", allowed)
-    const halftime = sponsorFor("halftime", allowed)
-    const story = sponsorFor("story", allowed)
+    const chapter = sponsorFor(channel.id, "chapter", allowed)
+    const halftime = sponsorFor(channel.id, "halftime", allowed)
+    const story = sponsorFor(channel.id, "story", allowed)
     const restricted = [chapter, halftime, story].some((s) => s.ageCategory)
     out[viewer] = { chapter, halftime, story, note: viewerNote(viewer, channel, isLive), restricted }
   }
@@ -329,4 +339,27 @@ export function previewLead(c: Channel) {
     photo: v.poster ?? "/media/mcg-night.jpg",
     duration: formatDuration(v.durationSec),
   }
+}
+
+const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter((w) => /^[A-Z]/.test(w))
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+
+/** Everything the miniature homepage (TemplatePreview) shows, taken from one publication's own content and sponsors. */
+export function previewContent(c: Channel) {
+  const lead = previewLead(c)!
+  const videos = listVideos(c.id)
+  const photos = [...new Set(videos.map((v) => v.poster).filter((p): p is string => !!p))]
+  const cycle = <T,>(xs: T[], n: number) => Array.from({ length: n }, (_, i) => xs[i % xs.length])
+  const stories = cycle(videos, 4).map((v) => ({ kicker: sectionLabel(c, v.section), title: v.title, photo: v.poster ?? photos[0], duration: formatDuration(v.durationSec) }))
+  const shorts = cycle(listShorts(c.id), 4).map((s, i) => ({ title: s.title, photo: s.poster ?? (s.videoId && getVideo(s.videoId)?.poster) ?? photos[i % photos.length] }))
+  const sponsor = (fill: "primary" | "secondary") => {
+    const s = listSponsors(c.id).find((x) => x.fill === fill)!
+    return { name: s.name, initials: initials(s.name), colour: s.colour, line: s.line, cta: s.cta }
+  }
+  return { lead, stories, shorts, sectionPhotos: photos, band: sponsor("primary"), gear: sponsor("secondary") }
 }

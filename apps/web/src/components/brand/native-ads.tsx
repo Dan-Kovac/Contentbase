@@ -140,6 +140,7 @@ export function ChapterSponsorSegment({ sponsor, from, to }: { sponsor: Sponsor;
  * ------------------------------------------------------------------------------------------- */
 
 export function HalftimeBreak({ sponsor, className }: { sponsor: Sponsor; className?: string }) {
+  if (sponsor.network === "adsense") return <AdSenseInArticle className={className} />
   const on = readableOn(sponsor.colour)
   return (
     <figure aria-label={`Sponsored by ${sponsor.name}`} className={cn("my-10 font-sans not-italic", className)} data-sponsor-unit="halftime">
@@ -204,8 +205,9 @@ export function SponsoredStoryCard({
   variant?: "card" | "rail"
   className?: string
 }) {
-  const on = readableOn(sponsor.colour)
   const rail = variant === "rail"
+  if (sponsor.network === "adsense") return <AdSenseInFeed ratio={ratio} rail={rail} size={size} className={className} />
+  const on = readableOn(sponsor.colour)
   return (
     <article
       aria-label={`Sponsored by ${sponsor.name}`}
@@ -350,5 +352,59 @@ export function PresentedBy({ sponsor, className, tone = "light" }: { sponsor: S
       </span>
       <span className="truncate">{sponsor.line}</span>
     </div>
+  )
+}
+
+/* ---------------------------------------------------------------------------------------------
+ * Google AdSense fill. When Homestand hasn't sold a story or half-time slot, the publisher's own
+ * AdSense account can fill it: a responsive in-feed or in-article unit inside the same box, so the
+ * page keeps its shape. Gambling and alcohol are blocked in the AdSense account, because AdSense
+ * can't check the triple lock. The prototype draws the box; a real build loads the AdSense tag
+ * here with a fixed container size and Auto ads off.
+ * ------------------------------------------------------------------------------------------- */
+
+function AdSenseLabel({ className }: { className?: string }) {
+  return (
+    <span className={cn("flex items-center gap-1.5 font-sans text-[13px] text-muted-foreground", className)}>
+      <span className="text-[11px] font-bold uppercase tracking-[1px]">Advertisement</span>
+      <span aria-hidden>·</span>
+      <span>Google AdSense</span>
+    </span>
+  )
+}
+
+function AdSenseBox({ ratio, label }: { ratio: string; label: string }) {
+  return (
+    <div
+      className="relative grid w-full place-items-center overflow-hidden rounded-lg border border-dashed border-foreground/20 bg-muted/60 text-center"
+      style={{ aspectRatio: ratio, backgroundImage: "repeating-linear-gradient(135deg, transparent 0 14px, rgb(0 0 0 / 0.03) 14px 28px)" }}
+    >
+      <span className="flex flex-col items-center gap-1 px-4 font-sans">
+        <span className="rounded-[3px] bg-background px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.8px] text-foreground ring-1 ring-border">Ad</span>
+        <span className="text-[13px] font-semibold text-foreground">{label}</span>
+        <span className="text-[12px] text-muted-foreground">Sized to this slot. Gambling and alcohol blocked.</span>
+      </span>
+    </div>
+  )
+}
+
+export function AdSenseInArticle({ className }: { className?: string }) {
+  return (
+    <figure aria-label="Advertisement" className={cn("my-10 font-sans not-italic", className)} data-sponsor-unit="halftime" data-ad-network="adsense">
+      <AdSenseBox ratio="16/9" label="AdSense in-article ad" />
+      <figcaption className="mt-2">
+        <AdSenseLabel />
+      </figcaption>
+    </figure>
+  )
+}
+
+export function AdSenseInFeed({ ratio = "16/9", rail, size = "md", className }: { ratio?: string; rail?: boolean; size?: StorySize; className?: string }) {
+  return (
+    <article aria-label="Advertisement" data-sponsor-unit="story" data-ad-network="adsense" className={cn("relative flex min-w-0 flex-col gap-3", rail && RAIL_CARD, className)}>
+      <AdSenseBox ratio={ratio} label="AdSense in-feed ad" />
+      <AdSenseLabel className={cn("mt-1", rail && "text-[12px]")} />
+      <p className={cn(DISPLAY, rail ? RAIL_HEADLINE : STORY_HEADLINE[size], "text-muted-foreground")}>Filled by Google when Homestand hasn&apos;t sold this card</p>
+    </article>
   )
 }

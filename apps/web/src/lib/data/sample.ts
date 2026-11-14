@@ -1,5 +1,6 @@
 // Sample data for the MVP screens. Everything is fixed (no Date.now or random)
 // so pages prerender. Replace with the database behind src/lib/data/index.ts.
+import { PLAN_ALLOWANCE, price } from "@/lib/credits"
 import type {
   AdDecision,
   CustomPage,
@@ -53,6 +54,7 @@ export const channels: Channel[] = [
     ],
     adCategoryBlocks: [],
     blockedAgeCategories: ["alcohol"],
+    adsense: { publisherId: "pub-4417280193650042", fillUnsold: true, unsoldSlots: [], blockedCategoriesConfirmed: true },
     followers: 18420,
     youtube: {
       handle: "@footyfixau",
@@ -107,6 +109,7 @@ export const channels: Channel[] = [
     ],
     adCategoryBlocks: [],
     blockedAgeCategories: [],
+    adsense: { publisherId: "pub-9032715548810276", fillUnsold: true, unsoldSlots: ["story", "halftime"], blockedCategoriesConfirmed: true },
     followers: 9310,
     youtube: {
       handle: "@tracksideau",
@@ -556,62 +559,43 @@ export const adDecisions: AdDecision[] = [
   { id: "dec_8f214", at: "11 Nov 2026 09:40:39", channel: "Footy Fix", slot: "end-of-article", outcome: "house", reason: "NO_FILL", locks: { session: { pass: false }, age: { pass: false }, optout: { pass: true } } },
 ]
 
+// The creator pool: half of net Native Format revenue, split by verified minutes (signed-in minutes
+// count in full, logged-out minutes a fifth). See docs/implementation-plan.md, payouts.
+const POOL = { size: 186400, ratePer1000: 15.84, ageVerifiedShare: 0.58 }
+const poolShare = (signedIn: number, loggedOut: number) => Math.round(((signedIn + loggedOut / 5) / 1000) * POOL.ratePer1000)
+
 export const earnings: Earnings[] = [
   {
     channelId: "ch_footyfix",
     period: "13 October to 11 November 2026",
-    total: 4180,
-    ageVerified: 2420,
+    total: poolShare(182000, 410000),
     previousTotal: 2960,
-    byFormat: [
-      { format: "chapter_sponsor", amount: 1420 },
-      { format: "halftime", amount: 1260 },
-      { format: "sponsored_story", amount: 610 },
-      { format: "sponsored_short", amount: 520 },
-      { format: "presented_by", amount: 370 },
-    ],
-    bySponsor: [
-      { name: "Harbour Bet", amount: 2420, ageCategory: "wagering" },
-      { name: "Southern Cross Utes", amount: 1080 },
-      { name: "Kick Boots Co.", amount: 680 },
-    ],
-    byViewer: [
-      { state: "Logged out", impressions: 412000, amount: 1140 },
-      { state: "Signed in", impressions: 96000, amount: 620 },
-      { state: "Confirmed 18+", impressions: 71000, amount: 2420 },
-    ],
+    minutes: { signedIn: 182000, loggedOut: 410000 },
+    pool: POOL,
+    adsense: 120,
   },
   {
     channelId: "ch_trackside",
     period: "13 October to 11 November 2026",
-    total: 3260,
-    ageVerified: 2210,
+    total: poolShare(168000, 188000),
     previousTotal: 2480,
-    byFormat: [
-      { format: "chapter_sponsor", amount: 1310 },
-      { format: "halftime", amount: 980 },
-      { format: "sponsored_story", amount: 420 },
-      { format: "sponsored_short", amount: 290 },
-      { format: "presented_by", amount: 260 },
-    ],
-    bySponsor: [
-      { name: "Harbour Bet", amount: 1640, ageCategory: "wagering" },
-      { name: "Riverside Brewing", amount: 570, ageCategory: "alcohol" },
-      { name: "Southern Cross Utes", amount: 1050 },
-    ],
-    byViewer: [
-      { state: "Logged out", impressions: 188000, amount: 690 },
-      { state: "Signed in", impressions: 52000, amount: 360 },
-      { state: "Confirmed 18+", impressions: 49000, amount: 2210 },
-    ],
+    minutes: { signedIn: 168000, loggedOut: 188000 },
+    pool: POOL,
+    adsense: 640,
   },
 ]
 
 export const sponsors: Sponsor[] = [
-  { id: "sp_ute", name: "Southern Cross Utes", colour: "#0f3d2e", line: "Built for the drive to every away game.", body: "3.5 tonnes of towing on every model, and room in the tray for the whole cheer squad.", cta: "Book a test drive", url: "https://example.com/utes" },
-  { id: "sp_boots", name: "Kick Boots Co.", colour: "#111111", line: "Grip for the wet ones.", body: "Fourteen studs, moulded for Australian grounds in July.", cta: "Shop the range", url: "https://example.com/boots" },
-  { id: "sp_harbour", name: "Harbour Bet", colour: "#0b2545", line: "Racing coverage, every meeting.", body: "Form, fields and results from every Australian meeting. 18+ only. Gamble responsibly.", cta: "Learn more", url: "https://example.com/harbour", ageCategory: "wagering" },
-  { id: "sp_brew", name: "Riverside Brewing", colour: "#7a3e00", line: "Brewed in Abbotsford since 1998.", body: "A 4.6% pale ale, best enjoyed after the siren. 18+ only.", cta: "Find a stockist", url: "https://example.com/brew", ageCategory: "alcohol" },
+  // Footy Fix
+  { id: "sp_ute", channelIds: ["ch_footyfix"], fill: "primary", name: "Southern Cross Utes", colour: "#0f3d2e", line: "Built for the drive to every away game.", body: "3.5 tonnes of towing on every model, and room in the tray for the whole cheer squad.", cta: "Book a test drive", url: "https://example.com/utes" },
+  { id: "sp_boots", channelIds: ["ch_footyfix"], fill: "secondary", name: "Kick Boots Co.", colour: "#111111", line: "Grip for the wet ones.", body: "Fourteen studs, moulded for Australian grounds in July.", cta: "Shop the range", url: "https://example.com/boots" },
+  { id: "sp_harbour", channelIds: ["ch_footyfix"], name: "Harbour Bet", colour: "#0b2545", line: "Every AFL game, every round.", body: "Team news, line-ups and results for every match. 18+ only. Gamble responsibly.", cta: "Learn more", url: "https://example.com/harbour", ageCategory: "wagering" },
+  { id: "sp_brew", channelIds: ["ch_footyfix"], name: "Riverside Brewing", colour: "#7a3e00", line: "Brewed in Abbotsford since 1998.", body: "A 4.6% pale ale, best enjoyed after the siren. 18+ only.", cta: "Find a stockist", url: "https://example.com/brew", ageCategory: "alcohol" },
+  // Trackside
+  { id: "sp_ute_tr", channelIds: ["ch_trackside"], fill: "primary", name: "Southern Cross Utes", colour: "#0f3d2e", line: "Tows the float to every meeting.", body: "3.5 tonnes of towing on every model, from the stables to the track and home again.", cta: "Book a test drive", url: "https://example.com/utes" },
+  { id: "sp_racewear", channelIds: ["ch_trackside"], fill: "secondary", name: "Saddle Lane", colour: "#3d2b56", line: "Dressed for Derby Day.", body: "Race-day suits, hats and fascinators, tailored in Melbourne.", cta: "Shop race day", url: "https://example.com/racewear" },
+  { id: "sp_harbour_tr", channelIds: ["ch_trackside"], name: "Harbour Bet", colour: "#0b2545", line: "Racing coverage, every meeting.", body: "Form, fields and results from every Australian meeting. 18+ only. Gamble responsibly.", cta: "Learn more", url: "https://example.com/harbour", ageCategory: "wagering" },
+  { id: "sp_brew_tr", channelIds: ["ch_trackside"], name: "Riverside Brewing", colour: "#7a3e00", line: "Brewed in Abbotsford since 1998.", body: "A 4.6% pale ale for the members' lawn. 18+ only.", cta: "Find a stockist", url: "https://example.com/brew", ageCategory: "alcohol" },
 ]
 
 export const standaloneArticles: StandaloneArticle[] = [
@@ -684,25 +668,30 @@ export const videoTemplates: VideoTemplate[] = [
   { id: "vt_chalkboard", name: "Chalkboard", tagline: "Tactics drawn on a board: arrows, zones and set plays.", style: "chalkboard", owned: false, price: 79, by: "Studio Halfback", formats: ["long", "short"], bestFor: "Structures and set plays" },
 ]
 
+// AI usage at provider cost plus the margin (lib/credits.ts). Amounts in AUD.
+const usage = (cost: number) => -price(cost)
 export const creditAccount: CreditAccount = {
-  balance: 1240,
-  monthlyIncluded: 2000,
-  usedThisMonth: 1760,
-  cap: 4000,
+  balance: 71.2,
+  monthlyIncluded: PLAN_ALLOWANCE.publisher,
+  usedThisMonth: 18.84,
+  cap: 150,
   renewsOn: "1 December 2026",
   ledger: [
-    { id: "cr_9", at: "12 November 2026", description: "Short video: Round 7 in 60 seconds", credits: -45, publication: "Footy Fix" },
-    { id: "cr_8", at: "11 November 2026", description: "Long-form video: Cox Plate draw explainer, 6 min", credits: -180, publication: "Trackside" },
-    { id: "cr_7", at: "10 November 2026", description: "Top-up: 1,000 credits ($100 inc. GST)", credits: 1000 },
-    { id: "cr_6", at: "9 November 2026", description: "Dubbing: Round 7 in five minutes, Vietnamese", credits: -75, publication: "Footy Fix" },
-    { id: "cr_5", at: "6 November 2026", description: "Extra processing: 4 video hours over the plan", credits: -80, publication: "Footy Fix" },
-    { id: "cr_4", at: "1 November 2026", description: "Monthly allowance, Publisher plan", credits: 2000 },
+    { id: "lg_12", at: "12 November 2026", kind: "charge", description: "Short video: Round 7 in 60 seconds, 58 s", cost: 0.121, amount: usage(0.121), publication: "Footy Fix" },
+    { id: "lg_11", at: "12 November 2026", kind: "release", description: "Render failed and was retried: hold released", amount: 0.15, publication: "Footy Fix" },
+    { id: "lg_10", at: "12 November 2026", kind: "hold", description: "Hold for a render: Round 7 in 60 seconds", amount: -0.15, publication: "Footy Fix" },
+    { id: "lg_9", at: "11 November 2026", kind: "charge", description: "Long-form video: Cox Plate draw explainer, 6 min 12 s", cost: 0.697, amount: usage(0.697), publication: "Trackside" },
+    { id: "lg_8", at: "10 November 2026", kind: "topup", description: "Top-up, card ending 4242", amount: 50 },
+    { id: "lg_7", at: "10 November 2026", kind: "charge", description: "Weekly Fix: 21,400 emails beyond the plan", cost: 12.84, amount: usage(12.84), publication: "Footy Fix" },
+    { id: "lg_6", at: "9 November 2026", kind: "charge", description: "Dubbing: Round 7 in five minutes, Vietnamese", cost: 0.26, amount: usage(0.26), publication: "Footy Fix" },
+    { id: "lg_5", at: "6 November 2026", kind: "charge", description: "Video to article: 4 video hours beyond the plan", cost: 2, amount: usage(2), publication: "Footy Fix" },
+    { id: "lg_4", at: "1 November 2026", kind: "allowance", description: "Monthly allowance, Publisher plan", amount: PLAN_ALLOWANCE.publisher },
   ],
 }
 
 export const madeVideos: MadeVideo[] = [
-  { id: "mv_round7", channelId: "ch_footyfix", title: "Round 7 in 60 seconds", templateId: "vt_countdown", format: "short", seconds: 58, status: "published", credits: 45, createdAt: "12 November 2026", sourceArticleId: "a_ladder" },
-  { id: "mv_coxdraw", channelId: "ch_trackside", title: "Why the Cox Plate draw matters, explained", templateId: "vt_explainer", format: "long", seconds: 372, status: "ready", credits: 180, createdAt: "11 November 2026" },
+  { id: "mv_round7", channelId: "ch_footyfix", title: "Round 7 in 60 seconds", templateId: "vt_countdown", format: "short", seconds: 58, status: "published", charged: 0.15, createdAt: "12 November 2026", sourceArticleId: "a_ladder" },
+  { id: "mv_coxdraw", channelId: "ch_trackside", title: "Why the Cox Plate draw matters, explained", templateId: "vt_explainer", format: "long", seconds: 372, status: "ready", charged: 0.84, createdAt: "11 November 2026" },
 ]
 
 export const customPages: CustomPage[] = [

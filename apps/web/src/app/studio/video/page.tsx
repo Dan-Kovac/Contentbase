@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { SceneFrame } from "@/components/studio/video/scene-frame"
 import { brandKit } from "@/components/studio/video/brand"
 import { buildStoryboard, clock } from "@/components/studio/video/storyboard"
-import { FORMAT_INFO } from "@/lib/credits"
+import { FORMAT_INFO, money } from "@/lib/credits"
 import { getArticle, getCreditAccount, listArticles, listMadeVideos, listVideoTemplates } from "@/lib/data"
 import { currentPublication } from "@/lib/publication"
 
@@ -76,17 +76,17 @@ export default async function VideoHubPage() {
           )}
         </section>
 
-        <aside className="flex flex-col gap-4" aria-label="Credits and templates">
+        <aside className="flex flex-col gap-4" aria-label="AI usage and templates">
           <Link href="/studio/credits" className="group flex flex-col gap-2 rounded-lg border bg-card p-4 outline-none hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring">
             <span className="flex items-center justify-between text-[13px] font-medium text-muted-foreground">
               <span className="flex items-center gap-2">
-                <Coins className="size-4" aria-hidden /> AI credits
+                <Coins className="size-4" aria-hidden /> AI usage
               </span>
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
             </span>
-            <span className="text-[30px] font-bold leading-9 tracking-[-0.6px]">{credits.balance.toLocaleString("en-AU")}</span>
+            <span className="text-[30px] font-bold leading-9 tracking-[-0.6px]">{money(credits.balance)}</span>
             <span className="text-xs leading-[18px] text-muted-foreground">
-              A short costs about 45 credits, a 5-minute explainer about 150. Shared by every publication on your account.
+              A short costs about 15 cents, a 5-minute explainer about 70: provider cost plus 20%. Shared by every publication on your account.
             </span>
           </Link>
           <Link href="/studio/video/templates" className="group flex flex-col gap-2 rounded-lg border bg-card p-4 outline-none hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring">
@@ -121,7 +121,7 @@ export default async function VideoHubPage() {
                     </span>
                   </span>
                   <StatusBadge tone={v.status === "published" ? "published" : "ready"} />
-                  <span className="w-24 text-right text-[13px] text-muted-foreground tabular-nums">{v.credits} credits</span>
+                  <span className="w-24 text-right text-[13px] text-muted-foreground tabular-nums">{money(v.charged)}</span>
                 </li>
               )
             })}

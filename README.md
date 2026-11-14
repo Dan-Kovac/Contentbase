@@ -36,7 +36,8 @@ pnpm typecheck && pnpm lint && pnpm build
 | [docs/implementation-plan.md](docs/implementation-plan.md) | Start here to build: the holes in the design, the pilot scope, data model additions and work packages |
 | [docs/demo-clarity-plan.md](docs/demo-clarity-plan.md) | The demo plan: same-shape ads, channel calls to action, landing page, simplified journey |
 | [docs/email.md](docs/email.md) | Newsletters: streams members choose, the builder, sending domains, deliverability and the Spam Act |
-| [docs/revenue-model.md](docs/revenue-model.md) | Revenue lines beyond subscriptions: ads, AI credits, triple lock licensing, data housing |
+| [docs/revenue-model.md](docs/revenue-model.md) | Revenue lines beyond subscriptions: the ad pool, AdSense, AI at cost plus 20%, triple lock licensing, data housing |
+| [docs/video-engine.md](docs/video-engine.md) | Words to video: the cheapest reliable stack (Remotion, Azure TTS, free stock) and the rate card |
 
 ## Layout
 

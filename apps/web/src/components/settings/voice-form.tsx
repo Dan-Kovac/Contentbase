@@ -12,19 +12,6 @@ import { cn } from "@/lib/utils"
 import type { Channel, VoiceSource } from "@/lib/types"
 import { Panel, PanelBody, PanelFooter, Section } from "./section"
 
-const SAMPLE_SOURCE =
-  "The Blues were insane on Saturday night but their centre bounce work was a mess, they lost the clearances 14-6 and the Pies kicked 4 goals straight out of the middle. Cripps looks a lock for the Brownlow but he can't do it on his own."
-
-const SAMPLE_REWRITE =
-  "Carlton's centre-bounce work fell apart against Collingwood on Saturday night. They lost the clearances 14 to 6, and Collingwood kicked four goals straight out of the middle. Patrick Cripps is still winning his own ball. The problem is who's standing next to him when it spills."
-
-const CHANGES = [
-  "Club names in full: “the Blues” is now Carlton, “the Pies” is Collingwood",
-  "Banned words removed: “insane”, “lock”",
-  "Numbers under ten in words: “4 goals” is now “four goals”",
-  "Explains the why: the last line names the cause, not just the result",
-]
-
 function Highlighted({ text, words }: { text: string; words: string[] }) {
   if (words.length === 0) return <>{text}</>
   const escaped = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
@@ -47,14 +34,50 @@ function Highlighted({ text, words }: { text: string; words: string[] }) {
 
 const ACCEPTED = [".docx", ".pdf", ".md", ".txt"]
 
-const PROFILE = {
-  summary:
-    "Measured and dry, with a sports editor's patience. You lead with the number, then explain the cause. You praise effort without excusing results, and you end on what to watch next rather than a verdict.",
-  phrases: ["The fix may already be on the list", "It isn't an effort problem", "Watch the third quarter again", "Two holes close at once", "The conversation changes"],
-  sentence: { average: 16, short: 38, medium: 47, long: 15 },
-  avoids: ["insane", "unreal", "lock", "smokey", "must-win", "statement game"],
-  example:
-    "Brisbane's forward line didn't go cold on Saturday. It went missing. They had 54 inside-50s and kicked nine goals, and the reason isn't Joe Daniher's kicking. Watch where Charlie Cameron leads from: he's starting deep, so by the time the ball arrives he's already used his space. Move him up the ground for a fortnight and the numbers look different.",
+/** What the voice page shows for each publication: a rough draft, the rewrite, and the learned profile. */
+const SAMPLES = {
+  footyfix: {
+    source:
+      "The Blues were insane on Saturday night but their centre bounce work was a mess, they lost the clearances 14-6 and the Pies kicked 4 goals straight out of the middle. Cripps looks a lock for the Brownlow but he can't do it on his own.",
+    rewrite:
+      "Carlton's centre-bounce work fell apart against Collingwood on Saturday night. They lost the clearances 14 to 6, and Collingwood kicked four goals straight out of the middle. Patrick Cripps is still winning his own ball. The problem is who's standing next to him when it spills.",
+    changes: [
+      "Club names in full: “the Blues” is now Carlton, “the Pies” is Collingwood",
+      "Banned words removed: “insane”, “lock”",
+      "Numbers under ten in words: “4 goals” is now “four goals”",
+      "Explains the why: the last line names the cause, not just the result",
+    ],
+    profile: {
+      summary:
+        "Measured and dry, with a sports editor's patience. You lead with the number, then explain the cause. You praise effort without excusing results, and you end on what to watch next rather than a verdict.",
+      phrases: ["The fix may already be on the list", "It isn't an effort problem", "Watch the third quarter again", "Two holes close at once", "The conversation changes"],
+      sentence: { average: 16, short: 38, medium: 47, long: 15 },
+      avoids: ["insane", "unreal", "lock", "smokey", "must-win", "statement game"],
+      example:
+        "Brisbane's forward line didn't go cold on Saturday. It went missing. They had 54 inside-50s and kicked nine goals, and the reason isn't Joe Daniher's kicking. Watch where Charlie Cameron leads from: he's starting deep, so by the time the ball arrives he's already used his space. Move him up the ground for a fortnight and the numbers look different.",
+    },
+  },
+  trackside: {
+    source:
+      "The colt was a good thing on paper and he bolted in, sat 3 wide the whole way and still won by 2 lengths. Barrier 1 is a certainty to matter on Saturday.",
+    rewrite:
+      "The colt raced three wide the whole way at Flemington and still won by two lengths. That's the run to remember. Barrier one has won four of the last ten Cox Plates, but the horses drawn wide tell you more about Saturday.",
+    changes: [
+      "Banned words removed: “good thing”, “certainty”",
+      "Numbers under ten in words: “2 lengths” is now “two lengths”",
+      "No tipping: a prediction becomes what the numbers show",
+      "Explains the why: the last line says which stat matters and why",
+    ],
+    profile: {
+      summary:
+        "Plain-spoken and exact, like a race caller off the air. You lead with the run, not the result, and you explain barriers, sectionals and track conditions without jargon. You never tip.",
+      phrases: ["The run to remember", "Watch the last 600 metres again", "The track played fair", "A stable that plans in August", "The horses drawn wide tell you more"],
+      sentence: { average: 18, short: 31, medium: 52, long: 17 },
+      avoids: ["good thing", "certainty", "roughie", "bolted in", "smokey", "sure thing"],
+      example:
+        "The Valley's turns punish anything drawn wide, and Saturday was no different. Of the four horses that started from barrier ten or wider, only one finished in the top six, and she had a sit behind the leaders from the 800. Watch the last 600 metres again: the winner never left the fence.",
+    },
+  },
 }
 
 const KIND_ICON: Record<VoiceSource["kind"], typeof FileText> = { upload: FileText, url: Link2, site: Globe }
@@ -73,6 +96,8 @@ function validUrl(v: string) {
 }
 
 export function VoiceForm({ channel }: { channel: Channel }) {
+  const sample = SAMPLES[channel.slug as keyof typeof SAMPLES] ?? SAMPLES.footyfix
+  const PROFILE = sample.profile
   const [tone, setTone] = useState(channel.voice.tone)
   const [banned, setBanned] = useState(channel.voice.bannedWords)
   const [word, setWord] = useState("")
@@ -463,13 +488,13 @@ export function VoiceForm({ channel }: { channel: Channel }) {
             <div className="bg-card p-4 sm:p-5">
               <p className="kicker text-muted-foreground">Rough draft</p>
               <p className="mt-3 font-serif text-[15px] leading-[1.6]">
-                <Highlighted text={SAMPLE_SOURCE} words={banned} />
+                <Highlighted text={sample.source} words={banned} />
               </p>
             </div>
             <div className="bg-card p-4 sm:p-5" aria-live="polite">
               <p className="kicker">In your voice</p>
               {tryState === "done" ? (
-                <p className="mt-3 font-serif text-[15px] leading-[1.6]">{SAMPLE_REWRITE}</p>
+                <p className="mt-3 font-serif text-[15px] leading-[1.6]">{sample.rewrite}</p>
               ) : tryState === "working" ? (
                 <div className="mt-3 grid gap-2" aria-label="Rewriting">
                   {[100, 94, 98, 72, 88].map((w, i) => (
@@ -485,7 +510,7 @@ export function VoiceForm({ channel }: { channel: Channel }) {
             <div className="border-t px-4 py-3 sm:px-5">
               <p className="text-[13px] font-semibold">What changed</p>
               <ul className="mt-1.5 grid gap-1 text-[13px] text-muted-foreground">
-                {CHANGES.map((c) => (
+                {sample.changes.map((c) => (
                   <li key={c} className="flex gap-2">
                     <ArrowRight className="mt-0.5 size-3.5 shrink-0" aria-hidden /> {c}
                   </li>

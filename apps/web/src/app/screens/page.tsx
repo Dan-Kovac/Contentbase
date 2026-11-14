@@ -46,7 +46,7 @@ const GROUPS: Group[] = [
       { href: "/studio/video", name: "Video", what: "Words to video: articles ready to become videos, what's been made, credit balance." },
       { href: "/studio/video/new?article=a_ladder", name: "Make a video", what: "Article to video: template, format, voice and brand kit, an editable storyboard, credit cost, render." },
       { href: "/studio/video/templates", name: "Video templates", what: "Three included, three to buy, each drawn in the publication's brand." },
-      { href: "/studio/credits", name: "AI credits", what: "Balance for the account, allowance, top-ups, spend cap, usage by publication, prices." },
+      { href: "/studio/credits", name: "AI usage", what: "Provider cost plus 20%: dollar balance for the account, allowance, top-ups, cap, the ledger by publication, the rate card." },
       { href: "/studio/email", name: "Email", what: "The publication's newsletters, sent and scheduled emails, sending health." },
       { href: "/studio/email/new?stream=es_weekly", name: "New email", what: "Blocks in your brand or paste your own HTML, draft from this week, preview, checks, send." },
       { href: "/studio/email/subscribers", name: "Subscribers", what: "Import a list with consent; duplicates and past unsubscribes skipped." },

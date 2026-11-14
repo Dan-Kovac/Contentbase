@@ -12,7 +12,7 @@ import {
   TypicalPageSketch,
 } from "@/components/marketing/product-visuals"
 import { TemplatePreview } from "@/components/settings/template-preview"
-import { previewLead } from "@/components/channel/lib"
+import { previewContent } from "@/components/channel/lib"
 import { PublicationsMock } from "@/components/marketing/product-visuals"
 import { SceneFrame } from "@/components/studio/video/scene-frame"
 import { brandKit } from "@/components/studio/video/brand"
@@ -177,7 +177,7 @@ export default function HomePage() {
                 sectionLabels={c.sections.map((s) => s.label)}
                 domain={c.customDomain ?? `${c.slug}.homestand.com.au`}
                 ctaLabel={c.cta.label}
-                lead={previewLead(c)}
+                content={previewContent(c)}
                 maxHeight={380}
               />
               <figcaption className="flex flex-wrap items-baseline gap-x-2 text-[14px]">
@@ -220,14 +220,14 @@ export default function HomePage() {
           <ReviewCardMock />
         </div>
 
-        {/* And the other way: words into video, paid for with AI credits */}
+        {/* And the other way: words into video, paid for as AI usage at cost plus 20% */}
         <div className="mt-14 grid grid-cols-1 items-center gap-8 rounded-lg border bg-card p-5 sm:p-8 lg:grid-cols-[1fr_1.5fr] lg:gap-12">
           <div className="flex flex-col gap-4">
             <p className="kicker">And the other way</p>
             <h3 className="text-[28px] font-extrabold leading-[32px] tracking-[-0.025em]">Write it once. Get the video too.</h3>
             <p className="text-[16px] leading-[25px] text-muted-foreground">
               Any article becomes a video in your brand: a voiceover in your voice, charts and tables from your numbers, big type in your colours. Long-form for YouTube, a short
-              for the feed, or a clip for apps. Three templates come with every plan, more are a click away, and AI credits pay for the rendering.
+              for the feed, or a clip for apps. Three templates come with every plan, more are a click away, and rendering is charged at provider cost plus 20%: about 15 cents a short.
             </p>
             <Link href="/studio/video" className="inline-flex w-fit items-center gap-1.5 text-[14px] font-semibold underline-offset-4 hover:underline">
               See words to video <ArrowRight className="size-4" aria-hidden />

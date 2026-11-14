@@ -28,7 +28,7 @@ const LIBRARY: Tab[] = [
 const VIDEO: Tab[] = [
   { href: "/studio/video", label: "Video" },
   { href: "/studio/video/templates", label: "Templates" },
-  { href: "/studio/credits", label: "AI credits" },
+  { href: "/studio/credits", label: "AI usage" },
 ]
 
 const EMAIL: Tab[] = [
@@ -86,6 +86,11 @@ export function StudioSectionTabs() {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+      )}
+      {(video || email) && (
+        <span className="ml-auto shrink-0 rounded-sm border px-1.5 py-0.5 text-[11px] font-semibold text-muted-foreground" title="Designed and clickable; built after the MVP">
+          Coming after the MVP
+        </span>
       )}
     </nav>
   )

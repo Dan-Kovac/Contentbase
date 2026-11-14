@@ -95,14 +95,14 @@ export default async function StudioHome() {
             >
               <span className="flex items-center justify-between text-[13px] font-medium text-muted-foreground">
                 <span className="flex items-center gap-2">
-                  <Wallet className="size-4" aria-hidden /> Sponsor earnings, 30 days
+                  <Wallet className="size-4" aria-hidden /> Ad earnings, 30 days
                 </span>
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
               </span>
               <span className="text-[30px] font-bold leading-9 tracking-[-0.6px]">${earn.total.toLocaleString("en-AU")}</span>
               <span className="text-xs leading-[18px] text-muted-foreground">
                 <span className="font-semibold text-foreground">{formatPct(pctChange(earn.total, earn.previousTotal))}</span> vs previous 30 days.{" "}
-                ${earn.ageVerified.toLocaleString("en-AU")} from age-verified sponsors. Sample data.
+                Your share of the ad pool, from {Math.round(earn.minutes.signedIn / 1000)}k signed-in minutes, plus ${earn.adsense.toLocaleString("en-AU")} from AdSense. Sample data.
               </span>
             </Link>
           )}

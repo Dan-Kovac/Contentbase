@@ -66,7 +66,7 @@ async function LivePageContent({ params }: { params: Promise<{ channel: string }
               Last updated <time dateTime={blog.updatedIso}>{blog.updatedAt}, {blog.startedAt}</time> · Newest first
             </p>
             {/* TLK-08: live coverage never carries age-restricted sponsors, whatever the viewer's locks. */}
-            <PresentedBy sponsor={sponsorFor("presented")} className="mt-2" />
+            <PresentedBy sponsor={sponsorFor(channel.id, "presented")} className="mt-2" />
           </header>
 
           <ol className="relative mt-2" aria-label="Live updates">
