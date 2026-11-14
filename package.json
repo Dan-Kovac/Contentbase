@@ -6,6 +6,7 @@
     "dev": "pnpm --filter web dev",
     "build": "pnpm --filter web build",
     "lint": "pnpm --filter web lint",
-    "typecheck": "pnpm --filter web exec tsc --noEmit"
+    "typecheck": "pnpm --filter web exec tsc --noEmit",
+    "check:demo": "pnpm --filter web check:demo"
   }
 }

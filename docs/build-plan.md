@@ -2,6 +2,8 @@
 
 How we take Homestand from designed screens to a working pilot. Read with the [PID](pid.md) (requirements, with IDs), the [brief](brief.md) (product decisions), the [brand guidelines](brand/brand-guidelines.md) and the [integrations research](research/integrations.md). Requirement IDs are the unit of work; every commit and PR names them.
 
+> **Update, 14 November 2026:** the [implementation plan](implementation-plan.md) adds multiple publications, words to video, AI credits and email, fixes where this plan still mentions AdSense or Racing-only mode, and breaks the work into packages. Where they disagree, the implementation plan wins.
+
 ## Where we are (11 November 2026)
 
 | Piece | State |
