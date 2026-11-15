@@ -82,17 +82,20 @@ pnpm --filter web start -p 3111 & BASE_URL=http://localhost:3111 pnpm check:demo
 
 ## How work gets done
 
-Work moves in **work packages** (WP-xx in the implementation plan). Each work package is one branch and one pull request. Status lives in [docs/work-queue.md](docs/work-queue.md).
+Work moves in **work packages** (WP-xx in the implementation plan). Each work package is one branch and one pull request into `main`. Status lives in [docs/work-queue.md](docs/work-queue.md).
+
+**Standing permission (Dan, 14 November 2026).** Homestand isn't public yet; it's an early iteration. The build loop may merge its own pull requests into `main` once every check passes, and may run any test it needs. It doesn't need a person to approve each merge.
 
 1. **Pick** the first `todo` package in the queue whose dependencies are `done` and that has no open pull request.
-2. **Branch** `wp/WP-xx-short-name` from the default branch, and mark it `doing` in the queue.
+2. **Branch** from `main`, using the branch the session was given, or `wp/WP-xx-short-name` if there isn't one. Mark the package `doing` in the queue.
 3. **Build** what the package says, behind the screens that already exist. Add tests for anything that moves money or enforces the law: `decide()`, the ledger, entitlements, sanitising.
 4. **Check:** typecheck, lint, build, unit tests and `check:demo` must all pass. Fix and repeat until they do.
 5. **Review:** run `/code-review high --fix`, then re-run the checks.
-6. **Open a pull request** that names the work package and requirement IDs, says what was faked before and is real now, and lists the checks that ran. Mark the package `review` with the pull request link.
-7. **Stop at a decision.** If a package needs a decision, credentials or an account that isn't there, mark it `blocked`, write what's needed in the queue and stop. Don't guess, and don't fake around it.
+6. **Open a pull request** into `main`. It names the work package and requirement IDs, says what was faked before and is real now, and lists the checks that ran. In the same branch, mark the package `done` in the queue and add a line to its log.
+7. **Merge.** When the local checks pass and CI on the pull request is green (or has reported nothing after 20 minutes), squash-merge it. If CI fails, fix it on the branch and try again. If it still fails after three rounds, leave the pull request open, mark the package `blocked` with the failure, and stop.
+8. **Stop at a decision.** If a package needs a decision, credentials or an account that isn't there, mark it `blocked`, write what's needed in the queue and stop. Don't guess, and don't fake around it.
 
-Never merge pull requests, push to the default branch, rewrite history or skip a failing check. A person merges, then marks the package `done`.
+Never merge with a failing check, skip or weaken a test to get green, push straight to `main` without a pull request, force-push `main`, or rewrite its history. One package per run.
 
 ## Writing
 

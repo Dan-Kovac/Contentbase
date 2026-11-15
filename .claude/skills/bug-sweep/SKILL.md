@@ -1,13 +1,13 @@
 ---
 name: bug-sweep
-description: Hunt for bugs and regressions in Homestand - run every check against the default branch, review what merged recently, test the hard rules, and open one issue or fix per real bug. Use when asked to "check for bugs", "run the sweep", or when the nightly scheduled run fires.
+description: Hunt for bugs and regressions in Homestand - run every check against main, review what merged recently, test the hard rules, and fix (and merge) or file each real bug. Use when asked to "check for bugs", "run the sweep", or when the nightly scheduled run fires.
 ---
 
 # Bug sweep
 
 The sweep finds problems; it doesn't build features. Read `CLAUDE.md` first.
 
-## 1. Run everything on the default branch
+## 1. Run everything on `main`
 
 ```bash
 pnpm install && pnpm typecheck && pnpm lint && pnpm build
@@ -48,7 +48,7 @@ Screenshot each publication's home page and a video page at 390 and 1440 wide, p
 ## 5. Report
 
 For each real bug:
-- **If the fix is small and clearly right**, branch `fix/short-name`, fix it with a test that fails before the fix, run every check, and open a pull request.
+- **If the fix is small and clearly right**, fix it on the session's branch (or `fix/short-name`), with a test that fails before the fix. Run every check, open a pull request into `main`, and squash-merge it once local checks and CI pass (the standing permission in CLAUDE.md).
 - **Otherwise** open a GitHub issue with the steps to reproduce, what happens and what should happen.
 
-Add one line to the log in `docs/work-queue.md` with the date, what ran and what was found, even when nothing was. Never merge, and never push to the default branch.
+Add one line to the log in `docs/work-queue.md` with the date, what ran and what was found, even when nothing was. Put it in a fix's pull request, or in its own small pull request. Never push straight to `main`, and never merge with a failing check.

@@ -5,11 +5,10 @@ The build loop reads and updates this file. The packages are defined in [impleme
 **Statuses:**
 - `todo`: ready once its dependencies are done.
 - `doing`: a run is building it.
-- `review`: a pull request is open, waiting for a person.
 - `blocked`: needs a person; see "Needs".
-- `done`: merged.
+- `done`: merged into `main`.
 
-A person sets `done` after merging. A run never edits a package another run marked `doing`.
+Runs merge their own pull requests once every check passes (standing permission in CLAUDE.md), and set `done` in the same pull request. A run never edits a package another run marked `doing`.
 
 ## MVP
 
@@ -42,7 +41,7 @@ A person sets `done` after merging. A run never edits a package another run mark
 
 These can't be automated from a session. Each one unblocks packages.
 
-1. Make one branch the default (rename it `main`), and merge the prototype into it.
+1. In GitHub, make `main` the default branch (Settings, General, Default branch). The loop already works from `main`.
 2. Create the Supabase project (Sydney) and link it to Vercel. Save the keys as secrets in the cloud environment, never in the repo.
 3. Create the Google OAuth client with the YouTube scopes. Add the Anthropic, Deepgram, Mux, Stripe and Resend keys as each package needs them.
 4. Make the decisions marked counsel in the implementation plan, section 8.
